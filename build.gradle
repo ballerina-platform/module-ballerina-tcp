@@ -15,42 +15,68 @@
  *
  */
 
-apply from: "$rootDir/gradle/balNativeLibProject.gradle"
-apply from: "$rootDir/gradle/baseNativeStdLibProject.gradle"
-
-description = 'Ballerina - Socket'
-
-dependencies {
-    baloCreat project(':lib-creator')
-    implementation project(':ballerina-runtime')
-    implementation project(':ballerina-lang')
-    implementation project(':lib-creator')
-
-    testCompile project(':ballerina-runtime-api')
-    testCompile project(':ballerina-lang:annotations')
-    testCompile project(':ballerina-io')
-    testCompile project(':ballerina-log-api')
-    testCompile project(':ballerina-test-utils')
-    testCompile project(':ballerina-core')
-    testCompile project(path: ':ballerina-test-common', configuration: 'tests')
-    testCompile project(':ballerina-file')
-    testCompile 'org.testng:testng'
-    testCompile 'org.awaitility:awaitility'
-    testCompile 'org.slf4j:slf4j-jdk14'
-
-    baloImplementation project(path: ':ballerina-io', configuration: 'baloImplementation')
-    baloImplementation project(path: ':ballerina-java', configuration: 'baloImplementation')
-    baloImplementation project(path: ':ballerina-lang:annotations', configuration: 'baloImplementation')
-    baloImplementation project(path: ':ballerina-log-api', configuration: 'baloImplementation')
-    baloImplementation project(path: ':ballerina-runtime-api', configuration: 'baloImplementation')
+plugins {
+    id "com.github.spotbugs" version "4.0.5"
+    id "com.github.johnrengelman.shadow" version "5.2.0"
+    id "de.undercouch.download" version "4.0.4"
+    id 'maven-publish'
 }
 
-configurations {
-    testCompile.exclude group: 'org.slf4j', module: 'slf4j-log4j12'
-    testCompile.exclude group: 'org.slf4j', module: 'slf4j-simple'
-    testCompile.exclude group: 'org.ops4j.pax.logging', module: 'pax-logging-api'
+ext.ballerinaLangVersion = '1.3.0-SNAPSHOT'
+ext.puppycrawlCheckstyleVersion = "8.18"
+ext.testngVersion = "6.14.3"
+
+allprojects {
+    group = 'org.ballerina.socket'
+    version = '1.3.0-SNAPSHOT'
+
+    apply plugin: 'jacoco'
+
+    repositories {
+        mavenLocal()
+        maven {
+            url = 'https://maven.wso2.org/nexus/content/repositories/releases/'
+        }
+
+        maven {
+            url = 'https://maven.wso2.org/nexus/content/repositories/snapshots/'
+        }
+
+        maven {
+            url = 'https://maven.wso2.org/nexus/content/groups/wso2-public/'
+        }
+
+        maven {
+            url = 'https://maven.wso2.org/nexus/content/repositories/orgballerinalang-1509'
+        }
+
+        maven {
+            url = 'https://repo.maven.apache.org/maven2'
+        }
+    }
 }
 
-createBalo {
-    jvmTarget = 'true'
+subprojects {
+    apply plugin: 'java'
+}
+
+task codeCoverageReport(type: JacocoReport) {
+    executionData fileTree(project.rootDir.absolutePath).include("**/build/coverage-reports/*.exec")
+
+    subprojects.each {
+        sourceSets it.sourceSets.main
+    }
+
+    reports {
+        xml.enabled = true
+        html.enabled = true
+        csv.enabled = true
+        xml.destination = new File("${buildDir}/reports/jacoco/report.xml")
+        html.destination = new File("${buildDir}/reports/jacoco/report.html")
+        csv.destination = new File("${buildDir}/reports/jacoco/report.csv")
+    }
+
+    onlyIf = {
+        true
+    }
 }
