@@ -23,20 +23,8 @@ apply from: "$rootDir/gradle/javaProject.gradle"
 description = 'Ballerinax - Socket Java Utils'
 
 dependencies {
-    
-    testImplementation "org.testng:testng:${testngVersion}"
-
     compile group: 'org.ballerinalang', name: 'ballerina-lang', version: "${ballerinaLangVersion}"
     compile group: 'org.ballerinalang', name: 'ballerina-runtime', version: "${ballerinaLangVersion}"
-    compile group: 'org.slf4j', name: 'slf4j-jdk14', version: '1.7.30'
-    
-    testCompile group: 'org.ballerinalang', name: 'ballerina-core', version: "${ballerinaLangVersion}"
-    testCompile group: 'org.ballerinalang', name: 'ballerina-test-utils', version: "${ballerinaLangVersion}"
-
-}
-
-test {
-    useTestNG() {
-        suites 'src/test/resources/testng.xml'
-    }
+    compile "org.slf4j:slf4j-jdk14:${slf4jVersion}"
+    compile project(":socket-native")
 }
