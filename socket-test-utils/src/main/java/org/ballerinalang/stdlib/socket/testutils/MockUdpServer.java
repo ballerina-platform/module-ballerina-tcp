@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2018 WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.ballerinalang.stdlib.socket;
+package org.ballerinalang.stdlib.socket.testutils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,13 +33,13 @@ import java.util.Iterator;
 import java.util.Set;
 
 /**
- * This UDP server socket will use to mock the backend server.
+ * This server socket will use to mock the backend server.
  */
 public class MockUdpServer implements Runnable {
 
     private static final Logger log = LoggerFactory.getLogger(MockUdpServer.class);
 
-    private static final int SERVER_PORT = 48826;
+    private static final int SERVER_PORT = 48829;
     private boolean execute = true;
     private Selector selector = null;
     private String receivedString;
@@ -78,16 +78,6 @@ public class MockUdpServer implements Runnable {
         }
     }
 
-    private void answerWithEcho(ByteBuffer buffer, SelectionKey key) throws IOException {
-        DatagramChannel channel = (DatagramChannel) key.channel();
-        SocketAddress client = channel.receive(buffer);
-        byte[] readBytes = buffer.array();
-        receivedString = new String(readBytes, StandardCharsets.UTF_8.name()).trim();
-        buffer.flip();
-        channel.send(buffer, client);
-        buffer.clear();
-    }
-
     void stop() {
         execute = false;
         if (selector == null) {
@@ -101,6 +91,15 @@ public class MockUdpServer implements Runnable {
         }
     }
 
+    private void answerWithEcho(ByteBuffer buffer, SelectionKey key) throws IOException {
+        DatagramChannel channel = (DatagramChannel) key.channel();
+        SocketAddress client = channel.receive(buffer);
+        byte[] readBytes = buffer.array();
+        receivedString = new String(readBytes, StandardCharsets.UTF_8.name()).trim();
+        buffer.flip();
+        channel.send(buffer, client);
+        buffer.clear();
+    }
     String getReceivedString() {
         return receivedString;
     }
