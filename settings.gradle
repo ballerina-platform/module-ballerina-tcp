@@ -13,4 +13,7 @@ plugins {
 
 rootProject.name = 'socket'
 include(':build-config:checkstyle')
-include ':socket-generator', ':socket-utils'
+include ':socket-native', ':socket-test-utils', ':socket-ballerina'
+include 'socket-test-utils'
+include 'socket-native'
+
