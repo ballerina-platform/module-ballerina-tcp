@@ -1,0 +1,130 @@
+/*
+ * Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
+import org.apache.tools.ant.taskdefs.condition.Os
+
+apply from: "$rootDir/gradle/mvnPublisher.gradle"
+
+description = 'Ballerinax - Socket Ballerina Generator'
+
+configurations {
+    balTools
+    socketBallerinaBirDir
+    socketBallerinaJar
+}
+
+dependencies {
+    balTools ("org.ballerinalang:jballerina-tools:${ballerinaLangVersion}") {
+        transitive = false
+    }
+    compile project(':socket-native')
+}
+
+
+
+clean {
+    delete "$project.projectDir/target"
+    delete "$project.projectDir/Ballerina.lock"
+}
+
+jar {
+    manifest {
+        attributes('Implementation-Title': project.name,
+                'Implementation-Version': project.version)
+    }
+}
+
+task unzip {
+    doLast {
+        configurations.balTools.resolvedConfiguration.resolvedArtifacts.each { artifact ->
+            copy {
+                from project.zipTree(artifact.getFile())
+                into new File(project.buildDir, "extracted-distribution/")
+            }
+        }
+    }
+}
+
+def artifactSocketBallerinaBirDir = file("$project.projectDir/target/caches/bir_cache/")
+def artifactSocketBallerinaJar = file("$project.projectDir/target/caches/jar_cache/ballerina/socket/ballerina.socket.jar")
+def balSockerJar =  file("$project.projectDir/build/libs/ballerina-socket-${ballerinaLangVersion}.jar")
+
+task ballerinaBuild {
+    dependsOn unzip
+    inputs.dir file(project.projectDir)
+    doLast {
+        exec {
+            workingDir project.projectDir
+            environment "JAVA_OPTS", "-DBALLERINA_DEV_COMPILE_BALLERINA_ORG=true"
+            def distributionBinPath =  project.projectDir.absolutePath + "/build/extracted-distribution/jballerina-tools-${ballerinaLangVersion}/bin"
+            if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+                commandLine 'cmd', '/c', "$distributionBinPath/ballerina.bat build -c -a"
+            } else {
+                commandLine 'sh', '-c', "$distributionBinPath/ballerina build -c -a"
+            }
+        }
+        copy {
+            // Copying the jar from ballerina build
+            from "$project.projectDir/target/caches/jar_cache/ballerina/socket/ballerina-socket-.jar"
+            into "$project.projectDir/target/caches/jar_cache/ballerina/socket/"
+            rename { String fileName ->
+                fileName.replace("ballerina-socket-.jar", artifactSocketBallerinaJar.getName())
+            }
+        }
+        // Copy the BIR to the 0.0.0 folder within it
+        ant.move file: "${artifactSocketBallerinaBirDir}/ballerina/socket/socket.bir",
+                todir: "${artifactSocketBallerinaBirDir}/ballerina/socket/0.0.0/"
+        copy {
+            // Copy the TOML to the same folder as the BIR
+            from file("$project.projectDir/Ballerina.toml")
+            into file("${artifactSocketBallerinaBirDir}/ballerina/socket/0.0.0")
+        }
+
+        copy {
+            from "$project.projectDir/build/libs/socket-generator-${ballerinaLangVersion}.jar"
+            into "$project.projectDir/build/libs/"
+            rename { String fileName ->
+                fileName.replace("socket-generator-${ballerinaLangVersion}.jar", balSockerJar.getName())
+            }
+        }
+    }
+    outputs.dir artifactSocketBallerinaBirDir
+    outputs.file artifactSocketBallerinaJar
+}
+
+artifacts {
+
+    socketBallerinaBirDir file: artifactSocketBallerinaBirDir, builtBy: ballerinaBuild
+    socketBallerinaJar file: artifactSocketBallerinaJar, builtBy: ballerinaBuild
+
+}
+
+task createArtifactZip(type: Zip) {
+    destinationDirectory = file("$buildDir/distributions")
+    from ballerinaBuild
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifact source: createArtifactZip, extension: 'zip'
+        }
+    }
+}
+ballerinaBuild.dependsOn ":socket-native:build"
+ballerinaBuild.dependsOn ":socket-test-utils:build"
+build.dependsOn ballerinaBuild
