@@ -118,3 +118,4 @@ publishing {
 }
 
 spotbugsMain.finalizedBy validateSpotbugs
+checkstyleMain.dependsOn(":build-config:checkstyle:downloadMultipleFiles")
