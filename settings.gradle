@@ -17,3 +17,9 @@ include ':socket-native', ':socket-test-utils', ':socket-ballerina'
 include 'socket-test-utils'
 include 'socket-native'
 
+gradleEnterprise {
+    buildScan {
+        termsOfServiceUrl = 'https://gradle.com/terms-of-service'
+        termsOfServiceAgree = 'yes'
+    }
+}
