@@ -20,7 +20,7 @@ plugins {
 }
 apply from: "$rootDir/gradle/javaProject.gradle"
 
-description = 'Ballerinax - Socket Java Utils'
+description = 'Ballerina - Socket Java Utils'
 
 dependencies {
     compile group: 'org.ballerinalang', name: 'ballerina-lang', version: "${ballerinaLangVersion}"
