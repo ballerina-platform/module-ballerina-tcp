@@ -34,8 +34,6 @@ dependencies {
     compile project(':socket-native')
 }
 
-
-
 clean {
     delete "$project.projectDir/target"
     delete "$project.projectDir/Ballerina.lock"
@@ -72,9 +70,9 @@ task ballerinaBuild {
             environment "JAVA_OPTS", "-DBALLERINA_DEV_COMPILE_BALLERINA_ORG=true"
             def distributionBinPath =  project.projectDir.absolutePath + "/build/extracted-distribution/jballerina-tools-${ballerinaLangVersion}/bin"
             if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-                commandLine 'cmd', '/c', "$distributionBinPath/ballerina.bat build -c -a"
+                commandLine 'cmd', '/c', "$distributionBinPath/ballerina.bat build --code-coverage -c -a"
             } else {
-                commandLine 'sh', '-c', "$distributionBinPath/ballerina build -c -a"
+                commandLine 'sh', '-c', "$distributionBinPath/ballerina build --code-coverage -c -a "
             }
         }
         copy {

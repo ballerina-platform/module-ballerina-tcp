@@ -83,6 +83,11 @@ function testContentReceiveWithLength() {
     checkpanic socketClient->close();
 }
 
+@test:AfterSuite
+function stopAll() {
+    var result = stopUdpServer();
+}
+
 function receiveClientContent(UdpClient socketClient) returns string {
     string returnStr = "";
     var result = socketClient->receiveFrom();
@@ -101,11 +106,6 @@ function receiveClientContent(UdpClient socketClient) returns string {
         test:assertFail(msg = errMsg is string ? errMsg : "Error in socket client receiveFrom()");
     }
     return returnStr;
-}
-
-@test:AfterSuite
-function stopAll() {
-    var result = stopUdpServer();
 }
 
 public function startUdpServer() returns Error? = @java:Method {

@@ -40,7 +40,7 @@ service echo on echoEP {
                 io:println("Write error!!!");
                 error writeError = writeResult;
                 string errMsg = <string>writeError.detail()["message"];
-                resp.statusCode = 500;
+                resp.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
                 resp.setPayload(errMsg);
                 var responseError = caller->respond(resp);
                 if (responseError is error) {
@@ -51,7 +51,7 @@ service echo on echoEP {
         } else {
             error err = payload;
             string errMsg = <string>err.detail()["message"];
-            resp.statusCode = 500;
+            resp.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
             resp.setPayload(<@untainted> errMsg);
             var responseError = caller->respond(resp);
             if (responseError is error) {

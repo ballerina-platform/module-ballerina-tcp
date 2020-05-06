@@ -78,7 +78,7 @@ function testHttpClientEcho() {
     var response = clientEndpoint->post("/echo", requestMessage);
 
     if (response is http:Response) {
-        test:assertEquals(response.statusCode, 202, "Unexpected response code");
+        test:assertEquals(response.statusCode, http:STATUS_ACCEPTED, "Unexpected response code");
     } else {
         string? errMsg = response.detail()?.message;
         test:assertFail(msg = errMsg is string ? errMsg : "Error in http post request");
