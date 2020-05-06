@@ -145,7 +145,7 @@ function invalidAddress() returns error? {
 }
 
 function createClient() {
-    Client socketClient = new ({host: "localhost", port: PORT4});
+    Client socketClient = new ({host: "localhost", port: PORT6});
 }
 
 function readClientMessage(Client socketClient) returns @tainted string|error {
