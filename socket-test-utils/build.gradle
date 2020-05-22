@@ -28,3 +28,25 @@ dependencies {
     compile "org.slf4j:slf4j-jdk14:${slf4jVersion}"
     compile project(":socket-native")
 }
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            groupId "org.ballerinalang"
+            artifactId "socket-test-utils"
+            version = project.version
+            artifact jar
+        }
+    }
+
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/BuddhiWathsala/module-ballerina-socket")
+            credentials {
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
+            }
+        }
+    }
+}
