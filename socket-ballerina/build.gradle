@@ -17,8 +17,6 @@
 
 import org.apache.tools.ant.taskdefs.condition.Os
 
-apply from: "$rootDir/gradle/mvnPublisher.gradle"
-
 description = 'Ballerina - Socket Ballerina Generator'
 
 configurations {
@@ -65,14 +63,23 @@ task ballerinaBuild {
     dependsOn unzip
     inputs.dir file(project.projectDir)
     doLast {
+        def distributionBinPath =  project.projectDir.absolutePath + "/build/extracted-distribution/jballerina-tools-${ballerinaLangVersion}/bin"
         exec {
             workingDir project.projectDir
             environment "JAVA_OPTS", "-DBALLERINA_DEV_COMPILE_BALLERINA_ORG=true"
-            def distributionBinPath =  project.projectDir.absolutePath + "/build/extracted-distribution/jballerina-tools-${ballerinaLangVersion}/bin"
             if (Os.isFamily(Os.FAMILY_WINDOWS)) {
                 commandLine 'cmd', '/c', "$distributionBinPath/ballerina.bat build --code-coverage -c -a"
             } else {
                 commandLine 'sh', '-c', "$distributionBinPath/ballerina build --code-coverage -c -a "
+            }
+        }
+        exec {
+            workingDir project.projectDir
+            environment "JAVA_OPTS", "-DBALLERINA_DEV_COMPILE_BALLERINA_ORG=true"
+            if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+                commandLine 'cmd', '/c', "$distributionBinPath/ballerina.bat build --code-coverage -c -a"
+            } else {
+                commandLine 'sh', '-c', "$distributionBinPath/ballerina doc -a "
             }
         }
         copy {
@@ -120,6 +127,17 @@ publishing {
     publications {
         mavenJava(MavenPublication) {
             artifact source: createArtifactZip, extension: 'zip'
+        }
+    }
+
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/ballerina-platform/module-ballerina-socket")
+            credentials {
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
+            }
         }
     }
 }
