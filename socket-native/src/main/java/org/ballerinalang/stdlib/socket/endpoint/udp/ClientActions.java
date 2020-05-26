@@ -125,7 +125,10 @@ public class ClientActions {
     private static String getHostFromAddress(MapValue<BString, Object> addressRecord) {
         String host = null;
         try {
-            host = addressRecord.getStringValue(StringUtils.fromString(SocketConstants.CONFIG_FIELD_HOST)).getValue();
+            BString bHost = addressRecord.getStringValue(StringUtils.fromString(SocketConstants.CONFIG_FIELD_HOST));
+            if (bHost != null) {
+                host = bHost.getValue();
+            }
         } catch (NullPointerException e) {
             host = null;
         }
