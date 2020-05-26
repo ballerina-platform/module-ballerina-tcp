@@ -20,9 +20,11 @@ package org.ballerinalang.stdlib.socket.tcp;
 
 import org.ballerinalang.jvm.BallerinaErrors;
 import org.ballerinalang.jvm.BallerinaValues;
+import org.ballerinalang.jvm.StringUtils;
 import org.ballerinalang.jvm.values.ErrorValue;
 import org.ballerinalang.jvm.values.MapValue;
 import org.ballerinalang.jvm.values.ObjectValue;
+import org.ballerinalang.jvm.values.api.BString;
 import org.ballerinalang.stdlib.socket.SocketConstants;
 
 import java.net.Socket;
@@ -75,8 +77,8 @@ public class SocketUtils {
         return BallerinaErrors.createError(code.errorCode(), createDetailRecord(errMsg, null));
     }
 
-    private static MapValue<String, Object> createDetailRecord(Object... values) {
-        MapValue<String, Object> detail = BallerinaValues.createRecordValue(SOCKET_PACKAGE_ID, DETAIL_RECORD_TYPE_NAME);
+    private static MapValue<BString, Object> createDetailRecord(Object... values) {
+        MapValue<BString, Object> detail = BallerinaValues.createRecordValue(SOCKET_PACKAGE_ID, DETAIL_RECORD_TYPE_NAME);
         return BallerinaValues.createRecord(detail, values);
     }
 
@@ -99,11 +101,11 @@ public class SocketUtils {
         if (client != null) {
             caller.addNativeData(SOCKET_KEY, client);
             Socket socket = client.socket();
-            caller.set(REMOTE_PORT, socket.getPort());
-            caller.set(LOCAL_PORT, socket.getLocalPort());
-            caller.set(REMOTE_ADDRESS, socket.getInetAddress().getHostAddress());
-            caller.set(LOCAL_ADDRESS, socket.getLocalAddress().getHostAddress());
-            caller.set(ID, client.hashCode());
+            caller.set(StringUtils.fromString(REMOTE_PORT), socket.getPort());
+            caller.set(StringUtils.fromString(LOCAL_PORT), socket.getLocalPort());
+            caller.set(StringUtils.fromString(REMOTE_ADDRESS), socket.getInetAddress().getHostAddress());
+            caller.set(StringUtils.fromString(LOCAL_ADDRESS), socket.getLocalAddress().getHostAddress());
+            caller.set(StringUtils.fromString(ID), client.hashCode());
         }
         return caller;
     }

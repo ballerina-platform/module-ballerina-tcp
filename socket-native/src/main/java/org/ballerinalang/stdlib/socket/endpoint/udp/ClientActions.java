@@ -17,10 +17,12 @@
  */
 package org.ballerinalang.stdlib.socket.endpoint.udp;
 
+import org.ballerinalang.jvm.StringUtils;
 import org.ballerinalang.jvm.scheduling.Scheduler;
 import org.ballerinalang.jvm.values.ArrayValue;
 import org.ballerinalang.jvm.values.MapValue;
 import org.ballerinalang.jvm.values.ObjectValue;
+import org.ballerinalang.jvm.values.api.BString;
 import org.ballerinalang.jvm.values.connector.NonBlockingCallback;
 import org.ballerinalang.stdlib.socket.SocketConstants;
 import org.ballerinalang.stdlib.socket.exceptions.SelectorInitializeException;
@@ -86,16 +88,16 @@ public class ClientActions {
             client.addNativeData(SOCKET_KEY, socketChannel);
             client.addNativeData(IS_CLIENT, true);
             if (address != null) {
-                MapValue<String, Object> addressRecord = (MapValue<String, Object>) address;
-                String host = addressRecord.getStringValue(SocketConstants.CONFIG_FIELD_HOST);
-                int port = addressRecord.getIntValue(SocketConstants.CONFIG_FIELD_PORT).intValue();
+                MapValue<BString, Object> addressRecord = (MapValue<BString, Object>) address;
+                String host = getHostFromAddress(addressRecord);
+                int port = addressRecord.getIntValue(StringUtils.fromString(SocketConstants.CONFIG_FIELD_PORT)).intValue();
                 if (host == null) {
                     socketChannel.bind(new InetSocketAddress(port));
                 } else {
                     socketChannel.bind(new InetSocketAddress(host, port));
                 }
             }
-            long timeout = config.getIntValue(READ_TIMEOUT);
+            long timeout = config.getIntValue(StringUtils.fromString(READ_TIMEOUT));
             socketService = new SocketService(socketChannel, Scheduler.getStrand().scheduler, null, timeout);
             client.addNativeData(SOCKET_SERVICE, socketService);
             selectorManager = SelectorManager.getInstance();
@@ -120,6 +122,16 @@ public class ClientActions {
         return null;
     }
 
+    private static String getHostFromAddress(MapValue<BString, Object> addressRecord) {
+        String host = null;
+        try {
+            host = addressRecord.getStringValue(StringUtils.fromString(SocketConstants.CONFIG_FIELD_HOST)).getValue();
+        } catch (NullPointerException e) {
+            host = null;
+        }
+        return host;
+    }
+
     public static Object receiveFrom(ObjectValue client, long length) {
         final NonBlockingCallback callback = new NonBlockingCallback(Scheduler.getStrand());
         if (length != DEFAULT_EXPECTED_READ_LENGTH && length < 1) {
@@ -140,8 +152,8 @@ public class ClientActions {
 
     public static Object sendTo(ObjectValue client, ArrayValue content, MapValue<String, Object> address) {
         DatagramChannel socket = (DatagramChannel) client.getNativeData(SocketConstants.SOCKET_KEY);
-        String host = address.getStringValue(SocketConstants.CONFIG_FIELD_HOST);
-        int port = address.getIntValue(SocketConstants.CONFIG_FIELD_PORT).intValue();
+        String host = address.getStringValue(StringUtils.fromString(SocketConstants.CONFIG_FIELD_HOST)).getValue();
+        int port = address.getIntValue(StringUtils.fromString(SocketConstants.CONFIG_FIELD_PORT)).intValue();
         byte[] byteContent = content.getBytes();
         if (log.isDebugEnabled()) {
             log.debug(String.format("No of byte going to write[%d]: %d", socket.hashCode(), byteContent.length));
