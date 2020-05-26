@@ -18,6 +18,7 @@
 
 package org.ballerinalang.stdlib.socket.endpoint.tcp;
 
+import org.ballerinalang.jvm.StringUtils;
 import org.ballerinalang.jvm.scheduling.Scheduler;
 import org.ballerinalang.jvm.values.MapValue;
 import org.ballerinalang.jvm.values.ObjectValue;
@@ -60,7 +61,7 @@ public class ServerActions {
             listener.addNativeData(SocketConstants.SERVER_SOCKET_KEY, serverSocket);
             listener.addNativeData(SocketConstants.LISTENER_CONFIG, config);
             listener.addNativeData(SocketConstants.CONFIG_FIELD_PORT, (int) port);
-            final long timeout = config.getIntValue(READ_TIMEOUT);
+            final long timeout = config.getIntValue(StringUtils.fromString(READ_TIMEOUT));
             listener.addNativeData(READ_TIMEOUT, timeout);
         } catch (SocketException e) {
             return SocketUtils.createSocketError("unable to bind the socket port");

@@ -18,11 +18,13 @@
 
 package org.ballerinalang.stdlib.socket.endpoint.tcp;
 
+import org.ballerinalang.jvm.StringUtils;
 import org.ballerinalang.jvm.scheduling.Scheduler;
 import org.ballerinalang.jvm.values.ArrayValue;
 import org.ballerinalang.jvm.values.ErrorValue;
 import org.ballerinalang.jvm.values.MapValue;
 import org.ballerinalang.jvm.values.ObjectValue;
+import org.ballerinalang.jvm.values.api.BString;
 import org.ballerinalang.jvm.values.connector.NonBlockingCallback;
 import org.ballerinalang.stdlib.socket.SocketConstants;
 import org.ballerinalang.stdlib.socket.exceptions.SelectorInitializeException;
@@ -56,7 +58,7 @@ import static java.nio.channels.SelectionKey.OP_READ;
 public class ClientActions {
     private static final Logger log = LoggerFactory.getLogger(ClientActions.class);
 
-    public static Object initEndpoint(ObjectValue client, MapValue<String, Object> config) {
+    public static Object initEndpoint(ObjectValue client, MapValue<BString, Object> config) {
         Object returnValue = null;
         try {
             SocketChannel socketChannel = SocketChannel.open();
@@ -64,9 +66,11 @@ public class ClientActions {
             socketChannel.socket().setReuseAddress(true);
             client.addNativeData(SocketConstants.SOCKET_KEY, socketChannel);
             client.addNativeData(SocketConstants.IS_CLIENT, true);
-            ObjectValue callbackService = (ObjectValue) config.get(SocketConstants.CLIENT_SERVICE_CONFIG);
+            ObjectValue callbackService = (ObjectValue) config.get(
+                    StringUtils.fromString(SocketConstants.CLIENT_SERVICE_CONFIG)
+            );
             client.addNativeData(SocketConstants.CLIENT_CONFIG, config);
-            final long readTimeout = config.getIntValue(SocketConstants.READ_TIMEOUT);
+            final long readTimeout = config.getIntValue(StringUtils.fromString(SocketConstants.READ_TIMEOUT));
             client.addNativeData(SocketConstants.SOCKET_SERVICE,
                     new SocketService(socketChannel, Scheduler.getStrand().scheduler, callbackService, readTimeout));
         } catch (SocketException e) {
@@ -162,8 +166,8 @@ public class ClientActions {
             channel = (SocketChannel) client.getNativeData(SocketConstants.SOCKET_KEY);
             MapValue<String, Object> config =
                     (MapValue<String, Object>) client.getNativeData(SocketConstants.CLIENT_CONFIG);
-            int port = Math.toIntExact(config.getIntValue(SocketConstants.CONFIG_FIELD_PORT));
-            String host = config.getStringValue(SocketConstants.CONFIG_FIELD_HOST);
+            int port = Math.toIntExact(config.getIntValue(StringUtils.fromString(SocketConstants.CONFIG_FIELD_PORT)));
+            String host = config.getStringValue(StringUtils.fromString(SocketConstants.CONFIG_FIELD_HOST)).getValue();
             channel.connect(new InetSocketAddress(host, port));
             channel.finishConnect();
             channel.configureBlocking(false);
