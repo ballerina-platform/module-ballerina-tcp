@@ -22,6 +22,7 @@ import org.ballerinalang.jvm.StringUtils;
 import org.ballerinalang.jvm.scheduling.Scheduler;
 import org.ballerinalang.jvm.values.MapValue;
 import org.ballerinalang.jvm.values.ObjectValue;
+import org.ballerinalang.jvm.values.api.BString;
 import org.ballerinalang.jvm.values.connector.NonBlockingCallback;
 import org.ballerinalang.stdlib.socket.SocketConstants;
 import org.ballerinalang.stdlib.socket.exceptions.SelectorInitializeException;
@@ -53,7 +54,7 @@ import static org.ballerinalang.stdlib.socket.SocketConstants.READ_TIMEOUT;
 public class ServerActions {
     private static final Logger log = LoggerFactory.getLogger(ServerActions.class);
 
-    public static Object initServer(ObjectValue listener, long port, MapValue<String, Object> config) {
+    public static Object initServer(ObjectValue listener, long port, MapValue<BString, Object> config) {
         try {
             ServerSocketChannel serverSocket = ServerSocketChannel.open();
             serverSocket.configureBlocking(false);
@@ -92,8 +93,8 @@ public class ServerActions {
             ServerSocketChannel channel =
                     (ServerSocketChannel) listener.getNativeData(SocketConstants.SERVER_SOCKET_KEY);
             int port = (int) listener.getNativeData(SocketConstants.CONFIG_FIELD_PORT);
-            MapValue<String, Object> config =
-                    (MapValue<String, Object>) listener.getNativeData(SocketConstants.LISTENER_CONFIG);
+            MapValue<BString, Object> config =
+                    (MapValue<BString, Object>) listener.getNativeData(SocketConstants.LISTENER_CONFIG);
             String networkInterface = (String) config.getNativeData(SocketConstants.CONFIG_FIELD_INTERFACE);
             if (networkInterface == null) {
                 channel.bind(new InetSocketAddress(port));
