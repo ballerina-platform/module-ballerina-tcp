@@ -164,8 +164,8 @@ public class ClientActions {
         SocketChannel channel = null;
         try {
             channel = (SocketChannel) client.getNativeData(SocketConstants.SOCKET_KEY);
-            MapValue<String, Object> config =
-                    (MapValue<String, Object>) client.getNativeData(SocketConstants.CLIENT_CONFIG);
+            MapValue<BString, Object> config =
+                    (MapValue<BString, Object>) client.getNativeData(SocketConstants.CLIENT_CONFIG);
             int port = Math.toIntExact(config.getIntValue(StringUtils.fromString(SocketConstants.CONFIG_FIELD_PORT)));
             String host = config.getStringValue(StringUtils.fromString(SocketConstants.CONFIG_FIELD_HOST)).getValue();
             channel.connect(new InetSocketAddress(host, port));

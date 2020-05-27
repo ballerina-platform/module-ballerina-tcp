@@ -77,7 +77,7 @@ public class ClientActions {
     }
 
     public static Object initEndpoint(ObjectValue client, Object address,
-                                      MapValue<String, Object> config) {
+                                      MapValue<BString, Object> config) {
         final NonBlockingCallback callback = new NonBlockingCallback(Scheduler.getStrand());
         SelectorManager selectorManager;
         SocketService socketService;
@@ -153,7 +153,7 @@ public class ClientActions {
         return null;
     }
 
-    public static Object sendTo(ObjectValue client, ArrayValue content, MapValue<String, Object> address) {
+    public static Object sendTo(ObjectValue client, ArrayValue content, MapValue<BString, Object> address) {
         DatagramChannel socket = (DatagramChannel) client.getNativeData(SocketConstants.SOCKET_KEY);
         String host = address.getStringValue(StringUtils.fromString(SocketConstants.CONFIG_FIELD_HOST)).getValue();
         int port = address.getIntValue(StringUtils.fromString(SocketConstants.CONFIG_FIELD_PORT)).intValue();

@@ -47,7 +47,7 @@ function testContentReceive() {
     int udpPort = 48827;
     UdpClient socketClient = new ({port: udpPort});
     string msg = "This is server";
-    var reuslt = passUdpContent(java:fromString(msg), udpPort);
+    var reuslt = passUdpContent(msg, udpPort);
     string readContent = receiveClientContent(socketClient);
     test:assertEquals(readContent, msg, "Found unexpected output");
     checkpanic socketClient->close();
@@ -60,7 +60,7 @@ function testContentReceiveWithLength() {
     int udpPort = 48828;
 
     string msg = "This is going to be a tricky";
-    var reuslt = passUdpContent(java:fromString(msg), udpPort);
+    var reuslt = passUdpContent(msg, udpPort);
 
     UdpClient socketClient = new ({host: "localhost", port: udpPort});
     string returnStr = "";
@@ -116,6 +116,6 @@ public function stopUdpServer() returns Error? = @java:Method {
     class: "org/ballerinalang/stdlib/socket/testutils/MockServerUtils"
 } external;
 
-public function passUdpContent(handle content, int port) returns Error? = @java:Method {
+public function passUdpContent(string content, int port) returns Error? = @java:Method {
     class: "org/ballerinalang/stdlib/socket/testutils/MockServerUtils"
 } external;

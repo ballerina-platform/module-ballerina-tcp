@@ -18,6 +18,7 @@
 
 package org.ballerinalang.stdlib.socket.testutils;
 
+import org.ballerinalang.jvm.values.api.BString;
 import org.ballerinalang.stdlib.socket.tcp.SocketUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,9 +50,9 @@ public class MockServerUtils {
         return null;
     }
 
-    public static Object passUdpContent(String serverContent, int port) {
+    public static Object passUdpContent(BString serverContent, int port) {
         ExecutorService client = Executors.newSingleThreadExecutor();
-        client.execute(() -> sendUdpContent(serverContent, port));
+        client.execute(() -> sendUdpContent(serverContent.getValue(), port));
         return null;
     }
 
