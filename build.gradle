@@ -21,14 +21,14 @@ plugins {
     id "de.undercouch.download" version "4.0.4"
 }
 
-ext.ballerinaLangVersion = '2.0.0-SNAPSHOT'
+ext.ballerinaLangVersion = project.version
 ext.puppycrawlCheckstyleVersion = "8.18"
 ext.testngVersion = "6.14.3"
 ext.slf4jVersion = "1.7.30"
 
 allprojects {
     group = 'org.ballerinalang'
-    version = '2.0.0-SNAPSHOT'
+    version = project.version
 
     apply plugin: 'jacoco'
     apply plugin: 'maven-publish'

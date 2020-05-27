@@ -7,14 +7,14 @@ target = "java8"
 
     [[platform.libraries]]
     artifactId = "socket"
-    version = "2.0.0-SNAPSHOT"
-    path = "../socket-native/build/libs/socket-native-2.0.0-SNAPSHOT.jar"
+    version = "@project.version@"
+    path = "../socket-native/build/libs/socket-native-@project.version@.jar"
     groupId = "ballerina"
     modules = ["socket"]
 
     [[platform.libraries]]
     artifactId = "socket"
-    version = "2.0.0-SNAPSHOT"
-    path = "../socket-test-utils/build/libs/socket-test-utils-2.0.0-SNAPSHOT.jar"
+    version = "@project.version@"
+    path = "../socket-test-utils/build/libs/socket-test-utils-@project.version@.jar"
     groupId = "org.ballerinalang.stdlib.socket"
     modules = ["socket"]
