@@ -55,14 +55,20 @@ task unzip {
     }
 }
 
+def ballerinaConfigFile = new File("$project.projectDir/Ballerina.toml")
+def balProjectVersion = ballerinaConfigFile.text.split("\n")[2].split("=")[1].split("\"")[1]
 def artifactSocketBallerinaBirDir = file("$project.projectDir/target/caches/bir_cache/")
-def artifactSocketBallerinaJar = file("$project.projectDir/target/caches/jar_cache/ballerina/socket/ballerina.socket.jar")
+def artifactSocketBallerinaJar = file("$project.projectDir/target/caches/jar_cache/ballerina/socket/${balProjectVersion}/ballerina-socket-${balProjectVersion}.jar")
 def balSockerJar =  file("$project.projectDir/build/libs/ballerina-socket-${ballerinaLangVersion}.jar")
 
 task ballerinaBuild {
     dependsOn unzip
     inputs.dir file(project.projectDir)
     doLast {
+        def originalConfig = ballerinaConfigFile.text
+        def newConfig = ballerinaConfigFile.text.replace("@project.version@", project.version)
+        ballerinaConfigFile.text = newConfig
+
         def distributionBinPath =  project.projectDir.absolutePath + "/build/extracted-distribution/jballerina-tools-${ballerinaLangVersion}/bin"
         exec {
             workingDir project.projectDir
@@ -82,21 +88,11 @@ task ballerinaBuild {
                 commandLine 'sh', '-c', "$distributionBinPath/ballerina doc -a "
             }
         }
-        copy {
-            // Copying the jar from ballerina build
-            from "$project.projectDir/target/caches/jar_cache/ballerina/socket/ballerina-socket-.jar"
-            into "$project.projectDir/target/caches/jar_cache/ballerina/socket/"
-            rename { String fileName ->
-                fileName.replace("ballerina-socket-.jar", artifactSocketBallerinaJar.getName())
-            }
-        }
-        // Copy the BIR to the 0.0.0 folder within it
-        ant.move file: "${artifactSocketBallerinaBirDir}/ballerina/socket/socket.bir",
-                todir: "${artifactSocketBallerinaBirDir}/ballerina/socket/0.0.0/"
+
         copy {
             // Copy the TOML to the same folder as the BIR
             from file("$project.projectDir/Ballerina.toml")
-            into file("${artifactSocketBallerinaBirDir}/ballerina/socket/0.0.0")
+            into file("${artifactSocketBallerinaBirDir}/ballerina/socket/${balProjectVersion}")
         }
 
         copy {
@@ -106,6 +102,7 @@ task ballerinaBuild {
                 fileName.replace("socket-generator-${ballerinaLangVersion}.jar", balSockerJar.getName())
             }
         }
+        ballerinaConfigFile.text = originalConfig
     }
     outputs.dir artifactSocketBallerinaBirDir
     outputs.file artifactSocketBallerinaJar
