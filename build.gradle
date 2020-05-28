@@ -58,6 +58,10 @@ allprojects {
         maven {
             url = 'https://maven.pkg.github.com/ballerina-platform/module-ballerina-socket'
         }
+
+        maven {
+            url = "https://maven.wso2.org/nexus/service/local/repositories/orgballerinalang-1577/content"
+        }
     }
 }
 
