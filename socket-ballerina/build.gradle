@@ -59,6 +59,7 @@ def ballerinaConfigFile = new File("$project.projectDir/Ballerina.toml")
 def balProjectVersion = ballerinaConfigFile.text.split("\n")[2].split("=")[1].split("\"")[1]
 def artifactSocketBallerinaBirDir = file("$project.projectDir/target/caches/bir_cache/")
 def artifactSocketBallerinaJar = file("$project.projectDir/target/caches/jar_cache/ballerina/socket/${balProjectVersion}/ballerina-socket-${balProjectVersion}.jar")
+def artifactSocketBallerinaDocs = file("$project.projectDir/build/apidocs/")
 def balSockerJar =  file("$project.projectDir/build/libs/ballerina-socket-${ballerinaLangVersion}.jar")
 
 task ballerinaBuild {
@@ -96,15 +97,14 @@ task ballerinaBuild {
         }
 
         copy {
-            from "$project.projectDir/build/libs/socket-generator-${ballerinaLangVersion}.jar"
-            into "$project.projectDir/build/libs/"
-            rename { String fileName ->
-                fileName.replace("socket-generator-${ballerinaLangVersion}.jar", balSockerJar.getName())
-            }
+            from file("$project.projectDir/target/apidocs/socket")
+            into file("$project.projectDir/build/apidocs/docs/socket")
         }
         ballerinaConfigFile.text = originalConfig
     }
+
     outputs.dir artifactSocketBallerinaBirDir
+    outputs.dir artifactSocketBallerinaDocs
     outputs.file artifactSocketBallerinaJar
 }
 
