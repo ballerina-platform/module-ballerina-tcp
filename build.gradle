@@ -21,7 +21,7 @@ plugins {
     id "de.undercouch.download" version "4.0.4"
 }
 
-ext.ballerinaLangVersion = project.version
+ext.ballerinaLangVersion = "2.0.0-Preview1-M3"
 ext.puppycrawlCheckstyleVersion = "8.18"
 ext.testngVersion = "6.14.3"
 ext.slf4jVersion = "1.7.30"
