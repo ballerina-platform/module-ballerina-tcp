@@ -56,11 +56,10 @@ task unzip {
 }
 
 def ballerinaConfigFile = new File("$project.projectDir/Ballerina.toml")
-def balProjectVersion = ballerinaConfigFile.text.split("\n")[2].split("=")[1].split("\"")[1]
 def artifactSocketBallerinaDocs = file("$project.projectDir/build/docs_parent/")
 def artifactSocketCacheParent = file("$project.projectDir/build/cache_parent/")
 def artifactSocketLibParent = file("$project.projectDir/build/lib_parent/")
-def targetSocketBallerinaJar = file("$project.projectDir/target/caches/jar_cache/ballerina/socket/${balProjectVersion}/ballerina-socket-${balProjectVersion}.jar")
+def targetSocketBallerinaJar = file("$project.projectDir/target/caches/jar_cache/ballerina/socket/${project.version}/ballerina-socket-${project.version}.jar")
 def targetSocketNativeJar = file("$project.rootDir/socket-native/build/libs/socket-native-${project.version}.jar")
 def targetSocketTestsJar = file("$project.rootDir/socket-test-utils/build/libs/socket-test-utils-${project.version}.jar")
 
@@ -95,11 +94,11 @@ task ballerinaBuild {
         // Populate caches
         copy {
             from file("$project.projectDir/Ballerina.toml")
-            into file("$artifactSocketCacheParent/caches/bir/ballerina/socket/${balProjectVersion}")
+            into file("$artifactSocketCacheParent/caches/bir/ballerina/socket/${project.version}")
         }
         copy {
             from file("$project.projectDir/Ballerina.toml")
-            into file("$artifactSocketCacheParent/caches/balo/ballerina/socket/${balProjectVersion}")
+            into file("$artifactSocketCacheParent/caches/balo/ballerina/socket/${project.version}")
         }
         copy {
             from file("$project.projectDir/target/caches/bir_cache")
@@ -107,7 +106,7 @@ task ballerinaBuild {
         }
         copy {
             from file("$project.projectDir/target/balo")
-            into file("$artifactSocketCacheParent/caches/balo/ballerina/socket/${balProjectVersion}")
+            into file("$artifactSocketCacheParent/caches/balo/ballerina/socket/${project.version}")
         }
 
         copy {
