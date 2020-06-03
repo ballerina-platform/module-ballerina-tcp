@@ -56,11 +56,12 @@ task unzip {
 }
 
 def ballerinaConfigFile = new File("$project.projectDir/Ballerina.toml")
-def balProjectVersion = ballerinaConfigFile.text.split("\n")[2].split("=")[1].split("\"")[1]
-def artifactSocketBallerinaBirDir = file("$project.projectDir/target/caches/bir_cache/")
-def artifactSocketBallerinaJar = file("$project.projectDir/target/caches/jar_cache/ballerina/socket/${balProjectVersion}/ballerina-socket-${balProjectVersion}.jar")
-def artifactSocketBallerinaDocs = file("$project.projectDir/build/apidocs/")
-def balSockerJar =  file("$project.projectDir/build/libs/ballerina-socket-${ballerinaLangVersion}.jar")
+def artifactSocketBallerinaDocs = file("$project.projectDir/build/docs_parent/")
+def artifactSocketCacheParent = file("$project.projectDir/build/cache_parent/")
+def artifactSocketLibParent = file("$project.projectDir/build/lib_parent/")
+def targetSocketBallerinaJar = file("$project.projectDir/target/caches/jar_cache/ballerina/socket/${project.version}/ballerina-socket-${project.version}.jar")
+def targetSocketNativeJar = file("$project.rootDir/socket-native/build/libs/socket-native-${project.version}.jar")
+def targetSocketTestsJar = file("$project.rootDir/socket-test-utils/build/libs/socket-test-utils-${project.version}.jar")
 
 task ballerinaBuild {
     dependsOn unzip
@@ -84,35 +85,60 @@ task ballerinaBuild {
             workingDir project.projectDir
             environment "JAVA_OPTS", "-DBALLERINA_DEV_COMPILE_BALLERINA_ORG=true"
             if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-                commandLine 'cmd', '/c', "$distributionBinPath/ballerina.bat build --code-coverage -c -a"
+                commandLine 'cmd', '/c', "$distributionBinPath/ballerina.bat doc -a"
             } else {
                 commandLine 'sh', '-c', "$distributionBinPath/ballerina doc -a "
             }
         }
 
+        // Populate caches
         copy {
-            // Copy the TOML to the same folder as the BIR
             from file("$project.projectDir/Ballerina.toml")
-            into file("${artifactSocketBallerinaBirDir}/ballerina/socket/${balProjectVersion}")
+            into file("$artifactSocketCacheParent/caches/bir/ballerina/socket/${project.version}")
+        }
+        copy {
+            from file("$project.projectDir/Ballerina.toml")
+            into file("$artifactSocketCacheParent/caches/balo/ballerina/socket/${project.version}")
+        }
+        copy {
+            from file("$project.projectDir/Ballerina.toml")
+            into file("$artifactSocketCacheParent/caches/jar/ballerina/socket/${project.version}")
+        }
+        copy {
+            from file("$project.projectDir/target/caches/bir_cache")
+            into file("$artifactSocketCacheParent/caches/bir")
+        }
+        copy {
+            from file("$project.projectDir/target/balo")
+            into file("$artifactSocketCacheParent/caches/balo/ballerina/socket/${project.version}")
+        }
+        copy {
+            from targetSocketBallerinaJar
+            into file("$artifactSocketCacheParent/caches/jar/ballerina/socket/${project.version}")
         }
 
         copy {
+            from targetSocketBallerinaJar
+            into file("$artifactSocketLibParent/libs")
+        }
+        copy {
+            from targetSocketNativeJar
+            into file("$artifactSocketLibParent/libs")
+        }
+        copy {
+            from targetSocketTestsJar
+            into file("$artifactSocketLibParent/libs")
+        }
+        copy {
             from file("$project.projectDir/target/apidocs/socket")
-            into file("$project.projectDir/build/apidocs/docs/socket")
+            into file("$project.projectDir/build/docs_parent/docs/socket")
         }
         ballerinaConfigFile.text = originalConfig
     }
 
-    outputs.dir artifactSocketBallerinaBirDir
+    outputs.dir artifactSocketCacheParent
     outputs.dir artifactSocketBallerinaDocs
-    outputs.file artifactSocketBallerinaJar
-}
-
-artifacts {
-
-    socketBallerinaBirDir file: artifactSocketBallerinaBirDir, builtBy: ballerinaBuild
-    socketBallerinaJar file: artifactSocketBallerinaJar, builtBy: ballerinaBuild
-
+    outputs.file artifactSocketLibParent
 }
 
 task createArtifactZip(type: Zip) {
