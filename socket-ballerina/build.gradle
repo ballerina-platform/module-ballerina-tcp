@@ -101,12 +101,20 @@ task ballerinaBuild {
             into file("$artifactSocketCacheParent/caches/balo/ballerina/socket/${project.version}")
         }
         copy {
+            from file("$project.projectDir/Ballerina.toml")
+            into file("$artifactSocketCacheParent/caches/jar/ballerina/socket/${project.version}")
+        }
+        copy {
             from file("$project.projectDir/target/caches/bir_cache")
             into file("$artifactSocketCacheParent/caches/bir")
         }
         copy {
             from file("$project.projectDir/target/balo")
             into file("$artifactSocketCacheParent/caches/balo/ballerina/socket/${project.version}")
+        }
+        copy {
+            from targetSocketBallerinaJar
+            into file("$artifactSocketCacheParent/caches/jar/ballerina/socket/${project.version}")
         }
 
         copy {
