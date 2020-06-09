@@ -57,7 +57,7 @@ allprojects {
         }
 
         maven {
-            url = 'https://maven.pkg.github.com/BuddhiWathsala/module-ballerina-socket'
+            url = 'https://maven.pkg.github.com/ballerina-platform/module-ballerina-socket'
         }
 
         maven {
