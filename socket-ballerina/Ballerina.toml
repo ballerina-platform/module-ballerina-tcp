@@ -1,6 +1,6 @@
 [project]
 org-name = "ballerina"
-version = "0.6.0"
+version = "@toml.version@"
 
 [platform]
 target = "java8"
@@ -18,3 +18,4 @@ target = "java8"
     path = "../socket-test-utils/build/libs/socket-test-utils-@project.version@.jar"
     groupId = "org.ballerinalang.stdlib.socket"
     modules = ["socket"]
+    scope = "testOnly"

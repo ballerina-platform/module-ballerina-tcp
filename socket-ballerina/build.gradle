@@ -59,9 +59,9 @@ def ballerinaConfigFile = new File("$project.projectDir/Ballerina.toml")
 def artifactSocketBallerinaDocs = file("$project.projectDir/build/docs_parent/")
 def artifactSocketCacheParent = file("$project.projectDir/build/cache_parent/")
 def artifactSocketLibParent = file("$project.projectDir/build/lib_parent/")
-def targetSocketBallerinaJar = file("$project.projectDir/target/caches/jar_cache/ballerina/socket/${project.version}/ballerina-socket-${project.version}.jar")
+def tomlVersion = project.version.split("-")[0]
+def targetSocketBallerinaJar = file("$project.projectDir/target/caches/jar_cache/ballerina/socket/${tomlVersion}/ballerina-socket-${tomlVersion}.jar")
 def targetSocketNativeJar = file("$project.rootDir/socket-native/build/libs/socket-native-${project.version}.jar")
-def targetSocketTestsJar = file("$project.rootDir/socket-test-utils/build/libs/socket-test-utils-${project.version}.jar")
 
 task ballerinaBuild {
     dependsOn unzip
@@ -69,6 +69,7 @@ task ballerinaBuild {
     doLast {
         def originalConfig = ballerinaConfigFile.text
         def newConfig = ballerinaConfigFile.text.replace("@project.version@", project.version)
+        newConfig = newConfig.replace("@toml.version@", tomlVersion)
         ballerinaConfigFile.text = newConfig
 
         def distributionBinPath =  project.projectDir.absolutePath + "/build/extracted-distribution/jballerina-tools-${ballerinaLangVersion}/bin"
@@ -94,15 +95,15 @@ task ballerinaBuild {
         // Populate caches
         copy {
             from file("$project.projectDir/Ballerina.toml")
-            into file("$artifactSocketCacheParent/caches/bir/ballerina/socket/${project.version}")
+            into file("$artifactSocketCacheParent/caches/bir/ballerina/socket/${tomlVersion}")
         }
         copy {
             from file("$project.projectDir/Ballerina.toml")
-            into file("$artifactSocketCacheParent/caches/balo/ballerina/socket/${project.version}")
+            into file("$artifactSocketCacheParent/caches/balo/ballerina/socket/${tomlVersion}")
         }
         copy {
             from file("$project.projectDir/Ballerina.toml")
-            into file("$artifactSocketCacheParent/caches/jar/ballerina/socket/${project.version}")
+            into file("$artifactSocketCacheParent/caches/jar/ballerina/socket/${tomlVersion}")
         }
         copy {
             from file("$project.projectDir/target/caches/bir_cache")
@@ -110,11 +111,11 @@ task ballerinaBuild {
         }
         copy {
             from file("$project.projectDir/target/balo")
-            into file("$artifactSocketCacheParent/caches/balo/ballerina/socket/${project.version}")
+            into file("$artifactSocketCacheParent/caches/balo/ballerina/socket/${tomlVersion}")
         }
         copy {
             from targetSocketBallerinaJar
-            into file("$artifactSocketCacheParent/caches/jar/ballerina/socket/${project.version}")
+            into file("$artifactSocketCacheParent/caches/jar/ballerina/socket/${tomlVersion}")
         }
 
         copy {
@@ -126,10 +127,6 @@ task ballerinaBuild {
             into file("$artifactSocketLibParent/libs")
         }
         copy {
-            from targetSocketTestsJar
-            into file("$artifactSocketLibParent/libs")
-        }
-        copy {
             from file("$project.projectDir/target/apidocs/socket")
             into file("$project.projectDir/build/docs_parent/docs/socket")
         }
@@ -138,7 +135,7 @@ task ballerinaBuild {
 
     outputs.dir artifactSocketCacheParent
     outputs.dir artifactSocketBallerinaDocs
-    outputs.file artifactSocketLibParent
+    outputs.dir artifactSocketLibParent
 }
 
 task createArtifactZip(type: Zip) {
@@ -164,6 +161,7 @@ publishing {
         }
     }
 }
+
 ballerinaBuild.dependsOn ":socket-native:build"
 ballerinaBuild.dependsOn ":socket-test-utils:build"
 build.dependsOn ballerinaBuild
