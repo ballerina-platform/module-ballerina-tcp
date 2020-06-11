@@ -38,25 +38,19 @@ service echo on echoEP {
                 checkpanic caller->accepted();
             } else {
                 io:println("Write error!!!");
-                error writeError = writeResult;
-                string errMsg = <string>writeError.detail()["message"];
                 resp.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
-                resp.setPayload(errMsg);
+                resp.setPayload(<@untainted> writeResult.message());
                 var responseError = caller->respond(resp);
                 if (responseError is error) {
-                    error err = responseError;
-                    io:println("Error sending response: ", err.detail()["message"]);
+                    io:println("Error sending response: ", responseError.message());
                 }
             }
         } else {
-            error err = payload;
-            string errMsg = <string>err.detail()["message"];
             resp.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
-            resp.setPayload(<@untainted> errMsg);
+            resp.setPayload(<@untainted> payload.message());
             var responseError = caller->respond(resp);
             if (responseError is error) {
-                error responseErr = responseError;
-                io:println("Error sending response: ", responseErr.detail()["message"]);
+                io:println("Error sending response: ", responseError.message());
             }
         }
     }
@@ -78,13 +72,11 @@ service ClientService = service {
                 if (str is string) {
                     io:println(<@untainted>str);
                 } else {
-                    error e = str;
-                    io:println(e.detail()["message"]);
+                    io:println(str.message());
                 }
                 var closeResult = caller->close();
                 if (closeResult is error) {
-                    error closeResultError = closeResult;
-                    io:println(closeResultError.detail()["message"]);
+                    io:println(closeResult.message());
                 } else {
                     io:println("Client connection closed successfully.");
                 }
@@ -97,7 +89,6 @@ service ClientService = service {
     }
 
     resource function onError(Caller caller, error er) {
-        error e = er;
-        io:println(e.detail()["message"]);
+        io:println(er.message());
     }
 };

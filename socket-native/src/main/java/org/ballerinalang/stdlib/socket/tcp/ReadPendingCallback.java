@@ -103,7 +103,7 @@ public class ReadPendingCallback {
             public void run() {
                 ReadPendingSocketMap.getInstance().remove(socketHash);
                 final ErrorValue timeoutError =
-                        SocketUtils.createSocketError(SocketConstants.ErrorCode.ReadTimedOutError, "read timed out");
+                        SocketUtils.createSocketError(SocketConstants.ErrorType.ReadTimedOutError, "read timed out");
                 callback.setReturnValues(timeoutError);
                 callback.notifySuccess();
                 cancel();

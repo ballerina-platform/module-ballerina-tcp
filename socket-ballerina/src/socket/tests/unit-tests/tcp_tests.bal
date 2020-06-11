@@ -28,16 +28,14 @@ public function testOneWayWrite() {
     if (writeResult is int) {
         log:printInfo("Number of bytes written: " + writeResult.toString());
     } else {
-        string? errMsg = writeResult.detail()?.message;
-        test:assertFail(msg = errMsg is string ? errMsg : "Error in socket write");
+        test:assertFail(msg = writeResult.message());
     }
 
     var readResult = readClientMessage(socketClient);
     if (readResult is string) {
         test:assertEquals(readResult, msg, msg = "Found unexpected output");
     } else {
-        string? errMsg = readResult.detail()?.message;
-        test:assertFail(msg = errMsg is string ? errMsg : "Error in socket read");
+        test:assertFail(msg = readResult.message());
     }
 
     closeClientConnection(socketClient);
@@ -55,22 +53,19 @@ function testShutdownWrite() returns error? {
     if (writeResult is int) {
         log:printInfo("Number of bytes written: " + writeResult.toString());
     } else {
-        string? errMsg = writeResult.detail()?.message;
-        test:assertFail(msg = errMsg is string ? errMsg : "Error in socket write");
+        test:assertFail(msg = writeResult.message());
     }
 
     var readResult = readClientMessage(socketClient);
     if (readResult is string) {
         test:assertEquals(readResult, firstMsg, msg = "Found unexpected output");
     } else {
-        string? errMsg = readResult.detail()?.message;
-        test:assertFail(msg = errMsg is string ? errMsg : "Error in socket read");
+        test:assertFail(msg = readResult.message());
     }
 
     var shutdownResult = socketClient->shutdownWrite();
     if (shutdownResult is error) {
-        string? errMsg = shutdownResult.detail()?.message;
-        test:assertFail(msg = errMsg is string ? errMsg : "Error in socket shutdown");
+        test:assertFail(msg = shutdownResult.message());
     }
     msgByteArray = secondMsg.toBytes();
     writeResult = socketClient->write(msgByteArray);
@@ -94,15 +89,13 @@ function testEcho() {
     if (writeResult is int) {
         io:println("Number of bytes written: ", writeResult);
     } else {
-        string? errMsg = writeResult.detail()?.message;
-        test:assertFail(msg = errMsg is string ? errMsg : "Error in socket write");
+        test:assertFail(msg = writeResult.message());
     }
     var readResult = readClientMessage(socketClient);
     if (readResult is string) {
         test:assertEquals(readResult, msg, msg = "Found unexpected output");
     } else {
-        string? errMsg = readResult.detail()?.message;
-        test:assertFail(msg = errMsg is string ? errMsg : "Error in socket read");
+        test:assertFail(msg = readResult.message());
     }
 
     closeClientConnection(socketClient);
@@ -114,8 +107,7 @@ function testEcho() {
 function testInvalidReadParam() {
     var result = invalidReadParam();
     if (result is error) {
-        string? errMsg = result.detail()?.message;
-        log:printInfo(errMsg is string ? errMsg : "Error in socket client");
+        log:printInfo(result.message());
     } else {
         test:assertFail("Expected: {ballerina/socket}ReadTimedOut, not found");
     }
@@ -127,8 +119,7 @@ function testInvalidReadParam() {
 function testInvalidAddress() {
     var result = invalidAddress();
     if (result is error) {
-        string? errMsg = result.detail()?.message;
-        log:printInfo(errMsg is string ? errMsg : "Error in socket client");
+        log:printInfo(result.message());
     } else {
         test:assertFail("Expected error unable to start the client socket: Connection refused, not found");
     }
@@ -168,9 +159,7 @@ function readClientMessage(Client socketClient) returns @tainted string|error {
 function closeClientConnection(Client socketClient) {
     var closeResult = socketClient->close();
     if (closeResult is error) {
-        error closeResultError = closeResult;
-        string? errMsg = closeResultError.detail()?.message;
-        log:printError(errMsg is string ? errMsg : "Error in socket client");
+        log:printError(closeResult.message());
     } else {
         log:printInfo("Client connection closed successfully.");
     }

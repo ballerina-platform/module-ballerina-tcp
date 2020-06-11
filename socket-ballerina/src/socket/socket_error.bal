@@ -14,24 +14,11 @@
 // specific language governing permissions and limitations
 // under the License.
 
-# Record type to hold the details of an error.
-#
-# + message - The specific error message for the error.
-# + cause - The cause of the error if this error occurred due to another error
-public type Detail record {
-    string message;
-    error cause?;
-};
-
-# This will used to construct a ReadTimedOutError.
-public const READ_TIMED_OUT = "{ballerina/socket}ReadTimedOut";
 # This will returns once the given read timed out time exceed for socket reads.
-public type ReadTimedOutError error<READ_TIMED_OUT, Detail>;
+public type ReadTimedOutError distinct error;
 
-# This will used to construct a GENERIC_ERROR.
-public const GENERIC_ERROR = "{ballerina/socket}GenericError";
-# Represents generic socket error. The detail record contains the information related to the error.
-public type GenericError error<GENERIC_ERROR, Detail>;
+# Represents generic socket error, which contains the information related to the error.
+public type GenericError distinct error;
 
 # Represents socket module related errors.
 public type Error GenericError|ReadTimedOutError;

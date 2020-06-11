@@ -34,7 +34,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import static org.ballerinalang.stdlib.socket.SocketConstants.CLIENT;
-import static org.ballerinalang.stdlib.socket.SocketConstants.ErrorCode.GenericError;
+import static org.ballerinalang.stdlib.socket.SocketConstants.ErrorType.GenericError;
 import static org.ballerinalang.stdlib.socket.SocketConstants.ID;
 import static org.ballerinalang.stdlib.socket.SocketConstants.LOCAL_ADDRESS;
 import static org.ballerinalang.stdlib.socket.SocketConstants.LOCAL_PORT;
@@ -54,8 +54,6 @@ public class SocketUtils {
     private SocketUtils() {
     }
 
-    private static final String DETAIL_RECORD_TYPE_NAME = "Detail";
-
     /**
      * Create Generic socket error with given error message.
      *
@@ -63,23 +61,18 @@ public class SocketUtils {
      * @return ErrorValue instance which contains the error details
      */
     public static ErrorValue createSocketError(String errMsg) {
-        return BallerinaErrors.createError(GenericError.errorCode(), createDetailRecord(errMsg, null));
+        return BallerinaErrors.createDistinctError(GenericError.errorType(), SOCKET_PACKAGE_ID, errMsg);
     }
 
     /**
-     * Create socket error with given error code and message.
+     * Create socket error with given error type and message.
      *
-     * @param code   the error code which cause for this error
+     * @param type   the error type which cause for this error
      * @param errMsg the error message
      * @return ErrorValue instance which contains the error details
      */
-    public static ErrorValue createSocketError(SocketConstants.ErrorCode code, String errMsg) {
-        return BallerinaErrors.createError(code.errorCode(), createDetailRecord(errMsg, null));
-    }
-
-    private static MapValue<BString, Object> createDetailRecord(Object... values) {
-        MapValue<BString, Object> detail = BallerinaValues.createRecordValue(SOCKET_PACKAGE_ID, DETAIL_RECORD_TYPE_NAME);
-        return BallerinaValues.createRecord(detail, values);
+    public static ErrorValue createSocketError(SocketConstants.ErrorType type, String errMsg) {
+        return BallerinaErrors.createDistinctError(type.errorType(), SOCKET_PACKAGE_ID, errMsg);
     }
 
     /**

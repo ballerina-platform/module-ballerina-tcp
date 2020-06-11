@@ -58,7 +58,7 @@ import java.util.concurrent.ThreadFactory;
 
 import static java.nio.channels.SelectionKey.OP_READ;
 import static org.ballerinalang.stdlib.socket.SocketConstants.DEFAULT_EXPECTED_READ_LENGTH;
-import static org.ballerinalang.stdlib.socket.SocketConstants.ErrorCode.ReadTimedOutError;
+import static org.ballerinalang.stdlib.socket.SocketConstants.ErrorType.ReadTimedOutError;
 import static org.ballerinalang.stdlib.socket.SocketConstants.SOCKET_PACKAGE_ID;
 
 /**
@@ -395,9 +395,9 @@ public class SelectorManager {
         }
     }
 
-    private void processError(ReadPendingCallback callback, SocketConstants.ErrorCode code, String msg) {
+    private void processError(ReadPendingCallback callback, SocketConstants.ErrorType type, String msg) {
         ErrorValue socketError =
-                code == null ? SocketUtils.createSocketError(msg) : SocketUtils.createSocketError(code, msg);
+                type == null ? SocketUtils.createSocketError(msg) : SocketUtils.createSocketError(type, msg);
         callback.getCallback().setReturnValues(socketError);
         callback.getCallback().notifySuccess();
     }
