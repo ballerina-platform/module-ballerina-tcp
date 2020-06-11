@@ -62,6 +62,7 @@ def artifactSocketLibParent = file("$project.projectDir/build/lib_parent/")
 def tomlVersion = project.version.split("-")[0]
 def targetSocketBallerinaJar = file("$project.projectDir/target/caches/jar_cache/ballerina/socket/${tomlVersion}/ballerina-socket-${tomlVersion}.jar")
 def targetSocketNativeJar = file("$project.rootDir/socket-native/build/libs/socket-native-${project.version}.jar")
+def targetSocketTestsJar = file("$project.rootDir/socket-test-utils/build/libs/socket-test-utils-${project.version}.jar")
 
 task ballerinaBuild {
     dependsOn unzip
@@ -124,6 +125,10 @@ task ballerinaBuild {
         }
         copy {
             from targetSocketNativeJar
+            into file("$artifactSocketLibParent/libs")
+        }
+        copy {
+            from targetSocketTestsJar
             into file("$artifactSocketLibParent/libs")
         }
         copy {
