@@ -83,15 +83,15 @@ task ballerinaBuild {
                 commandLine 'sh', '-c', "$distributionBinPath/ballerina build --code-coverage -c -a "
             }
         }
-        exec {
-            workingDir project.projectDir
-            environment "JAVA_OPTS", "-DBALLERINA_DEV_COMPILE_BALLERINA_ORG=true"
-            if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-                commandLine 'cmd', '/c', "$distributionBinPath/ballerina.bat doc -a"
-            } else {
-                commandLine 'sh', '-c', "$distributionBinPath/ballerina doc -a "
-            }
-        }
+//        exec {
+//            workingDir project.projectDir
+//            environment "JAVA_OPTS", "-DBALLERINA_DEV_COMPILE_BALLERINA_ORG=true"
+//            if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+//                commandLine 'cmd', '/c', "$distributionBinPath/ballerina.bat doc -a"
+//            } else {
+//                commandLine 'sh', '-c', "$distributionBinPath/ballerina doc -a "
+//            }
+//        }
 
         // Populate caches
         copy {
