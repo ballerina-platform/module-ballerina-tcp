@@ -61,20 +61,20 @@ public class SocketConstants {
     public static final String READ_TIMEOUT = "readTimeoutInMillis";
 
     /**
-     * Specifies the error code for socket module.
+     * Specifies the error type for socket module.
      */
-    public enum ErrorCode {
+    public enum ErrorType {
 
-        GenericError("{ballerina/socket}GenericError"), ReadTimedOutError("{ballerina/socket}ReadTimedOut");
+        GenericError("GenericError"), ReadTimedOutError("ReadTimedOut");
 
-        private String errorCode;
+        private String errorType;
 
-        ErrorCode(String errorCode) {
-            this.errorCode = errorCode;
+        ErrorType(String errorType) {
+            this.errorType = errorType;
         }
 
-        public String errorCode() {
-            return errorCode;
+        public String errorType() {
+            return errorType;
         }
     }
 

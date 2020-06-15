@@ -32,8 +32,7 @@ function testClientEcho() {
     if (sendResult is int) {
         log:printInfo("Number of bytes written: " + sendResult.toString());
     } else {
-        string? errMsg = sendResult.detail()?.message;
-        test:assertFail(msg = errMsg is string ? errMsg : "Error in socket sendTo");
+        test:assertFail(msg = sendResult.message());
     }
     string readContent = receiveClientContent(socketClient);
     test:assertEquals(readContent, msg, "Found unexpected output");
@@ -71,12 +70,10 @@ function testContentReceiveWithLength() {
         if (resultContent is string) {
             returnStr = <@untainted>resultContent;
         } else {
-            string? errMsg = resultContent.detail()?.message;
-            test:assertFail(msg = errMsg is string ? errMsg : "Error in socket content");
+            test:assertFail(msg = resultContent.message());
         }
     } else {
-        string? errMsg = result.detail()?.message;
-        test:assertFail(msg = errMsg is string ? errMsg : "Error in socket content");
+        test:assertFail(msg = result.message());
     }
     log:printInfo(msg);
     log:printInfo(returnStr);
@@ -97,13 +94,10 @@ function receiveClientContent(UdpClient socketClient) returns string {
         if (str is string) {
             returnStr = <@untainted>str;
         } else {
-            error err = str;
-            string? errMsg = err.detail()?.message;
-            test:assertFail(msg = errMsg is string ? errMsg : "Error in socket client receiveFrom()");
+            test:assertFail(msg = str.message());
         }
     } else {
-        string? errMsg = result.detail()?.message;
-        test:assertFail(msg = errMsg is string ? errMsg : "Error in socket client receiveFrom()");
+        test:assertFail(msg = result.message());
     }
     return returnStr;
 }

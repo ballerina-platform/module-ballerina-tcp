@@ -129,12 +129,10 @@ service echoOnReadyServer on server4 {
                     if (str is string) {
                         io:println(<@untainted> str);
                     } else {
-                        error e = str;
-                        io:println("Error: ", e.detail()["message"]);
+                        io:println("Error: ", str.message());
                     }
                 } else {
-                    error byteError = byteChannel;
-                    io:println("Error: ", byteError.detail()["message"]);
+                    io:println("Error: ", byteChannel.message());
                 }
             } else {
                 io:println("Client close: ", caller.remotePort);
@@ -146,7 +144,7 @@ service echoOnReadyServer on server4 {
 
     resource function onError(Caller caller, error er) {
         error e = er;
-        io:println(e.detail()["message"]);
+        io:println(er.message());
     }
 }
 
@@ -167,8 +165,7 @@ service timeoutServer on server5 {
                 log:printInfo("Client close: " + caller.remotePort.toString());
             }
         } else {
-            error resultError = result;
-            io:println(resultError.detail()["message"]);
+            io:println(result.message());
         }
     }
 

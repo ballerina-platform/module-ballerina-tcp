@@ -34,8 +34,7 @@ public function testPartialRead() {
     if (writeResult is int) {
         log:printInfo("Number of bytes written: " + writeResult.toString());
     } else {
-        string? errMsg = writeResult.detail()?.message;
-        test:assertFail(msg = errMsg is string ? errMsg : "Error in socket write");
+        test:assertFail(msg = writeResult.message());
     }
     var readResult = readClientMessage(socketClient);
     test:assertEquals(getTotalLength(), 15, msg = "Server didn't receive the expected bytes");
@@ -54,16 +53,14 @@ public function testBlockingRead() {
     if (writeResult is int) {
         log:printInfo("Number of bytes written: " + writeResult.toString());
     } else {
-        string? errMsg = writeResult.detail()?.message;
-        test:assertFail(msg = errMsg is string ? errMsg : "Error in socket write");
+        test:assertFail(msg = writeResult.message());
     }
 
     var readResult = readClientMessage(socketClient);
     if (readResult is string) {
         test:assertEquals(readResult, msg1 + msg2, msg = "Found unexpected output");
     } else {
-        string? errMsg = readResult.detail()?.message;
-        test:assertFail(msg = errMsg is string ? errMsg : "Error in socket read");
+        test:assertFail(msg = readResult.message());
     }
     closeClientConnection(socketClient);
 }
@@ -80,8 +77,7 @@ function testHttpClientEcho() {
     if (response is http:Response) {
         test:assertEquals(response.statusCode, http:STATUS_ACCEPTED, "Unexpected response code");
     } else {
-        string? errMsg = response.detail()?.message;
-        test:assertFail(msg = errMsg is string ? errMsg : "Error in http post request");
+        test:assertFail(msg = response.message());
     }
 }
 
@@ -110,8 +106,7 @@ function passMessageToSocketServer(string msg, int port) {
     if (writeResult is int) {
         log:printInfo("Number of bytes written: " + writeResult.toString());
     } else {
-        string? errMsg = writeResult.detail()?.message;
-        test:assertFail(msg = errMsg is string ? errMsg : "Error in socket write");
+        test:assertFail(msg = writeResult.message());
     }
     closeClientConnection(socketClient);
 }

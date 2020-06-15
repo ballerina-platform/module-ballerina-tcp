@@ -106,7 +106,7 @@ public class ClientActions {
         final NonBlockingCallback callback = new NonBlockingCallback(Scheduler.getStrand());
         if (length != SocketConstants.DEFAULT_EXPECTED_READ_LENGTH && length < 1) {
             String msg = "requested byte length need to be 1 or more";
-            callback.setReturnValues(SocketUtils.createSocketError(SocketConstants.ErrorCode.ReadTimedOutError, msg));
+            callback.setReturnValues(SocketUtils.createSocketError(SocketConstants.ErrorType.ReadTimedOutError, msg));
             callback.notifySuccess();
             return null;
         }
