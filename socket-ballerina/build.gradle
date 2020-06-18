@@ -74,26 +74,17 @@ task ballerinaBuild {
         ballerinaConfigFile.text = newConfig
 
         def distributionBinPath =  project.projectDir.absolutePath + "/build/extracted-distribution/jballerina-tools-${ballerinaLangVersion}/bin"
+
+        // Build and populate caches
         exec {
             workingDir project.projectDir
             environment "JAVA_OPTS", "-DBALLERINA_DEV_COMPILE_BALLERINA_ORG=true"
             if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-                commandLine 'cmd', '/c', "$distributionBinPath/ballerina.bat build --code-coverage -c -a"
+                commandLine 'cmd', '/c', "$distributionBinPath/ballerina.bat build --code-coverage -c socket"
             } else {
-                commandLine 'sh', '-c', "$distributionBinPath/ballerina build --code-coverage -c -a "
+                commandLine 'sh', '-c', "$distributionBinPath/ballerina build --code-coverage -c socket"
             }
         }
-//        exec {
-//            workingDir project.projectDir
-//            environment "JAVA_OPTS", "-DBALLERINA_DEV_COMPILE_BALLERINA_ORG=true"
-//            if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-//                commandLine 'cmd', '/c', "$distributionBinPath/ballerina.bat doc -a"
-//            } else {
-//                commandLine 'sh', '-c', "$distributionBinPath/ballerina doc -a "
-//            }
-//        }
-
-        // Populate caches
         copy {
             from file("$project.projectDir/Ballerina.toml")
             into file("$artifactSocketCacheParent/caches/bir/ballerina/socket/${tomlVersion}")
@@ -130,6 +121,17 @@ task ballerinaBuild {
         copy {
             from targetSocketTestsJar
             into file("$artifactSocketLibParent/libs")
+        }
+
+        // Doc creation and packing
+        exec {
+            workingDir project.projectDir
+            environment "JAVA_OPTS", "-DBALLERINA_DEV_COMPILE_BALLERINA_ORG=true"
+            if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+                commandLine 'cmd', '/c', "$distributionBinPath/ballerina.bat doc socket"
+            } else {
+                commandLine 'sh', '-c', "$distributionBinPath/ballerina doc socket"
+            }
         }
         copy {
             from file("$project.projectDir/target/apidocs/socket")
