@@ -49,7 +49,7 @@ allprojects {
         }
 
         maven {
-            url = 'https://maven.wso2.org/nexus/content/repositories/orgballerinalang-1590'
+            url = 'https://maven.wso2.org/nexus/content/repositories/orgballerinalang-1591'
         }
 
         maven {
