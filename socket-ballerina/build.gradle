@@ -60,6 +60,7 @@ def artifactSocketBallerinaDocs = file("$project.projectDir/build/docs_parent/")
 def artifactSocketCacheParent = file("$project.projectDir/build/cache_parent/")
 def artifactSocketLibParent = file("$project.projectDir/build/lib_parent/")
 def tomlVersion = project.version.split("-")[0]
+def ballerinaCentralAccessToken = System.getenv('BALLERINA_CENTRAL_ACCESS_TOKEN')
 def targetSocketBallerinaJar = file("$project.projectDir/target/caches/jar_cache/ballerina/socket/${tomlVersion}/ballerina-socket-${tomlVersion}.jar")
 def targetSocketNativeJar = file("$project.rootDir/socket-native/build/libs/socket-native-${project.version}.jar")
 
@@ -118,6 +119,20 @@ task ballerinaBuild {
             into file("$artifactSocketLibParent/libs")
         }
 
+        // Publish to central
+        if (!project.version.endsWith('-SNAPSHOT') && ballerinaCentralAccessToken != null && project.hasProperty("publishToCentral")) {
+            println("Publishing to the ballerina central..")
+            exec {
+                workingDir project.projectDir
+                environment "JAVA_OPTS", "-DBALLERINA_DEV_COMPILE_BALLERINA_ORG=true"
+                if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+                    commandLine 'cmd', '/c', "$distributionBinPath/ballerina.bat push socket"
+                } else {
+                    commandLine 'sh', '-c', "$distributionBinPath/ballerina push socket"
+                }
+            }
+
+        }
         // Doc creation and packing
         exec {
             workingDir project.projectDir
