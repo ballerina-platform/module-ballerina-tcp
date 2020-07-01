@@ -20,13 +20,13 @@ import org.apache.tools.ant.taskdefs.condition.Os
 description = 'Ballerina - Socket Ballerina Generator'
 
 configurations {
-    balTools
+    jbalTools
     socketBallerinaBirDir
     socketBallerinaJar
 }
 
 dependencies {
-    balTools ("org.ballerinalang:jballerina-tools:${ballerinaLangVersion}") {
+    jbalTools ("org.ballerinalang:jballerina-tools:${ballerinaLangVersion}") {
         transitive = false
     }
     compile project(':socket-native')
@@ -44,28 +44,25 @@ jar {
     }
 }
 
-task unzip {
-    doLast {
-        configurations.balTools.resolvedConfiguration.resolvedArtifacts.each { artifact ->
-            copy {
-                from project.zipTree(artifact.getFile())
-                into new File(project.buildDir, "extracted-distribution/")
-            }
-        }
+task unpackJballerinaTools(type: Copy) {
+    configurations.jbalTools.resolvedConfiguration.resolvedArtifacts.each { artifact ->
+        from zipTree(artifact.getFile())
+        into new File("${buildDir}/target/extracted-distributions", "jballerina-tools-zip")
     }
 }
 
+def moduleName = "socket"
+def moduleOrg = "ballerina"
 def ballerinaConfigFile = new File("$project.projectDir/Ballerina.toml")
-def artifactSocketBallerinaDocs = file("$project.projectDir/build/docs_parent/")
-def artifactSocketCacheParent = file("$project.projectDir/build/cache_parent/")
-def artifactSocketLibParent = file("$project.projectDir/build/lib_parent/")
+def artifactBallerinaDocs = file("$project.projectDir/build/docs_parent/")
+def artifactCacheParent = file("$project.projectDir/build/cache_parent/")
+def artifactLibParent = file("$project.projectDir/build/lib_parent/")
 def tomlVersion = project.version.split("-")[0]
 def ballerinaCentralAccessToken = System.getenv('BALLERINA_CENTRAL_ACCESS_TOKEN')
-def targetSocketBallerinaJar = file("$project.projectDir/target/caches/jar_cache/ballerina/socket/${tomlVersion}/ballerina-socket-${tomlVersion}.jar")
-def targetSocketNativeJar = file("$project.rootDir/socket-native/build/libs/socket-native-${project.version}.jar")
+def targetBallerinaJar = file("$project.projectDir/target/caches/jar_cache/${moduleOrg}/${moduleName}/${tomlVersion}/${moduleOrg}-${moduleName}-${tomlVersion}.jar")
+def targetNativeJar = file("$project.rootDir/${moduleName}-native/build/libs/${moduleName}-native-${project.version}.jar")
 
 task ballerinaBuild {
-    dependsOn unzip
     inputs.dir file(project.projectDir)
     doLast {
         def originalConfig = ballerinaConfigFile.text
@@ -73,50 +70,51 @@ task ballerinaBuild {
         newConfig = newConfig.replace("@toml.version@", tomlVersion)
         ballerinaConfigFile.text = newConfig
 
-        def distributionBinPath =  project.projectDir.absolutePath + "/build/extracted-distribution/jballerina-tools-${ballerinaLangVersion}/bin"
+        def distributionBinPath =  project.projectDir.absolutePath + "/build/target/extracted-distributions/jballerina-tools-zip/jballerina-tools-${ballerinaLangVersion}/bin"
 
         // Build and populate caches
         exec {
             workingDir project.projectDir
             environment "JAVA_OPTS", "-DBALLERINA_DEV_COMPILE_BALLERINA_ORG=true"
             if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-                commandLine 'cmd', '/c', "$distributionBinPath/ballerina.bat build --code-coverage -c socket"
+                commandLine 'cmd', '/c', "$distributionBinPath/ballerina.bat build -c ${moduleName}"
             } else {
-                commandLine 'sh', '-c', "$distributionBinPath/ballerina build --code-coverage -c socket"
+                commandLine 'sh', '-c', "$distributionBinPath/ballerina build -c ${moduleName}"
             }
         }
         copy {
             from file("$project.projectDir/Ballerina.toml")
-            into file("$artifactSocketCacheParent/caches/bir/ballerina/socket/${tomlVersion}")
+            into file("$artifactCacheParent/caches/bir/${moduleOrg}/${moduleName}/${tomlVersion}")
         }
         copy {
             from file("$project.projectDir/Ballerina.toml")
-            into file("$artifactSocketCacheParent/caches/balo/ballerina/socket/${tomlVersion}")
+            into file("$artifactCacheParent/caches/balo/${moduleOrg}/${moduleName}/${tomlVersion}")
         }
         copy {
             from file("$project.projectDir/Ballerina.toml")
-            into file("$artifactSocketCacheParent/caches/jar/ballerina/socket/${tomlVersion}")
+            into file("$artifactCacheParent/caches/jar/${moduleOrg}/${moduleName}/${tomlVersion}")
         }
         copy {
             from file("$project.projectDir/target/caches/bir_cache")
-            into file("$artifactSocketCacheParent/caches/bir")
+            into file("$artifactCacheParent/caches/bir")
         }
         copy {
             from file("$project.projectDir/target/balo")
-            into file("$artifactSocketCacheParent/caches/balo/ballerina/socket/${tomlVersion}")
+            into file("$artifactCacheParent/caches/balo/${moduleOrg}/${moduleName}/${tomlVersion}")
         }
         copy {
-            from targetSocketBallerinaJar
-            into file("$artifactSocketCacheParent/caches/jar/ballerina/socket/${tomlVersion}")
+            from targetBallerinaJar
+            into file("$artifactCacheParent/caches/jar/${moduleOrg}/${moduleName}/${tomlVersion}")
         }
 
         copy {
-            from targetSocketBallerinaJar
-            into file("$artifactSocketLibParent/libs")
+            from targetBallerinaJar
+            into file("$artifactLibParent/libs")
         }
+
         copy {
-            from targetSocketNativeJar
-            into file("$artifactSocketLibParent/libs")
+            from targetNativeJar
+            into file("$artifactLibParent/libs")
         }
 
         // Publish to central
@@ -126,9 +124,9 @@ task ballerinaBuild {
                 workingDir project.projectDir
                 environment "JAVA_OPTS", "-DBALLERINA_DEV_COMPILE_BALLERINA_ORG=true"
                 if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-                    commandLine 'cmd', '/c', "$distributionBinPath/ballerina.bat push socket"
+                    commandLine 'cmd', '/c', "$distributionBinPath/ballerina.bat push ${moduleName}"
                 } else {
-                    commandLine 'sh', '-c', "$distributionBinPath/ballerina push socket"
+                    commandLine 'sh', '-c', "$distributionBinPath/ballerina push ${moduleName}"
                 }
             }
 
@@ -138,21 +136,21 @@ task ballerinaBuild {
             workingDir project.projectDir
             environment "JAVA_OPTS", "-DBALLERINA_DEV_COMPILE_BALLERINA_ORG=true"
             if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-                commandLine 'cmd', '/c', "$distributionBinPath/ballerina.bat doc socket"
+                commandLine 'cmd', '/c', "$distributionBinPath/ballerina.bat doc ${moduleName}"
             } else {
-                commandLine 'sh', '-c', "$distributionBinPath/ballerina doc socket"
+                commandLine 'sh', '-c', "$distributionBinPath/ballerina doc ${moduleName}"
             }
         }
         copy {
-            from file("$project.projectDir/target/apidocs/socket")
-            into file("$project.projectDir/build/docs_parent/docs/socket")
+            from file("$project.projectDir/target/apidocs/${moduleName}")
+            into file("$project.projectDir/build/docs_parent/docs/${moduleName}")
         }
         ballerinaConfigFile.text = originalConfig
     }
 
-    outputs.dir artifactSocketCacheParent
-    outputs.dir artifactSocketBallerinaDocs
-    outputs.dir artifactSocketLibParent
+    outputs.dir artifactCacheParent
+    outputs.dir artifactBallerinaDocs
+    outputs.dir artifactLibParent
 }
 
 task createArtifactZip(type: Zip) {
@@ -181,4 +179,5 @@ publishing {
 
 ballerinaBuild.dependsOn ":socket-native:build"
 ballerinaBuild.dependsOn ":socket-test-utils:build"
+ballerinaBuild.dependsOn unpackJballerinaTools
 build.dependsOn ballerinaBuild
