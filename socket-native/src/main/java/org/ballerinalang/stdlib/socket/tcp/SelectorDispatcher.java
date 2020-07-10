@@ -48,7 +48,7 @@ public class SelectorDispatcher {
         try {
             Object[] params = getOnErrorResourceSignature(socketService, errorMsg);
             Executor.submit(socketService.getScheduler(), socketService.getService(), RESOURCE_ON_ERROR,
-                    new TCPSocketCallback(socketService), null, params);
+                    null, null, new TCPSocketCallback(socketService), null, params);
         } catch (Throwable e) {
             log.error("Error while executing onError resource", e);
         }
@@ -65,7 +65,8 @@ public class SelectorDispatcher {
         try {
             final ObjectValue caller = SocketUtils.createClient(socketService);
             Object[] params = new Object[] { caller, true, error, true };
-            Executor.submit(socketService.getScheduler(), socketService.getService(), RESOURCE_ON_ERROR, callback, null,
+            Executor.submit(socketService.getScheduler(), socketService.getService(), RESOURCE_ON_ERROR,
+                    null, null, callback, null,
                     params);
         } catch (Throwable e) {
             log.error("Error while executing onError resource", e);
@@ -81,7 +82,7 @@ public class SelectorDispatcher {
         try {
             Object[] params = getReadReadyResourceSignature(socketService);
             Executor.submit(socketService.getScheduler(), socketService.getService(), RESOURCE_ON_READ_READY,
-                    new TCPSocketReadCallback(socketService), null, params);
+                    null, null, new TCPSocketReadCallback(socketService), null, params);
         } catch (BallerinaConnectorException e) {
             invokeOnError(socketService, e.getMessage());
         }
@@ -97,7 +98,7 @@ public class SelectorDispatcher {
             final ObjectValue clientObj = SocketUtils.createClient(socketService);
             Object[] params = new Object[] { clientObj, true };
             Executor.submit(socketService.getScheduler(), socketService.getService(), RESOURCE_ON_CONNECT,
-                    new TCPSocketCallback(socketService), null, params);
+                    null, null, new TCPSocketCallback(socketService), null, params);
         } catch (BallerinaConnectorException e) {
             invokeOnError(socketService, e.getMessage());
         }
