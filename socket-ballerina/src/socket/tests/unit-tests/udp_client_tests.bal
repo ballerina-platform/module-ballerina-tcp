@@ -80,7 +80,7 @@ function testContentReceiveWithLength() {
     checkpanic socketClient->close();
 }
 
-@test:AfterSuite
+@test:AfterSuite{}
 function stopAll() {
     var result = stopUdpServer();
 }
