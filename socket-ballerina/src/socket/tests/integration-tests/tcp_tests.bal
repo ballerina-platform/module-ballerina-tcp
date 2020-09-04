@@ -14,11 +14,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
-import ballerina/http;
 import ballerina/log;
 import ballerina/test;
-
-http:Client clientEndpoint = new ("http://localhost:58291");
 
 @test:Config {
     dependsOn: ["testInvalidAddress"]
@@ -67,22 +64,6 @@ public function testBlockingRead() {
 
 @test:Config {
     dependsOn: ["testBlockingRead"]
-}
-function testHttpClientEcho() {
-    http:Request req = new;
-    req.addHeader("Content-Type", "text/plain");
-    string requestMessage = "Hello Ballerina";
-    var response = clientEndpoint->post("/echo", requestMessage);
-
-    if (response is http:Response) {
-        test:assertEquals(response.statusCode, http:STATUS_ACCEPTED, "Unexpected response code");
-    } else {
-        test:assertFail(msg = response.message());
-    }
-}
-
-@test:Config {
-    dependsOn: ["testHttpClientEcho"]
 }
 function testSocketServerJoinLeave() {
     int i = 0;

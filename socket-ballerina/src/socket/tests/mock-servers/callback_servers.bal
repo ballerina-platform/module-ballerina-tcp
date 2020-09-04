@@ -14,47 +14,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-import ballerina/http;
 import ballerina/io;
-
-listener http:Listener echoEP = new(58291);
-
-@http:ServiceConfig { basePath: "/echo" }
-service echo on echoEP {
-
-    @http:ResourceConfig {
-        methods: ["POST"],
-        path: "/"
-    }
-    resource function echo1(http:Caller caller, http:Request req) {
-        Client socketClient = new({ host: "localhost", port: 59152, callbackService: ClientService });
-        var payload = req.getTextPayload();
-        http:Response resp = new;
-        if (payload is string) {
-            byte[] payloadByte = payload.toBytes();
-            var writeResult = socketClient->write(payloadByte);
-            if (writeResult is int) {
-                io:println("Number of bytes written: ", writeResult);
-                checkpanic caller->accepted();
-            } else {
-                io:println("Write error!!!");
-                resp.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
-                resp.setPayload(<@untainted> writeResult.message());
-                var responseError = caller->respond(resp);
-                if (responseError is error) {
-                    io:println("Error sending response: ", responseError.message());
-                }
-            }
-        } else {
-            resp.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
-            resp.setPayload(<@untainted> payload.message());
-            var responseError = caller->respond(resp);
-            if (responseError is error) {
-                io:println("Error sending response: ", responseError.message());
-            }
-        }
-    }
-}
 
 service ClientService = service {
 
