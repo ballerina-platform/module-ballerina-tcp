@@ -74,7 +74,7 @@ public type Client client object {
 # + length - Represents the number of bytes, which should be read
 # + return - Content as a byte array and the number of bytes read or else a `socket:ReadTimedOutError` if the data
 #            can't be read from the client
-    public remote function read(public int length = -100) returns @tainted [byte[], int]|ReadTimedOutError {
+    public remote function read(int length = -100) returns @tainted [byte[], int]|ReadTimedOutError {
         return externRead(self, length);
     }
 
