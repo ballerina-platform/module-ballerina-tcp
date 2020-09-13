@@ -18,7 +18,7 @@ import ballerina/java;
 import ballerina/lang.'object as lang;
 
 # Represents the socket listener on which the socket listener service is registered and started.
-public type Listener object {
+public class Listener {
 
     *lang:Listener;
 
@@ -86,7 +86,7 @@ public type Listener object {
     // Socket listener operations are strictly bound to the attached service. In fact, a listener doesn't support
     // multiple services. Therefore, an already attached service is not removed during the detachment.
     }
-};
+}
 
 # Represents the socket server configuration.
 #
@@ -100,23 +100,23 @@ public type ListenerConfig record {|
 
 function initServer(Listener lis, int port, ListenerConfig config) returns error? =
 @java:Method {
-    class: "org.ballerinalang.stdlib.socket.endpoint.tcp.ServerActions"
+    'class: "org.ballerinalang.stdlib.socket.endpoint.tcp.ServerActions"
 } external;
 
 function externRegister(Listener lis, service s) returns error? =
 @java:Method {
     name: "register",
-    class: "org.ballerinalang.stdlib.socket.endpoint.tcp.ServerActions"
+    'class: "org.ballerinalang.stdlib.socket.endpoint.tcp.ServerActions"
 } external;
 
 function startService(Listener lis) returns error? =
 @java:Method {
     name: "start",
-    class: "org.ballerinalang.stdlib.socket.endpoint.tcp.ServerActions"
+    'class: "org.ballerinalang.stdlib.socket.endpoint.tcp.ServerActions"
 } external;
 
 function externStop(Listener lis, boolean graceful) returns error? =
 @java:Method {
     name: "stop",
-    class: "org.ballerinalang.stdlib.socket.endpoint.tcp.ServerActions"
+    'class: "org.ballerinalang.stdlib.socket.endpoint.tcp.ServerActions"
 } external;

@@ -24,7 +24,7 @@ import ballerina/java;
 # + localAddress - The local IP address string in textual presentation to which the socket is bound
 # + id - A unique identifier to identify each client
 # + config - The configurations for the socket client
-public type Client client object {
+public client class Client {
 
     private ClientConfig? config = ();
     public int remotePort = 0;
@@ -107,7 +107,7 @@ public type Client client object {
     public remote function shutdownWrite() returns Error? {
         return externShutdownWrite(self);
     }
-};
+}
 
 # Configurations for the socket client.
 #
@@ -127,41 +127,41 @@ public type ClientConfig record {|
 function initClientEndpoint(Client clientObj, ClientConfig clientConfig) returns error? =
 @java:Method {
     name: "initEndpoint",
-    class: "org.ballerinalang.stdlib.socket.endpoint.tcp.ClientActions"
+    'class: "org.ballerinalang.stdlib.socket.endpoint.tcp.ClientActions"
 } external;
 
 function startClient(Client clientObj) returns error? =
 @java:Method {
     name: "start",
-    class: "org.ballerinalang.stdlib.socket.endpoint.tcp.ClientActions"
+    'class: "org.ballerinalang.stdlib.socket.endpoint.tcp.ClientActions"
 } external;
 
 function externWrite(Client clientObj, byte[] content) returns int|Error =
 @java:Method {
     name: "write",
-    class: "org.ballerinalang.stdlib.socket.endpoint.tcp.ClientActions"
+    'class: "org.ballerinalang.stdlib.socket.endpoint.tcp.ClientActions"
 } external;
 
 function externRead(Client clientObj, int length) returns [byte[], int]|ReadTimedOutError =
 @java:Method {
     name: "read",
-    class: "org.ballerinalang.stdlib.socket.endpoint.tcp.ClientActions"
+    'class: "org.ballerinalang.stdlib.socket.endpoint.tcp.ClientActions"
 } external;
 
 function closeClient(Client clientObj) returns Error? =
 @java:Method {
     name: "close",
-    class: "org.ballerinalang.stdlib.socket.endpoint.tcp.ClientActions"
+    'class: "org.ballerinalang.stdlib.socket.endpoint.tcp.ClientActions"
 } external;
 
 function externShutdownRead(Client clientObj) returns Error? =
 @java:Method {
     name: "shutdownRead",
-    class: "org.ballerinalang.stdlib.socket.endpoint.tcp.ClientActions"
+    'class: "org.ballerinalang.stdlib.socket.endpoint.tcp.ClientActions"
 } external;
 
 function externShutdownWrite(Client clientObj) returns Error? =
 @java:Method {
     name: "shutdownWrite",
-    class: "org.ballerinalang.stdlib.socket.endpoint.tcp.ClientActions"
+    'class: "org.ballerinalang.stdlib.socket.endpoint.tcp.ClientActions"
 } external;
