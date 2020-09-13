@@ -18,7 +18,7 @@ import ballerina/java;
 import ballerina/lang.'object as lang;
 
 # Represents the socket listener on which the socket listener service is registered and started.
-public type Listener object {
+public class Listener {
 
     *lang:Listener;
 
@@ -33,60 +33,60 @@ public type Listener object {
         }
     }
 
-# Starts the `socket:Listener`.
-# ```ballerina
-# socket:error? result = socketListener.__start();
-# ```
-#
-# + return - `()` or else a `socket:Error` upon failure to start the listener
+    # Starts the `socket:Listener`.
+    # ```ballerina
+    # socket:error? result = socketListener.__start();
+    # ```
+    #
+    # + return - `()` or else a `socket:Error` upon failure to start the listener
     public function __start() returns error? {
         return startService(self);
     }
 
-# Stops the `socket:Listener` gracefully.
-# ```ballerina
-# socket:error? result = socketListener.__gracefulStop();
-# ```
-#
-# + return - `()` or else a `socket:Error` upon failure to stop the listener
+    # Stops the `socket:Listener` gracefully.
+    # ```ballerina
+    # socket:error? result = socketListener.__gracefulStop();
+    # ```
+    #
+    # + return - `()` or else a `socket:Error` upon failure to stop the listener
     public function __gracefulStop() returns error? {
         return externStop(self, true);
     }
 
-# Stops the `socket:Listener` forcefully.
-# ```ballerina
-# socket:error? result = socketListener.__immediateStop();
-# ```
-#
-# + return - `()` or else a `socket:Error` upon failure to stop the listener
+    # Stops the `socket:Listener` forcefully.
+    # ```ballerina
+    # socket:error? result = socketListener.__immediateStop();
+    # ```
+    #
+    # + return - `()` or else a `socket:Error` upon failure to stop the listener
     public function __immediateStop() returns error? {
         return externStop(self, false);
     }
 
-# Binds a service to the `socket:Listener`.
-# ```ballerina
-# socket:error? result = socketListener.__attach(helloService);
-# ```
-#
-# + s - Type descriptor of the service
-# + name - Name of the service
-# + return - `()` or else a `socket:Error` upon failure to register the listener
+    # Binds a service to the `socket:Listener`.
+    # ```ballerina
+    # socket:error? result = socketListener.__attach(helloService);
+    # ```
+    #
+    # + s - Type descriptor of the service
+    # + name - Name of the service
+    # + return - `()` or else a `socket:Error` upon failure to register the listener
     public function __attach(service s, string? name = ()) returns error? {
         return externRegister(self, s);
     }
 
-# Stops consuming messages and detaches the service from the `socket:Listener`.
-# ```ballerina
-# socket:error? result = socketListener.__detach(helloService);
-# ```
-#
-# + s - Type descriptor of the service
-# + return - `()` or else a `socket:Error` upon failure to detach the service
+    # Stops consuming messages and detaches the service from the `socket:Listener`.
+    # ```ballerina
+    # socket:error? result = socketListener.__detach(helloService);
+    # ```
+    #
+    # + s - Type descriptor of the service
+    # + return - `()` or else a `socket:Error` upon failure to detach the service
     public function __detach(service s) returns error? {
     // Socket listener operations are strictly bound to the attached service. In fact, a listener doesn't support
     // multiple services. Therefore, an already attached service is not removed during the detachment.
     }
-};
+}
 
 # Represents the socket server configuration.
 #
@@ -100,23 +100,23 @@ public type ListenerConfig record {|
 
 function initServer(Listener lis, int port, ListenerConfig config) returns error? =
 @java:Method {
-    class: "org.ballerinalang.stdlib.socket.endpoint.tcp.ServerActions"
+    'class: "org.ballerinalang.stdlib.socket.endpoint.tcp.ServerActions"
 } external;
 
 function externRegister(Listener lis, service s) returns error? =
 @java:Method {
     name: "register",
-    class: "org.ballerinalang.stdlib.socket.endpoint.tcp.ServerActions"
+    'class: "org.ballerinalang.stdlib.socket.endpoint.tcp.ServerActions"
 } external;
 
 function startService(Listener lis) returns error? =
 @java:Method {
     name: "start",
-    class: "org.ballerinalang.stdlib.socket.endpoint.tcp.ServerActions"
+    'class: "org.ballerinalang.stdlib.socket.endpoint.tcp.ServerActions"
 } external;
 
 function externStop(Listener lis, boolean graceful) returns error? =
 @java:Method {
     name: "stop",
-    class: "org.ballerinalang.stdlib.socket.endpoint.tcp.ServerActions"
+    'class: "org.ballerinalang.stdlib.socket.endpoint.tcp.ServerActions"
 } external;

@@ -24,7 +24,7 @@ import ballerina/java;
 # + localAddress - The local IP address string in textual presentation to which the socket is bound
 # + id - A unique identifier to identify each client
 # + config - The configurations for the socket client
-public type Client client object {
+public client class Client {
 
     private ClientConfig? config = ();
     public int remotePort = 0;
@@ -51,63 +51,63 @@ public type Client client object {
         return ();
     }
 
-# Writes the given data to the client socket.
-# ```ballerina
-# int|socket:Error writeResult = socketClient:write(payloadByte);
-# ```
-#
-# + content - The content, which will be sent to the client socket
-# + return - The number of bytes that got written or else a `socket:Error` if the given data can't be written
+    # Writes the given data to the client socket.
+    # ```ballerina
+    # int|socket:Error writeResult = socketClient:write(payloadByte);
+    # ```
+    #
+    # + content - The content, which will be sent to the client socket
+    # + return - The number of bytes that got written or else a `socket:Error` if the given data can't be written
     public remote function write(byte[] content) returns int|Error {
         return externWrite(self, content);
     }
 
-# Reads data from the client socket. If the data has the specified length, then it waits until that number of bytes
-# are received from the client. Else, it returns the data available in the OS buffer.
-# In the case of the connection being closed by the client, then return either -1 or the data
-# that is currently available in the buffer.
-# Number of bytes returned will be < 0 if the client closes the connection.
-# ```ballerina
-# [byte[], int]|socket:ReadTimedOutError result = socketClient->read();
-# ```
-#
-# + length - Represents the number of bytes, which should be read
-# + return - Content as a byte array and the number of bytes read or else a `socket:ReadTimedOutError` if the data
-#            can't be read from the client
+    # Reads data from the client socket. If the data has the specified length, then it waits until that number of bytes
+    # are received from the client. Else, it returns the data available in the OS buffer.
+    # In the case of the connection being closed by the client, then return either -1 or the data
+    # that is currently available in the buffer.
+    # Number of bytes returned will be < 0 if the client closes the connection.
+    # ```ballerina
+    # [byte[], int]|socket:ReadTimedOutError result = socketClient->read();
+    # ```
+    #
+    # + length - Represents the number of bytes, which should be read
+    # + return - Content as a byte array and the number of bytes read or else a `socket:ReadTimedOutError` if the data
+    #            can't be read from the client
     public remote function read(int length = -100) returns @tainted [byte[], int]|ReadTimedOutError {
         return externRead(self, length);
     }
 
-# Closes the client socket connection.
-# ```ballerina
-# socket:Error? closeResult = socketClient->close();
-# ```
-#
-# + return - A `socket:Error` if the client can't close the connection or else `()`
+    # Closes the client socket connection.
+    # ```ballerina
+    # socket:Error? closeResult = socketClient->close();
+    # ```
+    #
+    # + return - A `socket:Error` if the client can't close the connection or else `()`
     public remote function close() returns Error? {
         return closeClient(self);
     }
 
-# Shuts down any further reading from the socket.
-# ```ballerina
-# socket:Error? result = socketClient->shutdownRead();
-# ```
-#
-# + return - A `socket:Error` if the client can't be shut down to stop reading from the socket or else `()`
+    # Shuts down any further reading from the socket.
+    # ```ballerina
+    # socket:Error? result = socketClient->shutdownRead();
+    # ```
+    #
+    # + return - A `socket:Error` if the client can't be shut down to stop reading from the socket or else `()`
     public remote function shutdownRead() returns Error? {
         return externShutdownRead(self);
     }
 
-# Shuts down any further writing from the socket.
-# ```ballerina
-# socket:Error? result = socketClient->shutdownWrite();
-# ```
-#
-# + return - A `socket:Error` if the client can't shut down to stop the writing to the socket or else `()`
+    # Shuts down any further writing from the socket.
+    # ```ballerina
+    # socket:Error? result = socketClient->shutdownWrite();
+    # ```
+    #
+    # + return - A `socket:Error` if the client can't shut down to stop the writing to the socket or else `()`
     public remote function shutdownWrite() returns Error? {
         return externShutdownWrite(self);
     }
-};
+}
 
 # Configurations for the socket client.
 #
@@ -127,41 +127,41 @@ public type ClientConfig record {|
 function initClientEndpoint(Client clientObj, ClientConfig clientConfig) returns error? =
 @java:Method {
     name: "initEndpoint",
-    class: "org.ballerinalang.stdlib.socket.endpoint.tcp.ClientActions"
+    'class: "org.ballerinalang.stdlib.socket.endpoint.tcp.ClientActions"
 } external;
 
 function startClient(Client clientObj) returns error? =
 @java:Method {
     name: "start",
-    class: "org.ballerinalang.stdlib.socket.endpoint.tcp.ClientActions"
+    'class: "org.ballerinalang.stdlib.socket.endpoint.tcp.ClientActions"
 } external;
 
 function externWrite(Client clientObj, byte[] content) returns int|Error =
 @java:Method {
     name: "write",
-    class: "org.ballerinalang.stdlib.socket.endpoint.tcp.ClientActions"
+    'class: "org.ballerinalang.stdlib.socket.endpoint.tcp.ClientActions"
 } external;
 
 function externRead(Client clientObj, int length) returns [byte[], int]|ReadTimedOutError =
 @java:Method {
     name: "read",
-    class: "org.ballerinalang.stdlib.socket.endpoint.tcp.ClientActions"
+    'class: "org.ballerinalang.stdlib.socket.endpoint.tcp.ClientActions"
 } external;
 
 function closeClient(Client clientObj) returns Error? =
 @java:Method {
     name: "close",
-    class: "org.ballerinalang.stdlib.socket.endpoint.tcp.ClientActions"
+    'class: "org.ballerinalang.stdlib.socket.endpoint.tcp.ClientActions"
 } external;
 
 function externShutdownRead(Client clientObj) returns Error? =
 @java:Method {
     name: "shutdownRead",
-    class: "org.ballerinalang.stdlib.socket.endpoint.tcp.ClientActions"
+    'class: "org.ballerinalang.stdlib.socket.endpoint.tcp.ClientActions"
 } external;
 
 function externShutdownWrite(Client clientObj) returns Error? =
 @java:Method {
     name: "shutdownWrite",
-    class: "org.ballerinalang.stdlib.socket.endpoint.tcp.ClientActions"
+    'class: "org.ballerinalang.stdlib.socket.endpoint.tcp.ClientActions"
 } external;

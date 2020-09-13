@@ -51,7 +51,7 @@ public class TCPSocketCallback implements CallableUnitCallback {
 
     @Override
     public void notifyFailure(ErrorValue error) {
-        String errorMsg = error.stringValue();
+        String errorMsg = error.stringValue(null);
         if (log.isDebugEnabled()) {
             log.debug(String.format("Socket resource dispatch failed: %s", errorMsg));
         }
