@@ -18,13 +18,13 @@
 
 package org.ballerinalang.stdlib.socket.endpoint.tcp;
 
-import org.ballerinalang.jvm.StringUtils;
+import org.ballerinalang.jvm.api.BStringUtils;
+import org.ballerinalang.jvm.api.values.BError;
+import org.ballerinalang.jvm.api.values.BMap;
+import org.ballerinalang.jvm.api.values.BObject;
+import org.ballerinalang.jvm.api.values.BString;
 import org.ballerinalang.jvm.scheduling.Scheduler;
 import org.ballerinalang.jvm.values.ArrayValue;
-import org.ballerinalang.jvm.values.ErrorValue;
-import org.ballerinalang.jvm.values.MapValue;
-import org.ballerinalang.jvm.values.ObjectValue;
-import org.ballerinalang.jvm.values.api.BString;
 import org.ballerinalang.jvm.values.connector.NonBlockingCallback;
 import org.ballerinalang.stdlib.socket.SocketConstants;
 import org.ballerinalang.stdlib.socket.exceptions.SelectorInitializeException;
@@ -58,7 +58,7 @@ import static java.nio.channels.SelectionKey.OP_READ;
 public class ClientActions {
     private static final Logger log = LoggerFactory.getLogger(ClientActions.class);
 
-    public static Object initEndpoint(ObjectValue client, MapValue<BString, Object> config) {
+    public static Object initEndpoint(BObject client, BMap<BString, Object> config) {
         Object returnValue = null;
         try {
             SocketChannel socketChannel = SocketChannel.open();
@@ -66,11 +66,11 @@ public class ClientActions {
             socketChannel.socket().setReuseAddress(true);
             client.addNativeData(SocketConstants.SOCKET_KEY, socketChannel);
             client.addNativeData(SocketConstants.IS_CLIENT, true);
-            ObjectValue callbackService = (ObjectValue) config.get(
-                    StringUtils.fromString(SocketConstants.CLIENT_SERVICE_CONFIG)
+            BObject callbackService = (BObject) config.get(
+                    BStringUtils.fromString(SocketConstants.CLIENT_SERVICE_CONFIG)
             );
             client.addNativeData(SocketConstants.CLIENT_CONFIG, config);
-            final long readTimeout = config.getIntValue(StringUtils.fromString(SocketConstants.READ_TIMEOUT));
+            final long readTimeout = config.getIntValue(BStringUtils.fromString(SocketConstants.READ_TIMEOUT));
             client.addNativeData(SocketConstants.SOCKET_SERVICE,
                     new SocketService(socketChannel, Scheduler.getStrand().scheduler, callbackService, readTimeout));
         } catch (SocketException e) {
@@ -82,7 +82,7 @@ public class ClientActions {
         return returnValue;
     }
 
-    public static Object close(ObjectValue client) {
+    public static Object close(BObject client) {
         final SocketChannel socketChannel = (SocketChannel) client.getNativeData(SocketConstants.SOCKET_KEY);
         try {
             // SocketChannel can be null if something happen during the onConnect. Hence the null check.
@@ -102,7 +102,7 @@ public class ClientActions {
         return null;
     }
 
-    public static Object read(ObjectValue client, long length) {
+    public static Object read(BObject client, long length) {
         final NonBlockingCallback callback = new NonBlockingCallback(Scheduler.getStrand());
         if (length != SocketConstants.DEFAULT_EXPECTED_READ_LENGTH && length < 1) {
             String msg = "requested byte length need to be 1 or more";
@@ -121,7 +121,7 @@ public class ClientActions {
         return null;
     }
 
-    public static Object shutdownRead(ObjectValue client) {
+    public static Object shutdownRead(BObject client) {
         final SocketChannel socketChannel = (SocketChannel) client.getNativeData(SocketConstants.SOCKET_KEY);
         try {
             // SocketChannel can be null if something happen during the onAccept. Hence the null check.
@@ -139,7 +139,7 @@ public class ClientActions {
         return null;
     }
 
-    public static Object shutdownWrite(ObjectValue client) {
+    public static Object shutdownWrite(BObject client) {
         final SocketChannel socketChannel = (SocketChannel) client.getNativeData(SocketConstants.SOCKET_KEY);
         try {
             // SocketChannel can be null if something happen during the onAccept. Hence the null check.
@@ -157,17 +157,17 @@ public class ClientActions {
         return null;
     }
 
-    public static Object start(ObjectValue client) {
+    public static Object start(BObject client) {
         final NonBlockingCallback callback = new NonBlockingCallback(Scheduler.getStrand());
         SelectorManager selectorManager = null;
-        ErrorValue error = null;
+        BError error = null;
         SocketChannel channel = null;
         try {
             channel = (SocketChannel) client.getNativeData(SocketConstants.SOCKET_KEY);
-            MapValue<BString, Object> config =
-                    (MapValue<BString, Object>) client.getNativeData(SocketConstants.CLIENT_CONFIG);
-            int port = Math.toIntExact(config.getIntValue(StringUtils.fromString(SocketConstants.CONFIG_FIELD_PORT)));
-            String host = config.getStringValue(StringUtils.fromString(SocketConstants.CONFIG_FIELD_HOST)).getValue();
+            BMap<BString, Object> config =
+                    (BMap<BString, Object>) client.getNativeData(SocketConstants.CLIENT_CONFIG);
+            int port = Math.toIntExact(config.getIntValue(BStringUtils.fromString(SocketConstants.CONFIG_FIELD_PORT)));
+            String host = config.getStringValue(BStringUtils.fromString(SocketConstants.CONFIG_FIELD_HOST)).getValue();
             channel.connect(new InetSocketAddress(host, port));
             channel.finishConnect();
             channel.configureBlocking(false);
@@ -206,7 +206,7 @@ public class ClientActions {
         return null;
     }
 
-    public static Object write(ObjectValue client, ArrayValue content) {
+    public static Object write(BObject client, ArrayValue content) {
         final SocketChannel socketChannel = (SocketChannel) client.getNativeData(SocketConstants.SOCKET_KEY);
         byte[] byteContent = content.getBytes();
         if (log.isDebugEnabled()) {

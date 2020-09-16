@@ -18,13 +18,11 @@
 
 package org.ballerinalang.stdlib.socket.tcp;
 
-import org.ballerinalang.jvm.BallerinaErrors;
-import org.ballerinalang.jvm.BallerinaValues;
-import org.ballerinalang.jvm.StringUtils;
-import org.ballerinalang.jvm.values.ErrorValue;
-import org.ballerinalang.jvm.values.MapValue;
-import org.ballerinalang.jvm.values.ObjectValue;
-import org.ballerinalang.jvm.values.api.BString;
+import org.ballerinalang.jvm.api.BErrorCreator;
+import org.ballerinalang.jvm.api.BStringUtils;
+import org.ballerinalang.jvm.api.BValueCreator;
+import org.ballerinalang.jvm.api.values.BError;
+import org.ballerinalang.jvm.api.values.BObject;
 import org.ballerinalang.stdlib.socket.SocketConstants;
 
 import java.net.Socket;
@@ -58,10 +56,11 @@ public class SocketUtils {
      * Create Generic socket error with given error message.
      *
      * @param errMsg the error message
-     * @return ErrorValue instance which contains the error details
+     * @return BError instance which contains the error details
      */
-    public static ErrorValue createSocketError(String errMsg) {
-        return BallerinaErrors.createDistinctError(GenericError.errorType(), SOCKET_PACKAGE_ID, errMsg);
+    public static BError createSocketError(String errMsg) {
+        return BErrorCreator.createDistinctError(GenericError.errorType(), SOCKET_PACKAGE_ID,
+                                                 BStringUtils.fromString(errMsg));
     }
 
     /**
@@ -69,10 +68,10 @@ public class SocketUtils {
      *
      * @param type   the error type which cause for this error
      * @param errMsg the error message
-     * @return ErrorValue instance which contains the error details
+     * @return BError instance which contains the error details
      */
-    public static ErrorValue createSocketError(SocketConstants.ErrorType type, String errMsg) {
-        return BallerinaErrors.createDistinctError(type.errorType(), SOCKET_PACKAGE_ID, errMsg);
+    public static BError createSocketError(SocketConstants.ErrorType type, String errMsg) {
+        return BErrorCreator.createDistinctError(type.errorType(), SOCKET_PACKAGE_ID, BStringUtils.fromString(errMsg));
     }
 
     /**
@@ -81,9 +80,9 @@ public class SocketUtils {
      * @param socketService {@link SocketService} instance that contains SocketChannel and resource map
      * @return 'Caller' object
      */
-    static ObjectValue createClient(SocketService socketService) {
+    static BObject createClient(SocketService socketService) {
         Object[] args = new Object[] { null };
-        final ObjectValue caller = BallerinaValues.createObjectValue(SOCKET_PACKAGE_ID, CLIENT, args);
+        final BObject caller = BValueCreator.createObjectValue(SOCKET_PACKAGE_ID, CLIENT, args);
         caller.addNativeData(SOCKET_SERVICE, socketService);
         SocketChannel client = null;
         // An error can be thrown during the onAccept function. So there is a possibility of client not
@@ -94,11 +93,11 @@ public class SocketUtils {
         if (client != null) {
             caller.addNativeData(SOCKET_KEY, client);
             Socket socket = client.socket();
-            caller.set(StringUtils.fromString(REMOTE_PORT), socket.getPort());
-            caller.set(StringUtils.fromString(LOCAL_PORT), socket.getLocalPort());
-            caller.set(StringUtils.fromString(REMOTE_ADDRESS), socket.getInetAddress().getHostAddress());
-            caller.set(StringUtils.fromString(LOCAL_ADDRESS), socket.getLocalAddress().getHostAddress());
-            caller.set(StringUtils.fromString(ID), client.hashCode());
+            caller.set(BStringUtils.fromString(REMOTE_PORT), socket.getPort());
+            caller.set(BStringUtils.fromString(LOCAL_PORT), socket.getLocalPort());
+            caller.set(BStringUtils.fromString(REMOTE_ADDRESS), socket.getInetAddress().getHostAddress());
+            caller.set(BStringUtils.fromString(LOCAL_ADDRESS), socket.getLocalAddress().getHostAddress());
+            caller.set(BStringUtils.fromString(ID), client.hashCode());
         }
         return caller;
     }

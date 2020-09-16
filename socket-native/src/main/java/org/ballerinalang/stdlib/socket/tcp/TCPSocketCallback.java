@@ -18,8 +18,8 @@
 
 package org.ballerinalang.stdlib.socket.tcp;
 
-import org.ballerinalang.jvm.values.ErrorValue;
-import org.ballerinalang.jvm.values.connector.CallableUnitCallback;
+import org.ballerinalang.jvm.api.connector.CallableUnitCallback;
+import org.ballerinalang.jvm.api.values.BError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,14 +50,15 @@ public class TCPSocketCallback implements CallableUnitCallback {
     }
 
     @Override
-    public void notifyFailure(ErrorValue error) {
+    public void notifyFailure(BError error) {
         String errorMsg = error.stringValue(null);
         if (log.isDebugEnabled()) {
             log.debug(String.format("Socket resource dispatch failed: %s", errorMsg));
         }
         if (!executeFailureOnce) {
             // This is the first failure. Hence dispatching to onError.
-            SelectorDispatcher.invokeOnError(socketService, new TCPSocketCallback(socketService, true), error);
+            SelectorDispatcher.invokeOnError(socketService, new TCPSocketCallback(socketService, true),
+                                             error);
         } else {
             log.error(
                     String.format("NotifyFailure hit twice, hence preventing error dispatching. Cause: %s", errorMsg));

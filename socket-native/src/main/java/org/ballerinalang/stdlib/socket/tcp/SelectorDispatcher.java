@@ -18,10 +18,10 @@
 
 package org.ballerinalang.stdlib.socket.tcp;
 
+import org.ballerinalang.jvm.api.BExecutor;
+import org.ballerinalang.jvm.api.values.BError;
+import org.ballerinalang.jvm.api.values.BObject;
 import org.ballerinalang.jvm.util.exceptions.BallerinaConnectorException;
-import org.ballerinalang.jvm.values.ErrorValue;
-import org.ballerinalang.jvm.values.ObjectValue;
-import org.ballerinalang.jvm.values.connector.Executor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,7 +47,7 @@ public class SelectorDispatcher {
     static void invokeOnError(SocketService socketService, String errorMsg) {
         try {
             Object[] params = getOnErrorResourceSignature(socketService, errorMsg);
-            Executor.submit(socketService.getScheduler(), socketService.getService(), RESOURCE_ON_ERROR,
+            BExecutor.submit(socketService.getScheduler(), socketService.getService(), RESOURCE_ON_ERROR,
                     null, null, new TCPSocketCallback(socketService), null, params);
         } catch (Throwable e) {
             log.error("Error while executing onError resource", e);
@@ -59,13 +59,13 @@ public class SelectorDispatcher {
      *
      * @param socketService {@link SocketService} instance that contains SocketChannel and resource map
      * @param callback      {@link TCPSocketCallback} instance
-     * @param error         {@link ErrorValue} instance which contains the error details
+     * @param error         {@link BError} instance which contains the error details
      */
-    static void invokeOnError(SocketService socketService, TCPSocketCallback callback, ErrorValue error) {
+    static void invokeOnError(SocketService socketService, TCPSocketCallback callback, BError error) {
         try {
-            final ObjectValue caller = SocketUtils.createClient(socketService);
+            final BObject caller = SocketUtils.createClient(socketService);
             Object[] params = new Object[] { caller, true, error, true };
-            Executor.submit(socketService.getScheduler(), socketService.getService(), RESOURCE_ON_ERROR,
+            BExecutor.submit(socketService.getScheduler(), socketService.getService(), RESOURCE_ON_ERROR,
                     null, null, callback, null,
                     params);
         } catch (Throwable e) {
@@ -81,7 +81,7 @@ public class SelectorDispatcher {
     static void invokeReadReady(SocketService socketService) {
         try {
             Object[] params = getReadReadyResourceSignature(socketService);
-            Executor.submit(socketService.getScheduler(), socketService.getService(), RESOURCE_ON_READ_READY,
+            BExecutor.submit(socketService.getScheduler(), socketService.getService(), RESOURCE_ON_READ_READY,
                     null, null, new TCPSocketReadCallback(socketService), null, params);
         } catch (BallerinaConnectorException e) {
             invokeOnError(socketService, e.getMessage());
@@ -95,9 +95,9 @@ public class SelectorDispatcher {
      */
     static void invokeOnConnect(SocketService socketService) {
         try {
-            final ObjectValue clientObj = SocketUtils.createClient(socketService);
+            final BObject clientObj = SocketUtils.createClient(socketService);
             Object[] params = new Object[] { clientObj, true };
-            Executor.submit(socketService.getScheduler(), socketService.getService(), RESOURCE_ON_CONNECT,
+            BExecutor.submit(socketService.getScheduler(), socketService.getService(), RESOURCE_ON_CONNECT,
                     null, null, new TCPSocketCallback(socketService), null, params);
         } catch (BallerinaConnectorException e) {
             invokeOnError(socketService, e.getMessage());
@@ -105,13 +105,13 @@ public class SelectorDispatcher {
     }
 
     private static Object[] getOnErrorResourceSignature(SocketService socketService, String msg) {
-        ObjectValue caller = SocketUtils.createClient(socketService);
-        ErrorValue error = SocketUtils.createSocketError(msg);
+        BObject caller = SocketUtils.createClient(socketService);
+        BError error = SocketUtils.createSocketError(msg);
         return new Object[] { caller, true, error, true };
     }
 
     private static Object[] getReadReadyResourceSignature(SocketService socketService) {
-        ObjectValue caller = SocketUtils.createClient(socketService);
+        BObject caller = SocketUtils.createClient(socketService);
         return new Object[] { caller, true };
     }
 }
