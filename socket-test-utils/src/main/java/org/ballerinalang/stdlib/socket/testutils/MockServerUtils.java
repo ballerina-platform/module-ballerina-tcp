@@ -18,7 +18,7 @@
 
 package org.ballerinalang.stdlib.socket.testutils;
 
-import org.ballerinalang.jvm.values.api.BString;
+import org.ballerinalang.jvm.api.values.BString;
 import org.ballerinalang.stdlib.socket.tcp.SocketUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

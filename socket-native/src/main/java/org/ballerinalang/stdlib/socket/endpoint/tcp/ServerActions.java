@@ -18,11 +18,11 @@
 
 package org.ballerinalang.stdlib.socket.endpoint.tcp;
 
-import org.ballerinalang.jvm.StringUtils;
+import org.ballerinalang.jvm.api.BStringUtils;
+import org.ballerinalang.jvm.api.values.BMap;
+import org.ballerinalang.jvm.api.values.BObject;
+import org.ballerinalang.jvm.api.values.BString;
 import org.ballerinalang.jvm.scheduling.Scheduler;
-import org.ballerinalang.jvm.values.MapValue;
-import org.ballerinalang.jvm.values.ObjectValue;
-import org.ballerinalang.jvm.values.api.BString;
 import org.ballerinalang.jvm.values.connector.NonBlockingCallback;
 import org.ballerinalang.stdlib.socket.SocketConstants;
 import org.ballerinalang.stdlib.socket.exceptions.SelectorInitializeException;
@@ -54,7 +54,7 @@ import static org.ballerinalang.stdlib.socket.SocketConstants.READ_TIMEOUT;
 public class ServerActions {
     private static final Logger log = LoggerFactory.getLogger(ServerActions.class);
 
-    public static Object initServer(ObjectValue listener, long port, MapValue<BString, Object> config) {
+    public static Object initServer(BObject listener, long port, BMap<BString, Object> config) {
         try {
             ServerSocketChannel serverSocket = ServerSocketChannel.open();
             serverSocket.configureBlocking(false);
@@ -62,7 +62,7 @@ public class ServerActions {
             listener.addNativeData(SocketConstants.SERVER_SOCKET_KEY, serverSocket);
             listener.addNativeData(SocketConstants.LISTENER_CONFIG, config);
             listener.addNativeData(SocketConstants.CONFIG_FIELD_PORT, (int) port);
-            final long timeout = config.getIntValue(StringUtils.fromString(READ_TIMEOUT));
+            final long timeout = config.getIntValue(BStringUtils.fromString(READ_TIMEOUT));
             listener.addNativeData(READ_TIMEOUT, timeout);
         } catch (SocketException e) {
             return SocketUtils.createSocketError("unable to bind the socket port");
@@ -73,28 +73,28 @@ public class ServerActions {
         return null;
     }
 
-    public static Object register(ObjectValue listener, ObjectValue service) {
+    public static Object register(BObject listener, BObject service) {
         final SocketService socketService =
                 getSocketService(listener, Scheduler.getStrand().scheduler, service);
         listener.addNativeData(SocketConstants.SOCKET_SERVICE, socketService);
         return null;
     }
 
-    private static SocketService getSocketService(ObjectValue listener, Scheduler scheduler, ObjectValue service) {
+    private static SocketService getSocketService(BObject listener, Scheduler scheduler, BObject service) {
         ServerSocketChannel serverSocket =
                 (ServerSocketChannel) listener.getNativeData(SocketConstants.SERVER_SOCKET_KEY);
         long timeout = (long) listener.getNativeData(READ_TIMEOUT);
         return new SocketService(serverSocket, scheduler, service, timeout);
     }
 
-    public static Object start(ObjectValue listener) {
+    public static Object start(BObject listener) {
         final NonBlockingCallback callback = new NonBlockingCallback(Scheduler.getStrand());
         try {
             ServerSocketChannel channel =
                     (ServerSocketChannel) listener.getNativeData(SocketConstants.SERVER_SOCKET_KEY);
             int port = (int) listener.getNativeData(SocketConstants.CONFIG_FIELD_PORT);
-            MapValue<BString, Object> config =
-                    (MapValue<BString, Object>) listener.getNativeData(SocketConstants.LISTENER_CONFIG);
+            BMap<BString, Object> config =
+                    (BMap<BString, Object>) listener.getNativeData(SocketConstants.LISTENER_CONFIG);
             String networkInterface = (String) config.getNativeData(SocketConstants.CONFIG_FIELD_INTERFACE);
             if (networkInterface == null) {
                 channel.bind(new InetSocketAddress(port));
@@ -131,7 +131,7 @@ public class ServerActions {
         return null;
     }
 
-    public static Object stop(ObjectValue listener, boolean graceful) {
+    public static Object stop(BObject listener, boolean graceful) {
         try {
             ServerSocketChannel channel =
                     (ServerSocketChannel) listener.getNativeData(SocketConstants.SERVER_SOCKET_KEY);

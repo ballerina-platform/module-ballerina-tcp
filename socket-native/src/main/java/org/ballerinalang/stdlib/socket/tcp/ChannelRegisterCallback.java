@@ -18,7 +18,7 @@
 
 package org.ballerinalang.stdlib.socket.tcp;
 
-import org.ballerinalang.jvm.values.ErrorValue;
+import org.ballerinalang.jvm.api.values.BError;
 import org.ballerinalang.jvm.values.connector.NonBlockingCallback;
 
 /**
@@ -64,7 +64,7 @@ public class ChannelRegisterCallback {
      * @param errorMsg the error message
      */
     public void notifyFailure(String errorMsg) {
-        ErrorValue error = SocketUtils.createSocketError(errorMsg);
+        BError error = SocketUtils.createSocketError(errorMsg);
         callback.notifyFailure(error);
         // We don't need to dispatch the error to the onError here.
         // This should treated as a panic and stop listener/client getting start.

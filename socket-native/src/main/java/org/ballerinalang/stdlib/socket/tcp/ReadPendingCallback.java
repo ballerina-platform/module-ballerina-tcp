@@ -18,7 +18,7 @@
 
 package org.ballerinalang.stdlib.socket.tcp;
 
-import org.ballerinalang.jvm.values.ErrorValue;
+import org.ballerinalang.jvm.api.values.BError;
 import org.ballerinalang.jvm.values.connector.NonBlockingCallback;
 import org.ballerinalang.stdlib.socket.SocketConstants;
 
@@ -102,7 +102,7 @@ public class ReadPendingCallback {
         return new TimerTask() {
             public void run() {
                 ReadPendingSocketMap.getInstance().remove(socketHash);
-                final ErrorValue timeoutError =
+                final BError timeoutError =
                         SocketUtils.createSocketError(SocketConstants.ErrorType.ReadTimedOutError, "read timed out");
                 callback.setReturnValues(timeoutError);
                 callback.notifySuccess();

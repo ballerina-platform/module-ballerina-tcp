@@ -18,8 +18,8 @@
 
 package org.ballerinalang.stdlib.socket.tcp;
 
+import org.ballerinalang.jvm.api.values.BObject;
 import org.ballerinalang.jvm.scheduling.Scheduler;
-import org.ballerinalang.jvm.values.ObjectValue;
 
 import java.nio.channels.SelectableChannel;
 import java.util.concurrent.Semaphore;
@@ -35,17 +35,17 @@ public class SocketService {
     private Semaphore resourceLock = new Semaphore(1);
     private SelectableChannel socketChannel;
     private long readTimeout;
-    private ObjectValue service;
+    private BObject service;
     private Scheduler scheduler;
 
-    public SocketService(SelectableChannel socketChannel, Scheduler scheduler, ObjectValue service, long readTimeout) {
+    public SocketService(SelectableChannel socketChannel, Scheduler scheduler, BObject service, long readTimeout) {
         this.socketChannel = socketChannel;
         this.scheduler = scheduler;
         this.service = service;
         this.readTimeout = readTimeout;
     }
 
-    public SocketService(Scheduler scheduler, ObjectValue service) {
+    public SocketService(Scheduler scheduler, BObject service) {
         this.scheduler = scheduler;
         this.service = service;
     }
@@ -58,7 +58,7 @@ public class SocketService {
         return scheduler;
     }
 
-    public ObjectValue getService() {
+    public BObject getService() {
         return service;
     }
 
