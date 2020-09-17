@@ -26,7 +26,7 @@ public class Listener {
     #
     # + port - The port number of the remote service
     # + config - Configurations related to the `socket:Listener`
-    public function init(int port, ListenerConfig? config = ()) {
+    public isolated function init(int port, ListenerConfig? config = ()) {
         var result = initServer(self, port, config ?: {});
         if (result is error) {
             panic result;
@@ -39,7 +39,7 @@ public class Listener {
     # ```
     #
     # + return - `()` or else a `socket:Error` upon failure to start the listener
-    public function __start() returns error? {
+    public isolated function __start() returns error? {
         return startService(self);
     }
 
@@ -49,7 +49,7 @@ public class Listener {
     # ```
     #
     # + return - `()` or else a `socket:Error` upon failure to stop the listener
-    public function __gracefulStop() returns error? {
+    public isolated function __gracefulStop() returns error? {
         return externStop(self, true);
     }
 
@@ -59,7 +59,7 @@ public class Listener {
     # ```
     #
     # + return - `()` or else a `socket:Error` upon failure to stop the listener
-    public function __immediateStop() returns error? {
+    public isolated function __immediateStop() returns error? {
         return externStop(self, false);
     }
 
@@ -71,7 +71,7 @@ public class Listener {
     # + s - Type descriptor of the service
     # + name - Name of the service
     # + return - `()` or else a `socket:Error` upon failure to register the listener
-    public function __attach(service s, string? name = ()) returns error? {
+    public isolated function __attach(service s, string? name = ()) returns error? {
         return externRegister(self, s);
     }
 
@@ -82,7 +82,7 @@ public class Listener {
     #
     # + s - Type descriptor of the service
     # + return - `()` or else a `socket:Error` upon failure to detach the service
-    public function __detach(service s) returns error? {
+    public isolated function __detach(service s) returns error? {
     // Socket listener operations are strictly bound to the attached service. In fact, a listener doesn't support
     // multiple services. Therefore, an already attached service is not removed during the detachment.
     }
@@ -98,24 +98,24 @@ public type ListenerConfig record {|
     int readTimeoutInMillis = 300000;
 |};
 
-function initServer(Listener lis, int port, ListenerConfig config) returns error? =
+isolated function initServer(Listener lis, int port, ListenerConfig config) returns error? =
 @java:Method {
     'class: "org.ballerinalang.stdlib.socket.endpoint.tcp.ServerActions"
 } external;
 
-function externRegister(Listener lis, service s) returns error? =
+isolated function externRegister(Listener lis, service s) returns error? =
 @java:Method {
     name: "register",
     'class: "org.ballerinalang.stdlib.socket.endpoint.tcp.ServerActions"
 } external;
 
-function startService(Listener lis) returns error? =
+isolated function startService(Listener lis) returns error? =
 @java:Method {
     name: "start",
     'class: "org.ballerinalang.stdlib.socket.endpoint.tcp.ServerActions"
 } external;
 
-function externStop(Listener lis, boolean graceful) returns error? =
+isolated function externStop(Listener lis, boolean graceful) returns error? =
 @java:Method {
     name: "stop",
     'class: "org.ballerinalang.stdlib.socket.endpoint.tcp.ServerActions"
