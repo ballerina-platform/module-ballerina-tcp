@@ -33,7 +33,7 @@ public client class UdpClient {
     #
     # + localAddress - Local binding of the interface and port
     # + config - The configurations for the UDP client
-    public function init(Address? localAddress = (), UdpClientConfig? config = ()) {
+    public isolated function init(Address? localAddress = (), UdpClientConfig? config = ()) {
         UdpClientConfig configuration = config ?: {};
         self.localAddress = localAddress;
         var initResult = initUdpClientEndpoint(self, localAddress, configuration);
@@ -53,7 +53,7 @@ public client class UdpClient {
     # + content - The content to be sent to the client socket
     # + address - The address of the remote client socket
     # + return - The number of bytes got written or else a `socket:Error` if the given data can't be sent
-    public remote function sendTo(byte[] content, Address address) returns int|Error {
+    public isolated remote function sendTo(byte[] content, Address address) returns int|Error {
         return udpClientSendTo(self, content, address);
     }
 
@@ -67,7 +67,7 @@ public client class UdpClient {
     # + length - Represents the number of bytes, which should be read
     # + return - The content as a byte array, the number of bytes read, the address of the sender,
     #            or else a `socket:Error` if the data can't be read from the client
-    public remote function receiveFrom(int length = -100) returns [byte[], int, Address]|ReadTimedOutError {
+    public isolated remote function receiveFrom(int length = -100) returns [byte[], int, Address]|ReadTimedOutError {
         return externReceiveFrom(self, length);
     }
 
@@ -77,7 +77,7 @@ public client class UdpClient {
     # ```
     #
     # + return - A `socket:Error` if it can't close the connection or else `()`
-    public remote function close() returns Error? {
+    public isolated remote function close() returns Error? {
         return closeUdpClient(self);
     }
 }
@@ -99,25 +99,25 @@ public type UdpClientConfig record {|
     int readTimeoutInMillis = 300000;
 |};
 
-function initUdpClientEndpoint(UdpClient udpClient, Address? localAddress, UdpClientConfig config) returns error? =
+isolated function initUdpClientEndpoint(UdpClient udpClient, Address? localAddress, UdpClientConfig config) returns error? =
 @java:Method {
     name: "initEndpoint",
     'class: "org.ballerinalang.stdlib.socket.endpoint.udp.ClientActions"
 } external;
 
-function closeUdpClient(UdpClient udpClient) returns Error? =
+isolated function closeUdpClient(UdpClient udpClient) returns Error? =
 @java:Method {
     name: "close",
     'class: "org.ballerinalang.stdlib.socket.endpoint.udp.ClientActions"
 } external;
 
-function externReceiveFrom(UdpClient udpClient, int length) returns [byte[], int, Address]|ReadTimedOutError =
+isolated function externReceiveFrom(UdpClient udpClient, int length) returns [byte[], int, Address]|ReadTimedOutError =
 @java:Method {
     name: "receiveFrom",
     'class: "org.ballerinalang.stdlib.socket.endpoint.udp.ClientActions"
 } external;
 
-function udpClientSendTo(UdpClient udpClient, byte[] content, Address address) returns int|Error =
+isolated function udpClientSendTo(UdpClient udpClient, byte[] content, Address address) returns int|Error =
 @java:Method {
     name: "sendTo",
     'class: "org.ballerinalang.stdlib.socket.endpoint.udp.ClientActions"
