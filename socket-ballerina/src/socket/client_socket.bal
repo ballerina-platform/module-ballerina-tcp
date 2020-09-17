@@ -36,7 +36,7 @@ public client class Client {
     # Initializes the TCP socket client with the given client configuration.
     #
     # + clientConfig - This is used to provide the configurations like host, port, and timeout
-    public function init(ClientConfig? clientConfig) {
+    public isolated function init(ClientConfig? clientConfig) {
         if (clientConfig is ClientConfig) {
             self.config = clientConfig;
             var initResult = initClientEndpoint(self, clientConfig);
@@ -58,7 +58,7 @@ public client class Client {
     #
     # + content - The content, which will be sent to the client socket
     # + return - The number of bytes that got written or else a `socket:Error` if the given data can't be written
-    public remote function write(byte[] content) returns int|Error {
+    public isolated remote function write(byte[] content) returns int|Error {
         return externWrite(self, content);
     }
 
@@ -74,7 +74,7 @@ public client class Client {
     # + length - Represents the number of bytes, which should be read
     # + return - Content as a byte array and the number of bytes read or else a `socket:ReadTimedOutError` if the data
     #            can't be read from the client
-    public remote function read(int length = -100) returns @tainted [byte[], int]|ReadTimedOutError {
+    public isolated remote function read(int length = -100) returns @tainted [byte[], int]|ReadTimedOutError {
         return externRead(self, length);
     }
 
@@ -84,7 +84,7 @@ public client class Client {
     # ```
     #
     # + return - A `socket:Error` if the client can't close the connection or else `()`
-    public remote function close() returns Error? {
+    public isolated remote function close() returns Error? {
         return closeClient(self);
     }
 
@@ -94,7 +94,7 @@ public client class Client {
     # ```
     #
     # + return - A `socket:Error` if the client can't be shut down to stop reading from the socket or else `()`
-    public remote function shutdownRead() returns Error? {
+    public isolated remote function shutdownRead() returns Error? {
         return externShutdownRead(self);
     }
 
@@ -104,7 +104,7 @@ public client class Client {
     # ```
     #
     # + return - A `socket:Error` if the client can't shut down to stop the writing to the socket or else `()`
-    public remote function shutdownWrite() returns Error? {
+    public isolated remote function shutdownWrite() returns Error? {
         return externShutdownWrite(self);
     }
 }
@@ -124,43 +124,43 @@ public type ClientConfig record {|
     service callbackService?;
 |};
 
-function initClientEndpoint(Client clientObj, ClientConfig clientConfig) returns error? =
+isolated function initClientEndpoint(Client clientObj, ClientConfig clientConfig) returns error? =
 @java:Method {
     name: "initEndpoint",
     'class: "org.ballerinalang.stdlib.socket.endpoint.tcp.ClientActions"
 } external;
 
-function startClient(Client clientObj) returns error? =
+isolated function startClient(Client clientObj) returns error? =
 @java:Method {
     name: "start",
     'class: "org.ballerinalang.stdlib.socket.endpoint.tcp.ClientActions"
 } external;
 
-function externWrite(Client clientObj, byte[] content) returns int|Error =
+isolated function externWrite(Client clientObj, byte[] content) returns int|Error =
 @java:Method {
     name: "write",
     'class: "org.ballerinalang.stdlib.socket.endpoint.tcp.ClientActions"
 } external;
 
-function externRead(Client clientObj, int length) returns [byte[], int]|ReadTimedOutError =
+isolated function externRead(Client clientObj, int length) returns [byte[], int]|ReadTimedOutError =
 @java:Method {
     name: "read",
     'class: "org.ballerinalang.stdlib.socket.endpoint.tcp.ClientActions"
 } external;
 
-function closeClient(Client clientObj) returns Error? =
+isolated function closeClient(Client clientObj) returns Error? =
 @java:Method {
     name: "close",
     'class: "org.ballerinalang.stdlib.socket.endpoint.tcp.ClientActions"
 } external;
 
-function externShutdownRead(Client clientObj) returns Error? =
+isolated function externShutdownRead(Client clientObj) returns Error? =
 @java:Method {
     name: "shutdownRead",
     'class: "org.ballerinalang.stdlib.socket.endpoint.tcp.ClientActions"
 } external;
 
-function externShutdownWrite(Client clientObj) returns Error? =
+isolated function externShutdownWrite(Client clientObj) returns Error? =
 @java:Method {
     name: "shutdownWrite",
     'class: "org.ballerinalang.stdlib.socket.endpoint.tcp.ClientActions"
