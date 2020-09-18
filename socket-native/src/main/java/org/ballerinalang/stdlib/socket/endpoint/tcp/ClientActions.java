@@ -19,13 +19,14 @@
 package org.ballerinalang.stdlib.socket.endpoint.tcp;
 
 import org.ballerinalang.jvm.api.BStringUtils;
+import org.ballerinalang.jvm.api.BalEnv;
+import org.ballerinalang.jvm.api.BalFuture;
 import org.ballerinalang.jvm.api.values.BError;
 import org.ballerinalang.jvm.api.values.BMap;
 import org.ballerinalang.jvm.api.values.BObject;
 import org.ballerinalang.jvm.api.values.BString;
 import org.ballerinalang.jvm.scheduling.Scheduler;
 import org.ballerinalang.jvm.values.ArrayValue;
-import org.ballerinalang.jvm.values.connector.NonBlockingCallback;
 import org.ballerinalang.stdlib.socket.SocketConstants;
 import org.ballerinalang.stdlib.socket.exceptions.SelectorInitializeException;
 import org.ballerinalang.stdlib.socket.tcp.ChannelRegisterCallback;
@@ -102,18 +103,17 @@ public class ClientActions {
         return null;
     }
 
-    public static Object read(BObject client, long length) {
-        final NonBlockingCallback callback = new NonBlockingCallback(Scheduler.getStrand());
+    public static Object read(BalEnv env, BObject client, long length) {
+        final BalFuture balFuture = env.markAsync();
         if (length != SocketConstants.DEFAULT_EXPECTED_READ_LENGTH && length < 1) {
             String msg = "requested byte length need to be 1 or more";
-            callback.setReturnValues(SocketUtils.createSocketError(SocketConstants.ErrorType.ReadTimedOutError, msg));
-            callback.notifySuccess();
+            balFuture.complete(SocketUtils.createSocketError(SocketConstants.ErrorType.ReadTimedOutError, msg));
             return null;
         }
         SocketService socketService = (SocketService) client.getNativeData(SocketConstants.SOCKET_SERVICE);
         SocketChannel socketChannel = (SocketChannel) client.getNativeData(SocketConstants.SOCKET_KEY);
         int socketHash = socketChannel.hashCode();
-        ReadPendingCallback readPendingCallback = new ReadPendingCallback(callback, (int) length, socketHash,
+        ReadPendingCallback readPendingCallback = new ReadPendingCallback(balFuture, (int) length, socketHash,
                 socketService.getReadTimeout());
         ReadPendingSocketMap.getInstance().add(socketChannel.hashCode(), readPendingCallback);
         log.debug("Notify to invokeRead");
@@ -157,8 +157,8 @@ public class ClientActions {
         return null;
     }
 
-    public static Object start(BObject client) {
-        final NonBlockingCallback callback = new NonBlockingCallback(Scheduler.getStrand());
+    public static Object start(BalEnv env, BObject client) {
+        final BalFuture balFuture = env.markAsync();
         SelectorManager selectorManager = null;
         BError error = null;
         SocketChannel channel = null;
@@ -198,11 +198,11 @@ public class ClientActions {
             } catch (IOException e) {
                 log.error("Unable to close the channel during the error report", e);
             }
-            callback.notifyFailure(error);
+            balFuture.complete(error);
             return null;
         }
         SocketService socketService = (SocketService) client.getNativeData(SocketConstants.SOCKET_SERVICE);
-        selectorManager.registerChannel(new ChannelRegisterCallback(socketService, callback, OP_READ));
+        selectorManager.registerChannel(new ChannelRegisterCallback(socketService, balFuture, OP_READ));
         return null;
     }
 

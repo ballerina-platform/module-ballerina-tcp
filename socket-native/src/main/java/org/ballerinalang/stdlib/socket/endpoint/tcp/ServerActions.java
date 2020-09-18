@@ -19,11 +19,12 @@
 package org.ballerinalang.stdlib.socket.endpoint.tcp;
 
 import org.ballerinalang.jvm.api.BStringUtils;
+import org.ballerinalang.jvm.api.BalEnv;
+import org.ballerinalang.jvm.api.BalFuture;
 import org.ballerinalang.jvm.api.values.BMap;
 import org.ballerinalang.jvm.api.values.BObject;
 import org.ballerinalang.jvm.api.values.BString;
 import org.ballerinalang.jvm.scheduling.Scheduler;
-import org.ballerinalang.jvm.values.connector.NonBlockingCallback;
 import org.ballerinalang.stdlib.socket.SocketConstants;
 import org.ballerinalang.stdlib.socket.exceptions.SelectorInitializeException;
 import org.ballerinalang.stdlib.socket.tcp.ChannelRegisterCallback;
@@ -87,8 +88,8 @@ public class ServerActions {
         return new SocketService(serverSocket, scheduler, service, timeout);
     }
 
-    public static Object start(BObject listener) {
-        final NonBlockingCallback callback = new NonBlockingCallback(Scheduler.getStrand());
+    public static Object start(BalEnv env, BObject listener) {
+        final BalFuture balFuture = env.markAsync();
         try {
             ServerSocketChannel channel =
                     (ServerSocketChannel) listener.getNativeData(SocketConstants.SERVER_SOCKET_KEY);
@@ -105,28 +106,27 @@ public class ServerActions {
             final SelectorManager selectorManager = SelectorManager.getInstance();
             selectorManager.start();
             SocketService socketService = (SocketService) listener.getNativeData(SocketConstants.SOCKET_SERVICE);
-            ChannelRegisterCallback registerCallback = new ChannelRegisterCallback(socketService, callback, OP_ACCEPT);
+            ChannelRegisterCallback registerCallback = new ChannelRegisterCallback(socketService, balFuture, OP_ACCEPT);
             selectorManager.registerChannel(registerCallback);
             String socketListenerStarted = "[ballerina/socket] started socket listener ";
             PrintStream console = System.out;
             console.println(socketListenerStarted + channel.socket().getLocalPort());
         } catch (SelectorInitializeException e) {
             log.error(e.getMessage(), e);
-            callback.notifyFailure(SocketUtils.createSocketError("unable to initialize the selector"));
+            balFuture.complete(SocketUtils.createSocketError("unable to initialize the selector"));
         } catch (CancelledKeyException e) {
-            callback.notifyFailure(SocketUtils.createSocketError("server socket registration is failed"));
+            balFuture.complete(SocketUtils.createSocketError("server socket registration is failed"));
         } catch (AlreadyBoundException e) {
-            callback.notifyFailure(SocketUtils.createSocketError("server socket service is already bound to a port"));
+            balFuture.complete(SocketUtils.createSocketError("server socket service is already bound to a port"));
         } catch (UnsupportedAddressTypeException e) {
             log.error("Address not supported", e);
-            callback.notifyFailure(SocketUtils.createSocketError("provided address is not supported"));
+            balFuture.complete(SocketUtils.createSocketError("provided address is not supported"));
         } catch (IOException e) {
             log.error(e.getMessage(), e);
-            callback.notifyFailure(
-                    SocketUtils.createSocketError("unable to start the socket service: " + e.getMessage()));
+            balFuture.complete(SocketUtils.createSocketError("unable to start the socket service: " + e.getMessage()));
         } catch (RejectedExecutionException e) {
             log.error(e.getMessage(), e);
-            callback.notifyFailure(SocketUtils.createSocketError("unable to start the socket listener."));
+            balFuture.complete(SocketUtils.createSocketError("unable to start the socket listener."));
         }
         return null;
     }

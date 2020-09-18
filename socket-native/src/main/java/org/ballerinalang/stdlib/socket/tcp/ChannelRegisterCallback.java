@@ -18,8 +18,8 @@
 
 package org.ballerinalang.stdlib.socket.tcp;
 
+import org.ballerinalang.jvm.api.BalFuture;
 import org.ballerinalang.jvm.api.values.BError;
-import org.ballerinalang.jvm.values.connector.NonBlockingCallback;
 
 /**
  * This will hold the {@link SocketService}.
@@ -29,12 +29,12 @@ import org.ballerinalang.jvm.values.connector.NonBlockingCallback;
 public class ChannelRegisterCallback {
 
     private SocketService socketService;
-    private NonBlockingCallback callback;
+    private BalFuture balFuture;
     private final int initialInterest;
 
-    public ChannelRegisterCallback(SocketService socketService, NonBlockingCallback callback, int initialInterest) {
+    public ChannelRegisterCallback(SocketService socketService, BalFuture balFuture, int initialInterest) {
         this.socketService = socketService;
-        this.callback = callback;
+        this.balFuture = balFuture;
         this.initialInterest = initialInterest;
     }
 
@@ -52,7 +52,7 @@ public class ChannelRegisterCallback {
      * @param serviceAttached whether to invoke onConnect or not.
      */
     public void notifyRegister(boolean serviceAttached) {
-        callback.notifySuccess();
+        balFuture.complete(null);
         if (serviceAttached) {
             SelectorDispatcher.invokeOnConnect(socketService);
         }
@@ -65,7 +65,7 @@ public class ChannelRegisterCallback {
      */
     public void notifyFailure(String errorMsg) {
         BError error = SocketUtils.createSocketError(errorMsg);
-        callback.notifyFailure(error);
+        balFuture.complete(error);
         // We don't need to dispatch the error to the onError here.
         // This should treated as a panic and stop listener/client getting start.
     }

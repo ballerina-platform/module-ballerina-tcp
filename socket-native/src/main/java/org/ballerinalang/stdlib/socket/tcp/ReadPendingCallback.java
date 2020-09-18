@@ -18,8 +18,8 @@
 
 package org.ballerinalang.stdlib.socket.tcp;
 
+import org.ballerinalang.jvm.api.BalFuture;
 import org.ballerinalang.jvm.api.values.BError;
-import org.ballerinalang.jvm.values.connector.NonBlockingCallback;
 import org.ballerinalang.stdlib.socket.SocketConstants;
 
 import java.nio.ByteBuffer;
@@ -33,7 +33,7 @@ import java.util.TimerTask;
  */
 public class ReadPendingCallback {
 
-    private NonBlockingCallback callback;
+    private BalFuture balFuture;
     private final int expectedLength;
     private int currentLength;
     private ByteBuffer buffer;
@@ -41,16 +41,16 @@ public class ReadPendingCallback {
     private Timer timer;
     private long timeout;
 
-    public ReadPendingCallback(NonBlockingCallback callback, int expectedLength, int socketHash, long timeout) {
-        this.callback = callback;
+    public ReadPendingCallback(BalFuture balFuture, int expectedLength, int socketHash, long timeout) {
+        this.balFuture = balFuture;
         this.expectedLength = expectedLength;
         this.socketHash = socketHash;
         this.timeout = timeout;
         scheduleTimeout(timeout);
     }
 
-    public NonBlockingCallback getCallback() {
-        return callback;
+    public BalFuture getFuture() {
+        return balFuture;
     }
 
     public int getExpectedLength() {
@@ -104,8 +104,7 @@ public class ReadPendingCallback {
                 ReadPendingSocketMap.getInstance().remove(socketHash);
                 final BError timeoutError =
                         SocketUtils.createSocketError(SocketConstants.ErrorType.ReadTimedOutError, "read timed out");
-                callback.setReturnValues(timeoutError);
-                callback.notifySuccess();
+                balFuture.complete(timeoutError);
                 cancel();
             }
         };
