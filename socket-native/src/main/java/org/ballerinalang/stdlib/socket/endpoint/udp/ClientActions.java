@@ -18,12 +18,13 @@
 package org.ballerinalang.stdlib.socket.endpoint.udp;
 
 import org.ballerinalang.jvm.api.BStringUtils;
+import org.ballerinalang.jvm.api.BalEnv;
+import org.ballerinalang.jvm.api.BalFuture;
 import org.ballerinalang.jvm.api.values.BMap;
 import org.ballerinalang.jvm.api.values.BObject;
 import org.ballerinalang.jvm.api.values.BString;
 import org.ballerinalang.jvm.scheduling.Scheduler;
 import org.ballerinalang.jvm.values.ArrayValue;
-import org.ballerinalang.jvm.values.connector.NonBlockingCallback;
 import org.ballerinalang.stdlib.socket.SocketConstants;
 import org.ballerinalang.stdlib.socket.exceptions.SelectorInitializeException;
 import org.ballerinalang.stdlib.socket.tcp.ChannelRegisterCallback;
@@ -76,9 +77,9 @@ public class ClientActions {
         return null;
     }
 
-    public static Object initEndpoint(BObject client, Object address,
+    public static Object initEndpoint(BalEnv env, BObject client, Object address,
                                       BMap<BString, Object> config) {
-        final NonBlockingCallback callback = new NonBlockingCallback(Scheduler.getStrand());
+        final BalFuture balFuture = env.markAsync();
         SelectorManager selectorManager;
         SocketService socketService;
         try {
@@ -104,21 +105,21 @@ public class ClientActions {
             selectorManager.start();
         } catch (SelectorInitializeException e) {
             log.error(e.getMessage(), e);
-            callback.notifyFailure(SocketUtils.createSocketError("unable to initialize the selector"));
+            balFuture.complete(SocketUtils.createSocketError("unable to initialize the selector"));
             return null;
         } catch (SocketException e) {
-            callback.notifyFailure(SocketUtils.createSocketError("unable to bind the local socket port"));
+            balFuture.complete(SocketUtils.createSocketError("unable to bind the local socket port"));
             return null;
         } catch (IOException e) {
             log.error("Unable to initiate the client socket", e);
-            callback.notifyFailure(SocketUtils.createSocketError("unable to initiate the socket: " + e.getMessage()));
+            balFuture.complete(SocketUtils.createSocketError("unable to initiate the socket: " + e.getMessage()));
             return null;
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            callback.notifyFailure(SocketUtils.createSocketError("unable to start the socket client."));
+            balFuture.complete(SocketUtils.createSocketError("unable to start the socket client."));
             return null;
         }
-        selectorManager.registerChannel(new ChannelRegisterCallback(socketService, callback, OP_READ));
+        selectorManager.registerChannel(new ChannelRegisterCallback(socketService, balFuture, OP_READ));
         return null;
     }
 
@@ -135,17 +136,17 @@ public class ClientActions {
         return host;
     }
 
-    public static Object receiveFrom(BObject client, long length) {
-        final NonBlockingCallback callback = new NonBlockingCallback(Scheduler.getStrand());
+    public static Object receiveFrom(BalEnv env, BObject client, long length) {
+        final BalFuture balFuture = env.markAsync();
         if (length != DEFAULT_EXPECTED_READ_LENGTH && length < 1) {
             String msg = "requested byte length need to be 1 or more";
-            callback.notifyFailure(SocketUtils.createSocketError(msg));
+            balFuture.complete(SocketUtils.createSocketError(msg));
             return null;
         }
         DatagramChannel socket = (DatagramChannel) client.getNativeData(SocketConstants.SOCKET_KEY);
         int socketHash = socket.hashCode();
         SocketService socketService = (SocketService) client.getNativeData(SocketConstants.SOCKET_SERVICE);
-        ReadPendingCallback readPendingCallback = new ReadPendingCallback(callback, (int) length, socketHash,
+        ReadPendingCallback readPendingCallback = new ReadPendingCallback(balFuture, (int) length, socketHash,
                 socketService.getReadTimeout());
         ReadPendingSocketMap.getInstance().add(socket.hashCode(), readPendingCallback);
         log.debug("Notify to invokeRead");

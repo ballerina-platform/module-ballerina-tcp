@@ -338,8 +338,7 @@ public class SelectorManager {
             }
             byte[] bytes = SocketUtils
                     .getByteArrayFromByteBuffer(callback.getBuffer() == null ? buffer : callback.getBuffer());
-            callback.getCallback().setReturnValues(createUdpSocketReturnValue(callback, bytes, remoteAddress));
-            callback.getCallback().notifySuccess();
+            callback.getFuture().complete(createUdpSocketReturnValue(callback, bytes, remoteAddress));
             callback.cancelTimeout();
         } catch (CancelledKeyException | ClosedChannelException e) {
             processError(callback, null, "connection closed");
@@ -379,8 +378,7 @@ public class SelectorManager {
             }
             byte[] bytes = SocketUtils
                     .getByteArrayFromByteBuffer(callback.getBuffer() == null ? buffer : callback.getBuffer());
-            callback.getCallback().setReturnValues(createTcpSocketReturnValue(callback, bytes));
-            callback.getCallback().notifySuccess();
+            callback.getFuture().complete(createTcpSocketReturnValue(callback, bytes));
             callback.cancelTimeout();
         } catch (NotYetConnectedException e) {
             processError(callback, null, "connection not yet connected");
@@ -398,8 +396,7 @@ public class SelectorManager {
     private void processError(ReadPendingCallback callback, SocketConstants.ErrorType type, String msg) {
         BError socketError =
                 type == null ? SocketUtils.createSocketError(msg) : SocketUtils.createSocketError(type, msg);
-        callback.getCallback().setReturnValues(socketError);
-        callback.getCallback().notifySuccess();
+        callback.getFuture().complete(socketError);
     }
 
     private TupleValueImpl createTcpSocketReturnValue(ReadPendingCallback callback, byte[] bytes) {
