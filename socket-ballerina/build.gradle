@@ -60,10 +60,24 @@ task unpackStdLibs() {
     }
 }
 
-task copyStdlibs(type: Copy) {
-    def ballerinaDist = "build/target/extracted-distributions/jballerina-tools-zip/jballerina-tools-${ballerinaLangVersion}"
-    into ballerinaDist
+def moduleName = "socket"
+def moduleOrg = "ballerina"
+def ballerinaConfigFile = new File("$project.projectDir/Ballerina.toml")
+def artifactBallerinaDocs = file("$project.projectDir/build/docs_parent/")
+def artifactCacheParent = file("$project.projectDir/build/cache_parent/")
+def artifactLibParent = file("$project.projectDir/build/lib_parent/")
+def tomlVersion = project.version.split("-")[0]
+def ballerinaCentralAccessToken = System.getenv('BALLERINA_CENTRAL_ACCESS_TOKEN')
+def targetBallerinaJar = file("$project.projectDir/target/caches/jar_cache/${moduleOrg}/${moduleName}/${tomlVersion}/${moduleOrg}-${moduleName}-${tomlVersion}.jar")
+def targetNativeJar = file("$project.rootDir/${moduleName}-native/build/libs/${moduleName}-native-${project.version}.jar")
+def distributionPath =  project.projectDir.absolutePath + "/build/target/extracted-distributions/jballerina-tools-zip/jballerina-tools-${ballerinaLangVersion}"
+def distributionBinPath = distributionPath + "/bin"
+def originalConfig = ballerinaConfigFile.text
 
+task copyStdlibs(type: Copy) {
+    dependsOn(unpackStdLibs)
+
+    into distributionPath
     /* Standard Libraries */
     configurations.ballerinaStdLibs.resolvedConfiguration.resolvedArtifacts.each { artifact ->
         def artifactExtractedPath = "${buildDir}/target/extracted-distributions/" + artifact.name + "-zip"
@@ -89,19 +103,7 @@ task copyStdlibs(type: Copy) {
     }
 }
 
-def moduleName = "socket"
-def moduleOrg = "ballerina"
-def ballerinaConfigFile = new File("$project.projectDir/Ballerina.toml")
-def artifactBallerinaDocs = file("$project.projectDir/build/docs_parent/")
-def artifactCacheParent = file("$project.projectDir/build/cache_parent/")
-def artifactLibParent = file("$project.projectDir/build/lib_parent/")
-def tomlVersion = project.version.split("-")[0]
-def ballerinaCentralAccessToken = System.getenv('BALLERINA_CENTRAL_ACCESS_TOKEN')
-def targetBallerinaJar = file("$project.projectDir/target/caches/jar_cache/${moduleOrg}/${moduleName}/${tomlVersion}/${moduleOrg}-${moduleName}-${tomlVersion}.jar")
-def targetNativeJar = file("$project.rootDir/${moduleName}-native/build/libs/${moduleName}-native-${project.version}.jar")
-def originalConfig = ballerinaConfigFile.text
-
-task updateTomlVerions {
+task updateTomlFile {
     doLast {
         def stdlibDependentIoVersion = project.stdlibIoVersion.split("-")[0]
         def stdlibDependentLogVersion = project.stdlibLogVersion.split("-")[0]
@@ -120,26 +122,58 @@ task revertTomlFile {
     }
 }
 
+task ballerinaTest {
+    dependsOn(":socket-native:build")
+    dependsOn(":socket-test-utils:build")
+    dependsOn(unpackJballerinaTools)
+    dependsOn(unpackStdLibs)
+    dependsOn(copyStdlibs)
+    dependsOn(updateTomlFile)
+    finalizedBy(revertTomlFile)
+
+    def debugParams = ""
+    if (project.hasProperty("debug")) {
+        debugParams = "--debug ${project.findProperty("debug")}"
+    }
+
+    doLast {
+        exec {
+            workingDir project.projectDir
+            environment "JAVA_OPTS", "-DBALLERINA_DEV_COMPILE_BALLERINA_ORG=true"
+            environment "STDLIB_VERSION", tomlVersion
+            if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+                commandLine 'cmd', '/c', "$distributionBinPath/ballerina.bat test --code-coverage --all ${debugParams} && exit %%ERRORLEVEL%%"
+            } else {
+                commandLine 'sh', '-c', "$distributionBinPath/ballerina test --code-coverage --all ${debugParams}"
+            }
+        }
+    }
+}
+
+test {
+    dependsOn(ballerinaTest)
+}
+
 task ballerinaBuild {
     inputs.dir file(project.projectDir)
+    dependsOn(":socket-native:build")
+    dependsOn(":socket-test-utils:build")
+    dependsOn(unpackJballerinaTools)
+    dependsOn(unpackStdLibs)
+    dependsOn(copyStdlibs)
+    dependsOn(updateTomlFile)
+    dependsOn(test)
     finalizedBy(revertTomlFile)
 
     doLast {
-        def distributionBinPath =  project.projectDir.absolutePath + "/build/target/extracted-distributions/jballerina-tools-zip/jballerina-tools-${ballerinaLangVersion}/bin"
-        def additionalBuildParams = ""
-
-        if (project.hasProperty("skipBallerinaTests")) {
-            additionalBuildParams = "--skip-tests"
-        }
-
         // Build and populate caches
         exec {
             workingDir project.projectDir
             environment "JAVA_OPTS", "-DBALLERINA_DEV_COMPILE_BALLERINA_ORG=true"
             if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-                commandLine 'cmd', '/c', "$distributionBinPath/ballerina.bat build ${additionalBuildParams} -c ${moduleName}"
+                commandLine 'cmd', '/c', "$distributionBinPath/ballerina.bat build --skip-tests -c ${moduleName} && exit %%ERRORLEVEL%%"
             } else {
-                commandLine 'sh', '-c', "$distributionBinPath/ballerina build ${additionalBuildParams} -c ${moduleName}"
+                commandLine 'sh', '-c', "$distributionBinPath/ballerina build --skip-tests -c ${moduleName}"
             }
         }
         copy {
@@ -184,7 +218,7 @@ task ballerinaBuild {
                 workingDir project.projectDir
                 environment "JAVA_OPTS", "-DBALLERINA_DEV_COMPILE_BALLERINA_ORG=true"
                 if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-                    commandLine 'cmd', '/c', "$distributionBinPath/ballerina.bat push ${moduleName}"
+                    commandLine 'cmd', '/c', "$distributionBinPath/ballerina.bat push ${moduleName} && exit %%ERRORLEVEL%%"
                 } else {
                     commandLine 'sh', '-c', "$distributionBinPath/ballerina push ${moduleName}"
                 }
@@ -196,7 +230,7 @@ task ballerinaBuild {
             workingDir project.projectDir
             environment "JAVA_OPTS", "-DBALLERINA_DEV_COMPILE_BALLERINA_ORG=true"
             if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-                commandLine 'cmd', '/c', "$distributionBinPath/ballerina.bat doc ${moduleName}"
+                commandLine 'cmd', '/c', "$distributionBinPath/ballerina.bat doc ${moduleName} && exit %%ERRORLEVEL%%"
             } else {
                 commandLine 'sh', '-c', "$distributionBinPath/ballerina doc ${moduleName}"
             }
@@ -230,17 +264,13 @@ publishing {
             name = "GitHubPackages"
             url = uri("https://maven.pkg.github.com/ballerina-platform/module-ballerina-socket")
             credentials {
-                username = System.getenv("GITHUB_ACTOR")
-                password = System.getenv("GITHUB_TOKEN")
+                username = System.getenv("packageUser")
+                password = System.getenv("packagePAT")
             }
         }
     }
 }
 
-ballerinaBuild.dependsOn ":socket-native:build"
-ballerinaBuild.dependsOn ":socket-test-utils:build"
-unpackStdLibs.dependsOn unpackJballerinaTools
-copyStdlibs.dependsOn unpackStdLibs
-updateTomlVerions.dependsOn copyStdlibs
-ballerinaBuild.dependsOn updateTomlVerions
-build.dependsOn ballerinaBuild
+build {
+    dependsOn(ballerinaBuild)
+}

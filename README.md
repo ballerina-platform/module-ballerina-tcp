@@ -37,7 +37,7 @@ Execute the commands below to build from source.
 
 2. To build the module without the tests:
 
-        ./gradlew clean build -PskipBallerinaTests
+        ./gradlew clean build -x test
         
 ## Contributing to Ballerina
 
