@@ -28,3 +28,11 @@ dependencies {
     compile project(":socket-native")
 }
 
+compileJava {
+    doFirst {
+        options.compilerArgs = [
+                '--module-path', classpath.asPath,
+        ]
+        classpath = files()
+    }
+}
