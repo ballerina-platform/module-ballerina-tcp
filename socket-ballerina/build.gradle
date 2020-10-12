@@ -142,9 +142,9 @@ task ballerinaTest {
             environment "JAVA_OPTS", "-DBALLERINA_DEV_COMPILE_BALLERINA_ORG=true"
             environment "STDLIB_VERSION", tomlVersion
             if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-                commandLine 'cmd', '/c', "$distributionBinPath/ballerina.bat test --code-coverage --all ${debugParams} && exit %%ERRORLEVEL%%"
+                commandLine 'cmd', '/c', "$distributionBinPath/ballerina.bat test --all ${debugParams} && exit %%ERRORLEVEL%%"
             } else {
-                commandLine 'sh', '-c', "$distributionBinPath/ballerina test --code-coverage --all ${debugParams}"
+                commandLine 'sh', '-c', "$distributionBinPath/ballerina test --all ${debugParams}"
             }
         }
     }

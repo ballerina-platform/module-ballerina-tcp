@@ -91,7 +91,8 @@ public class ClientActions {
             if (address != null) {
                 BMap<BString, Object> addressRecord = (BMap<BString, Object>) address;
                 String host = getHostFromAddress(addressRecord);
-                int port = addressRecord.getIntValue(BStringUtils.fromString(SocketConstants.CONFIG_FIELD_PORT)).intValue();
+                int port = addressRecord.getIntValue(BStringUtils.fromString(SocketConstants.CONFIG_FIELD_PORT))
+                        .intValue();
                 if (host == null) {
                     socketChannel.bind(new InetSocketAddress(port));
                 } else {
