@@ -23,7 +23,6 @@ import org.ballerinalang.jvm.api.BalFuture;
 import org.ballerinalang.jvm.api.values.BMap;
 import org.ballerinalang.jvm.api.values.BObject;
 import org.ballerinalang.jvm.api.values.BString;
-import org.ballerinalang.jvm.scheduling.Scheduler;
 import org.ballerinalang.jvm.values.ArrayValue;
 import org.ballerinalang.stdlib.socket.SocketConstants;
 import org.ballerinalang.stdlib.socket.exceptions.SelectorInitializeException;
@@ -100,7 +99,7 @@ public class ClientActions {
                 }
             }
             long timeout = config.getIntValue(BStringUtils.fromString(READ_TIMEOUT));
-            socketService = new SocketService(socketChannel, Scheduler.getStrand().scheduler, null, timeout);
+            socketService = new SocketService(socketChannel, env.getRuntime(), null, timeout);
             client.addNativeData(SOCKET_SERVICE, socketService);
             selectorManager = SelectorManager.getInstance();
             selectorManager.start();

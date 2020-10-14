@@ -18,13 +18,13 @@
 
 package org.ballerinalang.stdlib.socket.endpoint.tcp;
 
+import org.ballerinalang.jvm.api.BRuntime;
 import org.ballerinalang.jvm.api.BStringUtils;
 import org.ballerinalang.jvm.api.BalEnv;
 import org.ballerinalang.jvm.api.BalFuture;
 import org.ballerinalang.jvm.api.values.BMap;
 import org.ballerinalang.jvm.api.values.BObject;
 import org.ballerinalang.jvm.api.values.BString;
-import org.ballerinalang.jvm.scheduling.Scheduler;
 import org.ballerinalang.stdlib.socket.SocketConstants;
 import org.ballerinalang.stdlib.socket.exceptions.SelectorInitializeException;
 import org.ballerinalang.stdlib.socket.tcp.ChannelRegisterCallback;
@@ -74,18 +74,18 @@ public class ServerActions {
         return null;
     }
 
-    public static Object register(BObject listener, BObject service) {
+    public static Object register(BalEnv env, BObject listener, BObject service) {
         final SocketService socketService =
-                getSocketService(listener, Scheduler.getStrand().scheduler, service);
+                getSocketService(listener, env.getRuntime(), service);
         listener.addNativeData(SocketConstants.SOCKET_SERVICE, socketService);
         return null;
     }
 
-    private static SocketService getSocketService(BObject listener, Scheduler scheduler, BObject service) {
+    private static SocketService getSocketService(BObject listener, BRuntime runtime, BObject service) {
         ServerSocketChannel serverSocket =
                 (ServerSocketChannel) listener.getNativeData(SocketConstants.SERVER_SOCKET_KEY);
         long timeout = (long) listener.getNativeData(READ_TIMEOUT);
-        return new SocketService(serverSocket, scheduler, service, timeout);
+        return new SocketService(serverSocket, runtime, service, timeout);
     }
 
     public static Object start(BalEnv env, BObject listener) {

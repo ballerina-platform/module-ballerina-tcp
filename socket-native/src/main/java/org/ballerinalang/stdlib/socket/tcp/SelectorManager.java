@@ -240,7 +240,7 @@ public class SelectorManager {
             client.configureBlocking(false);
             // Creating a new SocketService instance with the newly accepted client.
             // We don't need the ServerSocketChannel in here since we have all the necessary resources.
-            SocketService clientSocketService = new SocketService(client, socketService.getScheduler(),
+            SocketService clientSocketService = new SocketService(client, socketService.getRuntime(),
                     socketService.getService(), socketService.getReadTimeout());
             // Registering the channel against the selector directly without going through the queue,
             // since we are in same thread.
@@ -248,20 +248,20 @@ public class SelectorManager {
             SelectorDispatcher.invokeOnConnect(clientSocketService);
         } catch (ClosedByInterruptException e) {
             SelectorDispatcher
-                    .invokeOnError(new SocketService(socketService.getScheduler(), socketService.getService()),
+                    .invokeOnError(new SocketService(socketService.getRuntime(), socketService.getService()),
                     "client accept interrupt by another process");
         } catch (AsynchronousCloseException e) {
             SelectorDispatcher
-                    .invokeOnError(new SocketService(socketService.getScheduler(), socketService.getService()),
+                    .invokeOnError(new SocketService(socketService.getRuntime(), socketService.getService()),
                             "client closed by another process");
         } catch (ClosedChannelException e) {
             SelectorDispatcher
-                    .invokeOnError(new SocketService(socketService.getScheduler(), socketService.getService()),
+                    .invokeOnError(new SocketService(socketService.getRuntime(), socketService.getService()),
                             "client is already closed");
         } catch (IOException e) {
             log.error("An error occurred while accepting new client", e);
             SelectorDispatcher
-                    .invokeOnError(new SocketService(socketService.getScheduler(), socketService.getService()),
+                    .invokeOnError(new SocketService(socketService.getRuntime(), socketService.getService()),
                             "unable to accept a new client. " +  e.getMessage());
         }
     }
