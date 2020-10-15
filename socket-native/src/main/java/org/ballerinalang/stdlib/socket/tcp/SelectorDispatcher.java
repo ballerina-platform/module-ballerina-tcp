@@ -18,7 +18,6 @@
 
 package org.ballerinalang.stdlib.socket.tcp;
 
-import org.ballerinalang.jvm.api.BExecutor;
 import org.ballerinalang.jvm.api.values.BError;
 import org.ballerinalang.jvm.api.values.BObject;
 import org.ballerinalang.jvm.util.exceptions.BallerinaConnectorException;
@@ -47,7 +46,7 @@ public class SelectorDispatcher {
     static void invokeOnError(SocketService socketService, String errorMsg) {
         try {
             Object[] params = getOnErrorResourceSignature(socketService, errorMsg);
-            BExecutor.submit(socketService.getScheduler(), socketService.getService(), RESOURCE_ON_ERROR,
+            socketService.getRuntime().invokeMethodAsync(socketService.getService(), RESOURCE_ON_ERROR,
                     null, null, new TCPSocketCallback(socketService), null, params);
         } catch (Throwable e) {
             log.error("Error while executing onError resource", e);
@@ -65,7 +64,7 @@ public class SelectorDispatcher {
         try {
             final BObject caller = SocketUtils.createClient(socketService);
             Object[] params = new Object[] { caller, true, error, true };
-            BExecutor.submit(socketService.getScheduler(), socketService.getService(), RESOURCE_ON_ERROR,
+            socketService.getRuntime().invokeMethodAsync(socketService.getService(), RESOURCE_ON_ERROR,
                     null, null, callback, null,
                     params);
         } catch (Throwable e) {
@@ -81,7 +80,7 @@ public class SelectorDispatcher {
     static void invokeReadReady(SocketService socketService) {
         try {
             Object[] params = getReadReadyResourceSignature(socketService);
-            BExecutor.submit(socketService.getScheduler(), socketService.getService(), RESOURCE_ON_READ_READY,
+            socketService.getRuntime().invokeMethodAsync(socketService.getService(), RESOURCE_ON_READ_READY,
                     null, null, new TCPSocketReadCallback(socketService), null, params);
         } catch (BallerinaConnectorException e) {
             invokeOnError(socketService, e.getMessage());
@@ -97,7 +96,7 @@ public class SelectorDispatcher {
         try {
             final BObject clientObj = SocketUtils.createClient(socketService);
             Object[] params = new Object[] { clientObj, true };
-            BExecutor.submit(socketService.getScheduler(), socketService.getService(), RESOURCE_ON_CONNECT,
+            socketService.getRuntime().invokeMethodAsync(socketService.getService(), RESOURCE_ON_CONNECT,
                     null, null, new TCPSocketCallback(socketService), null, params);
         } catch (BallerinaConnectorException e) {
             invokeOnError(socketService, e.getMessage());

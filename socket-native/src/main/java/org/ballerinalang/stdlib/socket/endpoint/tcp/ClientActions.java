@@ -25,7 +25,6 @@ import org.ballerinalang.jvm.api.values.BError;
 import org.ballerinalang.jvm.api.values.BMap;
 import org.ballerinalang.jvm.api.values.BObject;
 import org.ballerinalang.jvm.api.values.BString;
-import org.ballerinalang.jvm.scheduling.Scheduler;
 import org.ballerinalang.jvm.values.ArrayValue;
 import org.ballerinalang.stdlib.socket.SocketConstants;
 import org.ballerinalang.stdlib.socket.exceptions.SelectorInitializeException;
@@ -59,7 +58,7 @@ import static java.nio.channels.SelectionKey.OP_READ;
 public class ClientActions {
     private static final Logger log = LoggerFactory.getLogger(ClientActions.class);
 
-    public static Object initEndpoint(BObject client, BMap<BString, Object> config) {
+    public static Object initEndpoint(BalEnv env, BObject client, BMap<BString, Object> config) {
         Object returnValue = null;
         try {
             SocketChannel socketChannel = SocketChannel.open();
@@ -73,7 +72,7 @@ public class ClientActions {
             client.addNativeData(SocketConstants.CLIENT_CONFIG, config);
             final long readTimeout = config.getIntValue(BStringUtils.fromString(SocketConstants.READ_TIMEOUT));
             client.addNativeData(SocketConstants.SOCKET_SERVICE,
-                    new SocketService(socketChannel, Scheduler.getStrand().scheduler, callbackService, readTimeout));
+                    new SocketService(socketChannel, env.getRuntime(), callbackService, readTimeout));
         } catch (SocketException e) {
             returnValue = SocketUtils.createSocketError("unable to bind the local socket port");
         } catch (IOException e) {
