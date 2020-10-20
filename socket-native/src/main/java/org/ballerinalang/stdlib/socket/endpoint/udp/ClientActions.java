@@ -17,13 +17,13 @@
  */
 package org.ballerinalang.stdlib.socket.endpoint.udp;
 
-import org.ballerinalang.jvm.api.BStringUtils;
-import org.ballerinalang.jvm.api.BalEnv;
-import org.ballerinalang.jvm.api.BalFuture;
-import org.ballerinalang.jvm.api.values.BMap;
-import org.ballerinalang.jvm.api.values.BObject;
-import org.ballerinalang.jvm.api.values.BString;
-import org.ballerinalang.jvm.values.ArrayValue;
+import io.ballerina.runtime.api.Environment;
+import io.ballerina.runtime.api.Future;
+import io.ballerina.runtime.api.StringUtils;
+import io.ballerina.runtime.api.values.BMap;
+import io.ballerina.runtime.api.values.BObject;
+import io.ballerina.runtime.api.values.BString;
+import io.ballerina.runtime.values.ArrayValue;
 import org.ballerinalang.stdlib.socket.SocketConstants;
 import org.ballerinalang.stdlib.socket.exceptions.SelectorInitializeException;
 import org.ballerinalang.stdlib.socket.tcp.ChannelRegisterCallback;
@@ -76,9 +76,9 @@ public class ClientActions {
         return null;
     }
 
-    public static Object initEndpoint(BalEnv env, BObject client, Object address,
+    public static Object initEndpoint(Environment env, BObject client, Object address,
                                       BMap<BString, Object> config) {
-        final BalFuture balFuture = env.markAsync();
+        final Future balFuture = env.markAsync();
         SelectorManager selectorManager;
         SocketService socketService;
         try {
@@ -90,7 +90,7 @@ public class ClientActions {
             if (address != null) {
                 BMap<BString, Object> addressRecord = (BMap<BString, Object>) address;
                 String host = getHostFromAddress(addressRecord);
-                int port = addressRecord.getIntValue(BStringUtils.fromString(SocketConstants.CONFIG_FIELD_PORT))
+                int port = addressRecord.getIntValue(StringUtils.fromString(SocketConstants.CONFIG_FIELD_PORT))
                         .intValue();
                 if (host == null) {
                     socketChannel.bind(new InetSocketAddress(port));
@@ -98,7 +98,7 @@ public class ClientActions {
                     socketChannel.bind(new InetSocketAddress(host, port));
                 }
             }
-            long timeout = config.getIntValue(BStringUtils.fromString(READ_TIMEOUT));
+            long timeout = config.getIntValue(StringUtils.fromString(READ_TIMEOUT));
             socketService = new SocketService(socketChannel, env.getRuntime(), null, timeout);
             client.addNativeData(SOCKET_SERVICE, socketService);
             selectorManager = SelectorManager.getInstance();
@@ -126,7 +126,7 @@ public class ClientActions {
     private static String getHostFromAddress(BMap<BString, Object> addressRecord) {
         String host = null;
         try {
-            BString bHost = addressRecord.getStringValue(BStringUtils.fromString(SocketConstants.CONFIG_FIELD_HOST));
+            BString bHost = addressRecord.getStringValue(StringUtils.fromString(SocketConstants.CONFIG_FIELD_HOST));
             if (bHost != null) {
                 host = bHost.getValue();
             }
@@ -136,8 +136,8 @@ public class ClientActions {
         return host;
     }
 
-    public static Object receiveFrom(BalEnv env, BObject client, long length) {
-        final BalFuture balFuture = env.markAsync();
+    public static Object receiveFrom(Environment env, BObject client, long length) {
+        final Future balFuture = env.markAsync();
         if (length != DEFAULT_EXPECTED_READ_LENGTH && length < 1) {
             String msg = "requested byte length need to be 1 or more";
             balFuture.complete(SocketUtils.createSocketError(msg));
@@ -156,8 +156,8 @@ public class ClientActions {
 
     public static Object sendTo(BObject client, ArrayValue content, BMap<BString, Object> address) {
         DatagramChannel socket = (DatagramChannel) client.getNativeData(SocketConstants.SOCKET_KEY);
-        String host = address.getStringValue(BStringUtils.fromString(SocketConstants.CONFIG_FIELD_HOST)).getValue();
-        int port = address.getIntValue(BStringUtils.fromString(SocketConstants.CONFIG_FIELD_PORT)).intValue();
+        String host = address.getStringValue(StringUtils.fromString(SocketConstants.CONFIG_FIELD_HOST)).getValue();
+        int port = address.getIntValue(StringUtils.fromString(SocketConstants.CONFIG_FIELD_PORT)).intValue();
         byte[] byteContent = content.getBytes();
         if (log.isDebugEnabled()) {
             log.debug(String.format("No of byte going to write[%d]: %d", socket.hashCode(), byteContent.length));

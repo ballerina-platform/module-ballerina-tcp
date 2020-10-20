@@ -18,8 +18,8 @@
 
 package org.ballerinalang.stdlib.socket.tcp;
 
-import org.ballerinalang.jvm.api.BRuntime;
-import org.ballerinalang.jvm.api.values.BObject;
+import io.ballerina.runtime.api.Runtime;
+import io.ballerina.runtime.api.values.BObject;
 
 import java.nio.channels.SelectableChannel;
 import java.util.concurrent.Semaphore;
@@ -36,16 +36,16 @@ public class SocketService {
     private SelectableChannel socketChannel;
     private long readTimeout;
     private BObject service;
-    private BRuntime runtime;
+    private Runtime runtime;
 
-    public SocketService(SelectableChannel socketChannel, BRuntime runtime, BObject service, long readTimeout) {
+    public SocketService(SelectableChannel socketChannel, Runtime runtime, BObject service, long readTimeout) {
         this.socketChannel = socketChannel;
         this.runtime = runtime;
         this.service = service;
         this.readTimeout = readTimeout;
     }
 
-    public SocketService(BRuntime runtime, BObject service) {
+    public SocketService(Runtime runtime, BObject service) {
         this.runtime = runtime;
         this.service = service;
     }
@@ -54,7 +54,7 @@ public class SocketService {
         return socketChannel;
     }
 
-    public BRuntime getRuntime() {
+    public Runtime getRuntime() {
         return runtime;
     }
 

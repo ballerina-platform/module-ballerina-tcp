@@ -18,8 +18,8 @@
 
 package org.ballerinalang.stdlib.socket.tcp;
 
-import org.ballerinalang.jvm.api.BalFuture;
-import org.ballerinalang.jvm.api.values.BError;
+import io.ballerina.runtime.api.Future;
+import io.ballerina.runtime.api.values.BError;
 import org.ballerinalang.stdlib.socket.SocketConstants;
 
 import java.nio.ByteBuffer;
@@ -33,7 +33,7 @@ import java.util.TimerTask;
  */
 public class ReadPendingCallback {
 
-    private BalFuture balFuture;
+    private Future balFuture;
     private final int expectedLength;
     private int currentLength;
     private ByteBuffer buffer;
@@ -41,7 +41,7 @@ public class ReadPendingCallback {
     private Timer timer;
     private long timeout;
 
-    public ReadPendingCallback(BalFuture balFuture, int expectedLength, int socketHash, long timeout) {
+    public ReadPendingCallback(Future balFuture, int expectedLength, int socketHash, long timeout) {
         this.balFuture = balFuture;
         this.expectedLength = expectedLength;
         this.socketHash = socketHash;
@@ -49,7 +49,7 @@ public class ReadPendingCallback {
         scheduleTimeout(timeout);
     }
 
-    public BalFuture getFuture() {
+    public Future getFuture() {
         return balFuture;
     }
 

@@ -18,8 +18,8 @@
 
 package org.ballerinalang.stdlib.socket.tcp;
 
-import org.ballerinalang.jvm.api.connector.CallableUnitCallback;
-import org.ballerinalang.jvm.api.values.BError;
+import io.ballerina.runtime.api.async.Callback;
+import io.ballerina.runtime.api.values.BError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
  *
  * @since 0.985.0
  */
-public class TCPSocketCallback implements CallableUnitCallback {
+public class TCPSocketCallback implements Callback {
 
     private static final Logger log = LoggerFactory.getLogger(TCPSocketCallback.class);
 

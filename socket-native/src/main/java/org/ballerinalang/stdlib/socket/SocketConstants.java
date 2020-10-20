@@ -18,9 +18,9 @@
 
 package org.ballerinalang.stdlib.socket;
 
-import org.ballerinalang.jvm.types.BPackage;
+import io.ballerina.runtime.api.Module;
 
-import static org.ballerinalang.jvm.util.BLangConstants.BALLERINA_BUILTIN_PKG_PREFIX;
+import static io.ballerina.runtime.util.BLangConstants.BALLERINA_BUILTIN_PKG_PREFIX;
 
 /**
  * Constant variable for socket related operations.
@@ -32,7 +32,7 @@ public class SocketConstants {
     public static final String SERVER_SOCKET_KEY = "ServerSocket";
     public static final String SOCKET_KEY = "Socket";
     public static final String SOCKET_PACKAGE = "ballerina/socket";
-    public static final BPackage SOCKET_PACKAGE_ID = new BPackage(BALLERINA_BUILTIN_PKG_PREFIX, "socket", "0.6.9");
+    public static final Module SOCKET_PACKAGE_ID = new Module(BALLERINA_BUILTIN_PKG_PREFIX, "socket", "0.6.9");
     public static final String RESOURCE_ON_CONNECT = "onConnect";
     public static final String RESOURCE_ON_READ_READY = "onReadReady";
     public static final String RESOURCE_ON_ERROR = "onError";
