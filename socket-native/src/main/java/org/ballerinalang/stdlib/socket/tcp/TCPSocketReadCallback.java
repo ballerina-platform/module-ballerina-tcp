@@ -46,7 +46,7 @@ public class TCPSocketReadCallback extends TCPSocketCallback {
     }
 
     @Override
-    public void notifyFailure(org.ballerinalang.jvm.api.values.BError error) {
+    public void notifyFailure(io.ballerina.runtime.api.values.BError error) {
         socketService.getResourceLock().release();
         super.notifyFailure(error);
     }

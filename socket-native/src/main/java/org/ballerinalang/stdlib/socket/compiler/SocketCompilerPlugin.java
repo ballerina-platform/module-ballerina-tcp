@@ -18,9 +18,9 @@
 
 package org.ballerinalang.stdlib.socket.compiler;
 
+import io.ballerina.runtime.api.TypeTags;
 import org.ballerinalang.compiler.plugins.AbstractCompilerPlugin;
 import org.ballerinalang.compiler.plugins.SupportedResourceParamTypes;
-import org.ballerinalang.jvm.types.TypeTags;
 import org.ballerinalang.model.tree.AnnotationAttachmentNode;
 import org.ballerinalang.model.tree.ServiceNode;
 import org.ballerinalang.util.diagnostic.DiagnosticLog;

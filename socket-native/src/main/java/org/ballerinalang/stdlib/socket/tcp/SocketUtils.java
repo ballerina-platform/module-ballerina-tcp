@@ -18,11 +18,11 @@
 
 package org.ballerinalang.stdlib.socket.tcp;
 
-import org.ballerinalang.jvm.api.BErrorCreator;
-import org.ballerinalang.jvm.api.BStringUtils;
-import org.ballerinalang.jvm.api.BValueCreator;
-import org.ballerinalang.jvm.api.values.BError;
-import org.ballerinalang.jvm.api.values.BObject;
+import io.ballerina.runtime.api.ErrorCreator;
+import io.ballerina.runtime.api.StringUtils;
+import io.ballerina.runtime.api.ValueCreator;
+import io.ballerina.runtime.api.values.BError;
+import io.ballerina.runtime.api.values.BObject;
 import org.ballerinalang.stdlib.socket.SocketConstants;
 
 import java.net.Socket;
@@ -59,8 +59,8 @@ public class SocketUtils {
      * @return BError instance which contains the error details
      */
     public static BError createSocketError(String errMsg) {
-        return BErrorCreator.createDistinctError(GenericError.errorType(), SOCKET_PACKAGE_ID,
-                                                 BStringUtils.fromString(errMsg));
+        return ErrorCreator.createDistinctError(GenericError.errorType(), SOCKET_PACKAGE_ID,
+                                                 StringUtils.fromString(errMsg));
     }
 
     /**
@@ -71,7 +71,7 @@ public class SocketUtils {
      * @return BError instance which contains the error details
      */
     public static BError createSocketError(SocketConstants.ErrorType type, String errMsg) {
-        return BErrorCreator.createDistinctError(type.errorType(), SOCKET_PACKAGE_ID, BStringUtils.fromString(errMsg));
+        return ErrorCreator.createDistinctError(type.errorType(), SOCKET_PACKAGE_ID, StringUtils.fromString(errMsg));
     }
 
     /**
@@ -82,7 +82,7 @@ public class SocketUtils {
      */
     static BObject createClient(SocketService socketService) {
         Object[] args = new Object[] { null };
-        final BObject caller = BValueCreator.createObjectValue(SOCKET_PACKAGE_ID, CLIENT, args);
+        final BObject caller = ValueCreator.createObjectValue(SOCKET_PACKAGE_ID, CLIENT, args);
         caller.addNativeData(SOCKET_SERVICE, socketService);
         SocketChannel client = null;
         // An error can be thrown during the onAccept function. So there is a possibility of client not
@@ -93,11 +93,11 @@ public class SocketUtils {
         if (client != null) {
             caller.addNativeData(SOCKET_KEY, client);
             Socket socket = client.socket();
-            caller.set(BStringUtils.fromString(REMOTE_PORT), socket.getPort());
-            caller.set(BStringUtils.fromString(LOCAL_PORT), socket.getLocalPort());
-            caller.set(BStringUtils.fromString(REMOTE_ADDRESS), socket.getInetAddress().getHostAddress());
-            caller.set(BStringUtils.fromString(LOCAL_ADDRESS), socket.getLocalAddress().getHostAddress());
-            caller.set(BStringUtils.fromString(ID), client.hashCode());
+            caller.set(StringUtils.fromString(REMOTE_PORT), socket.getPort());
+            caller.set(StringUtils.fromString(LOCAL_PORT), socket.getLocalPort());
+            caller.set(StringUtils.fromString(REMOTE_ADDRESS), socket.getInetAddress().getHostAddress());
+            caller.set(StringUtils.fromString(LOCAL_ADDRESS), socket.getLocalAddress().getHostAddress());
+            caller.set(StringUtils.fromString(ID), client.hashCode());
         }
         return caller;
     }

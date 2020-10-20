@@ -18,14 +18,14 @@
 
 package org.ballerinalang.stdlib.socket.endpoint.tcp;
 
-import org.ballerinalang.jvm.api.BStringUtils;
-import org.ballerinalang.jvm.api.BalEnv;
-import org.ballerinalang.jvm.api.BalFuture;
-import org.ballerinalang.jvm.api.values.BError;
-import org.ballerinalang.jvm.api.values.BMap;
-import org.ballerinalang.jvm.api.values.BObject;
-import org.ballerinalang.jvm.api.values.BString;
-import org.ballerinalang.jvm.values.ArrayValue;
+import io.ballerina.runtime.api.Environment;
+import io.ballerina.runtime.api.Future;
+import io.ballerina.runtime.api.StringUtils;
+import io.ballerina.runtime.api.values.BError;
+import io.ballerina.runtime.api.values.BMap;
+import io.ballerina.runtime.api.values.BObject;
+import io.ballerina.runtime.api.values.BString;
+import io.ballerina.runtime.values.ArrayValue;
 import org.ballerinalang.stdlib.socket.SocketConstants;
 import org.ballerinalang.stdlib.socket.exceptions.SelectorInitializeException;
 import org.ballerinalang.stdlib.socket.tcp.ChannelRegisterCallback;
@@ -58,7 +58,7 @@ import static java.nio.channels.SelectionKey.OP_READ;
 public class ClientActions {
     private static final Logger log = LoggerFactory.getLogger(ClientActions.class);
 
-    public static Object initEndpoint(BalEnv env, BObject client, BMap<BString, Object> config) {
+    public static Object initEndpoint(Environment env, BObject client, BMap<BString, Object> config) {
         Object returnValue = null;
         try {
             SocketChannel socketChannel = SocketChannel.open();
@@ -67,10 +67,10 @@ public class ClientActions {
             client.addNativeData(SocketConstants.SOCKET_KEY, socketChannel);
             client.addNativeData(SocketConstants.IS_CLIENT, true);
             BObject callbackService = (BObject) config.get(
-                    BStringUtils.fromString(SocketConstants.CLIENT_SERVICE_CONFIG)
+                    StringUtils.fromString(SocketConstants.CLIENT_SERVICE_CONFIG)
             );
             client.addNativeData(SocketConstants.CLIENT_CONFIG, config);
-            final long readTimeout = config.getIntValue(BStringUtils.fromString(SocketConstants.READ_TIMEOUT));
+            final long readTimeout = config.getIntValue(StringUtils.fromString(SocketConstants.READ_TIMEOUT));
             client.addNativeData(SocketConstants.SOCKET_SERVICE,
                     new SocketService(socketChannel, env.getRuntime(), callbackService, readTimeout));
         } catch (SocketException e) {
@@ -102,8 +102,8 @@ public class ClientActions {
         return null;
     }
 
-    public static Object read(BalEnv env, BObject client, long length) {
-        final BalFuture balFuture = env.markAsync();
+    public static Object read(Environment env, BObject client, long length) {
+        final Future balFuture = env.markAsync();
         if (length != SocketConstants.DEFAULT_EXPECTED_READ_LENGTH && length < 1) {
             String msg = "requested byte length need to be 1 or more";
             balFuture.complete(SocketUtils.createSocketError(SocketConstants.ErrorType.ReadTimedOutError, msg));
@@ -156,8 +156,8 @@ public class ClientActions {
         return null;
     }
 
-    public static Object start(BalEnv env, BObject client) {
-        final BalFuture balFuture = env.markAsync();
+    public static Object start(Environment env, BObject client) {
+        final Future balFuture = env.markAsync();
         SelectorManager selectorManager = null;
         BError error = null;
         SocketChannel channel = null;
@@ -165,8 +165,8 @@ public class ClientActions {
             channel = (SocketChannel) client.getNativeData(SocketConstants.SOCKET_KEY);
             BMap<BString, Object> config =
                     (BMap<BString, Object>) client.getNativeData(SocketConstants.CLIENT_CONFIG);
-            int port = Math.toIntExact(config.getIntValue(BStringUtils.fromString(SocketConstants.CONFIG_FIELD_PORT)));
-            String host = config.getStringValue(BStringUtils.fromString(SocketConstants.CONFIG_FIELD_HOST)).getValue();
+            int port = Math.toIntExact(config.getIntValue(StringUtils.fromString(SocketConstants.CONFIG_FIELD_PORT)));
+            String host = config.getStringValue(StringUtils.fromString(SocketConstants.CONFIG_FIELD_HOST)).getValue();
             channel.connect(new InetSocketAddress(host, port));
             channel.finishConnect();
             channel.configureBlocking(false);

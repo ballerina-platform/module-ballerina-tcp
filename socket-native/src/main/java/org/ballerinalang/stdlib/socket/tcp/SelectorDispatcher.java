@@ -18,9 +18,9 @@
 
 package org.ballerinalang.stdlib.socket.tcp;
 
-import org.ballerinalang.jvm.api.values.BError;
-import org.ballerinalang.jvm.api.values.BObject;
-import org.ballerinalang.jvm.util.exceptions.BallerinaConnectorException;
+import io.ballerina.runtime.api.values.BError;
+import io.ballerina.runtime.api.values.BObject;
+import io.ballerina.runtime.util.exceptions.BallerinaConnectorException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

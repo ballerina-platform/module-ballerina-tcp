@@ -18,17 +18,17 @@
 
 package org.ballerinalang.stdlib.socket.tcp;
 
-import org.ballerinalang.jvm.api.BStringUtils;
-import org.ballerinalang.jvm.api.BValueCreator;
-import org.ballerinalang.jvm.api.values.BError;
-import org.ballerinalang.jvm.api.values.BMap;
-import org.ballerinalang.jvm.api.values.BString;
-import org.ballerinalang.jvm.runtime.BLangThreadFactory;
-import org.ballerinalang.jvm.types.BArrayType;
-import org.ballerinalang.jvm.types.BTupleType;
-import org.ballerinalang.jvm.types.BTypes;
-import org.ballerinalang.jvm.values.ArrayValueImpl;
-import org.ballerinalang.jvm.values.TupleValueImpl;
+import io.ballerina.runtime.api.PredefinedTypes;
+import io.ballerina.runtime.api.StringUtils;
+import io.ballerina.runtime.api.ValueCreator;
+import io.ballerina.runtime.api.values.BError;
+import io.ballerina.runtime.api.values.BMap;
+import io.ballerina.runtime.api.values.BString;
+import io.ballerina.runtime.scheduling.BLangThreadFactory;
+import io.ballerina.runtime.types.BArrayType;
+import io.ballerina.runtime.types.BTupleType;
+import io.ballerina.runtime.values.ArrayValueImpl;
+import io.ballerina.runtime.values.TupleValueImpl;
 import org.ballerinalang.stdlib.socket.SocketConstants;
 import org.ballerinalang.stdlib.socket.exceptions.SelectorInitializeException;
 import org.slf4j.Logger;
@@ -79,10 +79,10 @@ public class SelectorManager {
     private ConcurrentLinkedQueue<Integer> readReadySockets = new ConcurrentLinkedQueue<>();
     private final Object startStopLock = new Object();
     private static final BTupleType receiveFromResultTuple = new BTupleType(
-            Arrays.asList(new BArrayType(BTypes.typeByte), BTypes.typeInt,
-                    BValueCreator.createRecordValue(SOCKET_PACKAGE_ID, "Address").getType()));
+            Arrays.asList(new BArrayType(PredefinedTypes.TYPE_BYTE), PredefinedTypes.TYPE_INT,
+                    ValueCreator.createRecordValue(SOCKET_PACKAGE_ID, "Address").getType()));
     private static final BTupleType tcpReadResultTuple = new BTupleType(
-            Arrays.asList(new BArrayType(BTypes.typeByte), BTypes.typeInt));
+            Arrays.asList(new BArrayType(PredefinedTypes.TYPE_BYTE), PredefinedTypes.TYPE_INT));
 
     private SelectorManager() throws IOException {
         selector = Selector.open();
@@ -408,9 +408,9 @@ public class SelectorManager {
 
     private TupleValueImpl createUdpSocketReturnValue(ReadPendingCallback callback, byte[] bytes,
             InetSocketAddress remoteAddress) {
-        BMap<BString, Object> address = BValueCreator.createRecordValue(SOCKET_PACKAGE_ID, "Address");
-        address.put(BStringUtils.fromString("port"), remoteAddress.getPort());
-        address.put(BStringUtils.fromString("host"), BStringUtils.fromString(remoteAddress.getHostName()));
+        BMap<BString, Object> address = ValueCreator.createRecordValue(SOCKET_PACKAGE_ID, "Address");
+        address.put(StringUtils.fromString("port"), remoteAddress.getPort());
+        address.put(StringUtils.fromString("host"), StringUtils.fromString(remoteAddress.getHostName()));
         TupleValueImpl contentTuple = new TupleValueImpl(receiveFromResultTuple);
         contentTuple.add(0, new ArrayValueImpl(bytes));
         contentTuple.add(1, Long.valueOf(callback.getCurrentLength()));

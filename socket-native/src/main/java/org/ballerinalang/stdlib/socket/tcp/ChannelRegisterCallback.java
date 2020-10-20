@@ -18,8 +18,8 @@
 
 package org.ballerinalang.stdlib.socket.tcp;
 
-import org.ballerinalang.jvm.api.BalFuture;
-import org.ballerinalang.jvm.api.values.BError;
+import io.ballerina.runtime.api.Future;
+import io.ballerina.runtime.api.values.BError;
 
 /**
  * This will hold the {@link SocketService}.
@@ -29,10 +29,10 @@ import org.ballerinalang.jvm.api.values.BError;
 public class ChannelRegisterCallback {
 
     private SocketService socketService;
-    private BalFuture balFuture;
+    private Future balFuture;
     private final int initialInterest;
 
-    public ChannelRegisterCallback(SocketService socketService, BalFuture balFuture, int initialInterest) {
+    public ChannelRegisterCallback(SocketService socketService, Future balFuture, int initialInterest) {
         this.socketService = socketService;
         this.balFuture = balFuture;
         this.initialInterest = initialInterest;

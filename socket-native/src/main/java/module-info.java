@@ -17,7 +17,7 @@
  */
 
 module io.ballerina.stdlib.socket {
-    requires io.ballerina.jvm;
+    requires io.ballerina.runtime;
     requires io.ballerina.lang;
     requires org.slf4j;
     exports org.ballerinalang.stdlib.socket.compiler;
