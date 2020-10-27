@@ -18,7 +18,7 @@ import ballerina/io;
 
 service ClientService = service {
 
-    resource function onConnect(Caller caller) {
+    resource isolated function onConnect(Caller caller) {
         io:println("connect: ", caller.remotePort);
     }
 
@@ -48,7 +48,7 @@ service ClientService = service {
         }
     }
 
-    resource function onError(Caller caller, error er) {
+    resource isolated function onError(Caller caller, error er) {
         io:println(er.message());
     }
 };
