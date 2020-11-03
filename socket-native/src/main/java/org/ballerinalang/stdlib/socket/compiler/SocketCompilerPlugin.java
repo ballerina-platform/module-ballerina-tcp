@@ -19,6 +19,7 @@
 package org.ballerinalang.stdlib.socket.compiler;
 
 import io.ballerina.runtime.api.TypeTags;
+import io.ballerina.tools.diagnostics.DiagnosticSeverity;
 import org.ballerinalang.compiler.plugins.AbstractCompilerPlugin;
 import org.ballerinalang.compiler.plugins.SupportedResourceParamTypes;
 import org.ballerinalang.model.tree.AnnotationAttachmentNode;
@@ -37,7 +38,6 @@ import static org.ballerinalang.model.types.TypeKind.RECORD;
 import static org.ballerinalang.stdlib.socket.SocketConstants.RESOURCE_ON_CONNECT;
 import static org.ballerinalang.stdlib.socket.SocketConstants.RESOURCE_ON_ERROR;
 import static org.ballerinalang.stdlib.socket.SocketConstants.RESOURCE_ON_READ_READY;
-import static org.ballerinalang.util.diagnostic.Diagnostic.Kind.ERROR;
 
 /**
  * Compiler plugin for validating Socket services.
@@ -69,7 +69,7 @@ public class SocketCompilerPlugin extends AbstractCompilerPlugin {
         if (resourceCount != mandatoryResourceCount) {
             String errorMsg = "service needs to have all 3 resources [%s, %s, %s].";
             String msg = String.format(errorMsg, RESOURCE_ON_CONNECT, RESOURCE_ON_READ_READY, RESOURCE_ON_ERROR);
-            diagnosticLog.logDiagnostic(ERROR, serviceNode.getPosition(), msg);
+            diagnosticLog.logDiagnostic(DiagnosticSeverity.ERROR, serviceNode.getPosition(), msg);
         }
     }
 
@@ -99,7 +99,7 @@ public class SocketCompilerPlugin extends AbstractCompilerPlugin {
             String msg = String
                     .format(INVALID_RESOURCE_SIGNATURE + "Parameters should be a 'socket:Caller' and 'error'",
                             resource.getName().getValue(), serviceName);
-            diagnosticLog.logDiagnostic(ERROR, resource.getPosition(), msg);
+            diagnosticLog.logDiagnostic(DiagnosticSeverity.ERROR, resource.getPosition(), msg);
             return;
         }
         validateEndpointCaller(serviceName, resource, diagnosticLog, readReadyParams);
@@ -108,7 +108,7 @@ public class SocketCompilerPlugin extends AbstractCompilerPlugin {
             if (!"error".equals(error.tsymbol.toString())) {
                 String msg = String.format(INVALID_RESOURCE_SIGNATURE + "The second parameter should be an 'error'",
                         resource.getName().getValue(), serviceName);
-                diagnosticLog.logDiagnostic(ERROR, resource.getPosition(), msg);
+                diagnosticLog.logDiagnostic(DiagnosticSeverity.ERROR, resource.getPosition(), msg);
             }
         }
     }
@@ -119,7 +119,7 @@ public class SocketCompilerPlugin extends AbstractCompilerPlugin {
             String msg = String
                     .format(INVALID_RESOURCE_SIGNATURE + "Parameters should be a 'socket:Caller'",
                             resource.getName().getValue(), serviceName);
-            diagnosticLog.logDiagnostic(ERROR, resource.getPosition(), msg);
+            diagnosticLog.logDiagnostic(DiagnosticSeverity.ERROR, resource.getPosition(), msg);
             return;
         }
         validateEndpointCaller(serviceName, resource, diagnosticLog, readReadyParams);
@@ -130,7 +130,7 @@ public class SocketCompilerPlugin extends AbstractCompilerPlugin {
         if (acceptParams.size() != 1) {
             String msg = String.format(INVALID_RESOURCE_SIGNATURE + "The parameter should be a 'socket:Caller'",
                     resource.getName().getValue(), serviceName);
-            diagnosticLog.logDiagnostic(ERROR, resource.getPosition(), msg);
+            diagnosticLog.logDiagnostic(DiagnosticSeverity.ERROR, resource.getPosition(), msg);
             return;
         }
         validateEndpointCaller(serviceName, resource, diagnosticLog, acceptParams);
@@ -143,7 +143,7 @@ public class SocketCompilerPlugin extends AbstractCompilerPlugin {
         if (!("ballerina/socket:Listener".equals(eventType) || "ballerina/socket:Client".equals(eventType))) {
             String msg = String.format(INVALID_RESOURCE_SIGNATURE + "The parameter should be a 'socket:Caller'",
                     resource.getName().getValue(), serviceName);
-            diagnosticLog.logDiagnostic(ERROR, resource.getPosition(), msg);
+            diagnosticLog.logDiagnostic(DiagnosticSeverity.ERROR, resource.getPosition(), msg);
         }
     }
 
