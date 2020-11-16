@@ -20,7 +20,6 @@ package org.ballerinalang.stdlib.socket.tcp;
 
 import io.ballerina.runtime.api.values.BError;
 import io.ballerina.runtime.api.values.BObject;
-import io.ballerina.runtime.util.exceptions.BallerinaConnectorException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -82,7 +81,7 @@ public class SelectorDispatcher {
             Object[] params = getReadReadyResourceSignature(socketService);
             socketService.getRuntime().invokeMethodAsync(socketService.getService(), RESOURCE_ON_READ_READY,
                     null, null, new TCPSocketReadCallback(socketService), null, params);
-        } catch (BallerinaConnectorException e) {
+        } catch (BError e) {
             invokeOnError(socketService, e.getMessage());
         }
     }
@@ -98,7 +97,7 @@ public class SelectorDispatcher {
             Object[] params = new Object[] { clientObj, true };
             socketService.getRuntime().invokeMethodAsync(socketService.getService(), RESOURCE_ON_CONNECT,
                     null, null, new TCPSocketCallback(socketService), null, params);
-        } catch (BallerinaConnectorException e) {
+        } catch (BError e) {
             invokeOnError(socketService, e.getMessage());
         }
     }

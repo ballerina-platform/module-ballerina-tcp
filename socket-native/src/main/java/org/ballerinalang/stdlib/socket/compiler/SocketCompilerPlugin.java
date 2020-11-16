@@ -19,6 +19,7 @@
 package org.ballerinalang.stdlib.socket.compiler;
 
 import io.ballerina.runtime.api.TypeTags;
+import io.ballerina.runtime.api.types.StructureType;
 import io.ballerina.tools.diagnostics.DiagnosticSeverity;
 import org.ballerinalang.compiler.plugins.AbstractCompilerPlugin;
 import org.ballerinalang.compiler.plugins.SupportedResourceParamTypes;
@@ -26,7 +27,6 @@ import org.ballerinalang.model.tree.AnnotationAttachmentNode;
 import org.ballerinalang.model.tree.ServiceNode;
 import org.ballerinalang.util.diagnostic.DiagnosticLog;
 import org.wso2.ballerinalang.compiler.semantics.model.types.BObjectType;
-import org.wso2.ballerinalang.compiler.semantics.model.types.BStructureType;
 import org.wso2.ballerinalang.compiler.semantics.model.types.BType;
 import org.wso2.ballerinalang.compiler.tree.BLangFunction;
 import org.wso2.ballerinalang.compiler.tree.BLangSimpleVariable;
@@ -138,8 +138,8 @@ public class SocketCompilerPlugin extends AbstractCompilerPlugin {
 
 
     private void validateEndpointCaller(String serviceName, BLangFunction resource, DiagnosticLog diagnosticLog,
-            BStructureType event) {
-        String eventType = event.tsymbol.toString();
+            StructureType event) {
+        String eventType = event.getQualifiedName();
         if (!("ballerina/socket:Listener".equals(eventType) || "ballerina/socket:Client".equals(eventType))) {
             String msg = String.format(INVALID_RESOURCE_SIGNATURE + "The parameter should be a 'socket:Caller'",
                     resource.getName().getValue(), serviceName);
@@ -151,7 +151,8 @@ public class SocketCompilerPlugin extends AbstractCompilerPlugin {
             List<BLangSimpleVariable> params) {
         BType caller = params.get(0).type;
         if (OBJECT.equals(caller.getKind()) && caller.tag == TypeTags.OBJECT_TYPE_TAG) {
-            validateEndpointCaller(serviceName, resource, diagnosticLog, new BObjectType(caller.tsymbol));
+            validateEndpointCaller(serviceName, resource, diagnosticLog,
+                    (StructureType) new BObjectType(caller.tsymbol));
         }
     }
 }
