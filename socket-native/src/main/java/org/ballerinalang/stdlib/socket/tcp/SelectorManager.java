@@ -19,17 +19,16 @@
 package org.ballerinalang.stdlib.socket.tcp;
 
 import io.ballerina.runtime.api.PredefinedTypes;
-import io.ballerina.runtime.api.StringUtils;
-import io.ballerina.runtime.api.ValueCreator;
+import io.ballerina.runtime.api.creators.TypeCreator;
+import io.ballerina.runtime.api.creators.ValueCreator;
+import io.ballerina.runtime.api.types.TupleType;
+import io.ballerina.runtime.api.utils.StringUtils;
+import io.ballerina.runtime.api.values.BArray;
 import io.ballerina.runtime.api.values.BError;
 import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BString;
-import io.ballerina.runtime.scheduling.BLangThreadFactory;
-import io.ballerina.runtime.types.BArrayType;
-import io.ballerina.runtime.types.BTupleType;
-import io.ballerina.runtime.values.ArrayValueImpl;
-import io.ballerina.runtime.values.TupleValueImpl;
 import org.ballerinalang.stdlib.socket.SocketConstants;
+import org.ballerinalang.stdlib.socket.SocketThreadFactory;
 import org.ballerinalang.stdlib.socket.exceptions.SelectorInitializeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,18 +70,18 @@ public class SelectorManager {
     private static final Logger log = LoggerFactory.getLogger(SelectorManager.class);
 
     private Selector selector;
-    private ThreadFactory threadFactory = new BLangThreadFactory("socket-selector");
+    private ThreadFactory threadFactory = new SocketThreadFactory("socket-selector");
     private ExecutorService executor = null;
     private boolean running = false;
     private boolean executing = true;
     private ConcurrentLinkedQueue<ChannelRegisterCallback> registerPendingSockets = new ConcurrentLinkedQueue<>();
     private ConcurrentLinkedQueue<Integer> readReadySockets = new ConcurrentLinkedQueue<>();
     private final Object startStopLock = new Object();
-    private static final BTupleType receiveFromResultTuple = new BTupleType(
-            Arrays.asList(new BArrayType(PredefinedTypes.TYPE_BYTE), PredefinedTypes.TYPE_INT,
+    private static final TupleType receiveFromResultTuple = TypeCreator.createTupleType(
+            Arrays.asList(TypeCreator.createArrayType(PredefinedTypes.TYPE_BYTE), PredefinedTypes.TYPE_INT,
                     ValueCreator.createRecordValue(SOCKET_PACKAGE_ID, "Address").getType()));
-    private static final BTupleType tcpReadResultTuple = new BTupleType(
-            Arrays.asList(new BArrayType(PredefinedTypes.TYPE_BYTE), PredefinedTypes.TYPE_INT));
+    private static final TupleType tcpReadResultTuple = TypeCreator.createTupleType(
+            Arrays.asList(TypeCreator.createArrayType(PredefinedTypes.TYPE_BYTE), PredefinedTypes.TYPE_INT));
 
     private SelectorManager() throws IOException {
         selector = Selector.open();
@@ -399,20 +398,20 @@ public class SelectorManager {
         callback.getFuture().complete(socketError);
     }
 
-    private TupleValueImpl createTcpSocketReturnValue(ReadPendingCallback callback, byte[] bytes) {
-        TupleValueImpl contentTuple = new TupleValueImpl(tcpReadResultTuple);
-        contentTuple.add(0, new ArrayValueImpl(bytes));
+    private BArray createTcpSocketReturnValue(ReadPendingCallback callback, byte[] bytes) {
+        BArray contentTuple = ValueCreator.createTupleValue(tcpReadResultTuple);
+        contentTuple.add(0, ValueCreator.createArrayValue(bytes));
         contentTuple.add(1, Long.valueOf(callback.getCurrentLength()));
         return contentTuple;
     }
 
-    private TupleValueImpl createUdpSocketReturnValue(ReadPendingCallback callback, byte[] bytes,
+    private BArray createUdpSocketReturnValue(ReadPendingCallback callback, byte[] bytes,
             InetSocketAddress remoteAddress) {
         BMap<BString, Object> address = ValueCreator.createRecordValue(SOCKET_PACKAGE_ID, "Address");
         address.put(StringUtils.fromString("port"), remoteAddress.getPort());
         address.put(StringUtils.fromString("host"), StringUtils.fromString(remoteAddress.getHostName()));
-        TupleValueImpl contentTuple = new TupleValueImpl(receiveFromResultTuple);
-        contentTuple.add(0, new ArrayValueImpl(bytes));
+        BArray contentTuple = ValueCreator.createTupleValue(receiveFromResultTuple);
+        contentTuple.add(0, ValueCreator.createArrayValue(bytes));
         contentTuple.add(1, Long.valueOf(callback.getCurrentLength()));
         contentTuple.add(2, address);
         return contentTuple;
