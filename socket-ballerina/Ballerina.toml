@@ -1,25 +1,27 @@
-[project]
-org-name = "ballerina"
+[package]
+org = "ballerina"
+name = "socket"
 version = "@toml.version@"
 
-[dependencies]
-"ballerina/io" = "@stdlib.io.version@"
-"ballerina/log" = "@stdlib.log.version@"
+[[dependency]]
+org = "ballerina"
+name = "io"
+version = "@stdlib.io.version@"
 
-[platform]
-target = "java11"
+[[dependency]]
+org = "ballerina"
+name = "log"
+version = "@stdlib.log.version@"
 
-    [[platform.libraries]]
-    artifactId = "socket"
-    version = "@project.version@"
-    path = "../socket-native/build/libs/socket-native-@project.version@.jar"
-    groupId = "ballerina"
-    modules = ["socket"]
+[[platform.java11.dependency]]
+path = "../socket-native/build/libs/socket-native-@project.version@.jar"
+groupId = "ballerina"
+artifactId = "socket"
+version = "@project.version@"
 
-    [[platform.libraries]]
-    artifactId = "socket"
-    version = "@project.version@"
-    path = "../socket-test-utils/build/libs/socket-test-utils-@project.version@.jar"
-    groupId = "org.ballerinalang.stdlib.socket"
-    modules = ["socket"]
-    scope = "testOnly"
+[[platform.java11.dependency]]
+path = "../socket-test-utils/build/libs/socket-test-utils-@project.version@.jar"
+groupId = "org.ballerinalang.stdlib.socket"
+scope = "testOnly"
+artifactId = "socket"
+version = "@project.version@"
