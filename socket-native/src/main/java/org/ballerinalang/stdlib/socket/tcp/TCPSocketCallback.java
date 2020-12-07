@@ -45,7 +45,7 @@ public class TCPSocketCallback implements Callback {
     }
 
     @Override
-    public void notifySuccess() {
+    public void notifySuccess(Object o) {
         log.debug("Socket resource dispatch succeed.");
     }
 

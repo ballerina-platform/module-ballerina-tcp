@@ -38,7 +38,7 @@ public class TCPSocketReadCallback extends TCPSocketCallback {
     }
 
     @Override
-    public void notifySuccess() {
+    public void notifySuccess(Object o) {
         // Exiting from the resource, so no more further caller->read statements. Release the resource lock.
         socketService.getResourceLock().release();
         SelectorManager.getInstance().invokePendingReadReadyResources(socketService.getSocketChannel().hashCode());

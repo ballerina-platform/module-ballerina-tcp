@@ -16,13 +16,13 @@
 
 import ballerina/io;
 
-service ClientService = service {
+service object {} ClientService = service object {
 
-    resource isolated function onConnect(Caller caller) {
+    remote isolated function onConnect(Caller caller) {
         io:println("connect: ", caller.remotePort);
     }
 
-    resource function onReadReady(Caller caller) {
+    remote function onReadReady(Caller caller) {
         io:println("New content received for callback");
         var result = caller->read();
         if (result is [byte[], int]) {
@@ -48,7 +48,7 @@ service ClientService = service {
         }
     }
 
-    resource isolated function onError(Caller caller, error er) {
+    remote isolated function onError(Caller caller, error er) {
         io:println(er.message());
     }
 };
