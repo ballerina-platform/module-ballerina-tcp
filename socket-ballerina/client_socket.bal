@@ -58,7 +58,7 @@ public client class Client {
     #
     # + content - The content, which will be sent to the client socket
     # + return - The number of bytes that got written or else a `socket:Error` if the given data can't be written
-    public isolated remote function write(byte[] content) returns int|Error {
+    isolated remote function write(byte[] content) returns int|Error {
         return externWrite(self, content);
     }
 
@@ -74,7 +74,7 @@ public client class Client {
     # + length - Represents the number of bytes, which should be read
     # + return - Content as a byte array and the number of bytes read or else a `socket:ReadTimedOutError` if the data
     #            can't be read from the client
-    public isolated remote function read(int length = -100) returns @tainted [byte[], int]|ReadTimedOutError {
+    isolated remote function read(int length = -100) returns @tainted [byte[], int]|ReadTimedOutError {
         return externRead(self, length);
     }
 
@@ -84,7 +84,7 @@ public client class Client {
     # ```
     #
     # + return - A `socket:Error` if the client can't close the connection or else `()`
-    public isolated remote function close() returns Error? {
+    isolated remote function close() returns Error? {
         return closeClient(self);
     }
 
@@ -94,7 +94,7 @@ public client class Client {
     # ```
     #
     # + return - A `socket:Error` if the client can't be shut down to stop reading from the socket or else `()`
-    public isolated remote function shutdownRead() returns Error? {
+    isolated remote function shutdownRead() returns Error? {
         return externShutdownRead(self);
     }
 
@@ -104,7 +104,7 @@ public client class Client {
     # ```
     #
     # + return - A `socket:Error` if the client can't shut down to stop the writing to the socket or else `()`
-    public isolated remote function shutdownWrite() returns Error? {
+    isolated remote function shutdownWrite() returns Error? {
         return externShutdownWrite(self);
     }
 }
@@ -121,7 +121,7 @@ public type ClientConfig record {|
     string host;
     int port;
     int readTimeoutInMillis = 300000;
-    service callbackService?;
+    service object {} callbackService?;
 |};
 
 isolated function initClientEndpoint(Client clientObj, ClientConfig clientConfig) returns error? =

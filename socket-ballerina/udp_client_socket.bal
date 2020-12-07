@@ -53,7 +53,7 @@ public client class UdpClient {
     # + content - The content to be sent to the client socket
     # + address - The address of the remote client socket
     # + return - The number of bytes got written or else a `socket:Error` if the given data can't be sent
-    public isolated remote function sendTo(byte[] content, Address address) returns int|Error {
+    isolated remote function sendTo(byte[] content, Address address) returns int|Error {
         return udpClientSendTo(self, content, address);
     }
 
@@ -67,7 +67,7 @@ public client class UdpClient {
     # + length - Represents the number of bytes, which should be read
     # + return - The content as a byte array, the number of bytes read, the address of the sender,
     #            or else a `socket:Error` if the data can't be read from the client
-    public isolated remote function receiveFrom(int length = -100) returns [byte[], int, Address]|ReadTimedOutError {
+    isolated remote function receiveFrom(int length = -100) returns [byte[], int, Address]|ReadTimedOutError {
         return externReceiveFrom(self, length);
     }
 
@@ -77,7 +77,7 @@ public client class UdpClient {
     # ```
     #
     # + return - A `socket:Error` if it can't close the connection or else `()`
-    public isolated remote function close() returns Error? {
+    isolated remote function close() returns Error? {
         return closeUdpClient(self);
     }
 }

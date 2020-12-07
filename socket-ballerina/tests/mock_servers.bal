@@ -34,13 +34,13 @@ listener Listener server3 = new (PORT3);
 listener Listener server4 = new (PORT4);
 listener Listener server5 = new Listener(PORT5, {readTimeoutInMillis: 20000});
 
-service echoServer on server1 {
+service "echoServer" on server1 {
 
-    resource isolated function onConnect(Caller caller) {
+    remote isolated function onConnect(Caller caller) {
         log:printInfo("Join: " + caller.remotePort.toString());
     }
 
-    resource isolated function onReadReady(Caller caller) {
+    remote isolated function onReadReady(Caller caller) {
         var result = caller->read();
         if (result is [byte[], int]) {
             var [content, length] = result;
@@ -55,18 +55,18 @@ service echoServer on server1 {
         }
     }
 
-    resource isolated function onError(Caller caller, error er) {
+    remote isolated function onError(Caller caller, error er) {
         log:printError("Error on echo service", <error>er);
     }
 }
 
-service helloServer on server2 {
+service "helloServer" on server2 {
 
-    resource isolated function onConnect(Caller caller) {
+    remote isolated function onConnect(Caller caller) {
         log:printInfo("Join: " + caller.remotePort.toString());
     }
 
-    resource function onReadReady(Caller caller) {
+    remote function onReadReady(Caller caller) {
         var result = caller->read(5);
         process(result, caller);
         result = caller->read(4);
@@ -78,18 +78,18 @@ service helloServer on server2 {
         _ = checkpanic caller->write(msgByteArray);
     }
 
-    resource isolated function onError(Caller caller, error er) {
+    remote isolated function onError(Caller caller, error er) {
         log:printError("Error on hello server", <error>er);
     }
 }
 
-service BlockingReadServer on server3 {
+service "blockingReadServer" on server3 {
 
-    resource isolated function onConnect(Caller caller) {
+    remote isolated function onConnect(Caller caller) {
         log:printInfo("Join: " + caller.remotePort.toString());
     }
 
-    resource isolated function onReadReady(Caller caller) {
+    remote isolated function onReadReady(Caller caller) {
         var result = caller->read(length = 18);
         if (result is [byte[], int]) {
             var [content, length] = result;
@@ -104,20 +104,20 @@ service BlockingReadServer on server3 {
         }
     }
 
-    resource isolated function onError(Caller caller, error er) {
+    remote isolated function onError(Caller caller, error er) {
         log:printError("Error on blocking read server", <error>er);
     }
 }
 
-service echoOnReadyServer on server4 {
-    resource function onConnect(Caller caller) {
+service "echoOnReadyServer" on server4 {
+    remote function onConnect(Caller caller) {
         lock {
             joinee = joinee + 1;
             io:println("Join: ", joinee);
         }
     }
 
-    resource function onReadReady(Caller caller) {
+    remote function onReadReady(Caller caller) {
         var result = caller->read();
         if (result is [byte[], int]) {
             var [content, length] = result;
@@ -142,19 +142,19 @@ service echoOnReadyServer on server4 {
         }
     }
 
-    resource isolated function onError(Caller caller, error er) {
+    remote isolated function onError(Caller caller, error er) {
         error e = er;
         io:println(er.message());
     }
 }
 
-service timeoutServer on server5 {
+service "timeoutServer" on server5 {
 
-    resource isolated function onConnect(Caller caller) {
+    remote isolated function onConnect(Caller caller) {
         log:printInfo("Join: " + caller.remotePort.toString());
     }
 
-    resource isolated function onReadReady(Caller caller) {
+    remote isolated function onReadReady(Caller caller) {
         var result = caller->read(18);
         if (result is [byte[], int]) {
             var [content, length] = result;
@@ -169,7 +169,7 @@ service timeoutServer on server5 {
         }
     }
 
-    resource isolated function onError(Caller caller, error er) {
+    remote isolated function onError(Caller caller, error er) {
         log:printError("Error on timeout server", <error> er);
     }
 }
