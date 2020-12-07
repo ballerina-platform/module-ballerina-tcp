@@ -46,7 +46,7 @@ public class SelectorDispatcher {
         try {
             Object[] params = getOnErrorResourceSignature(socketService, errorMsg);
             socketService.getRuntime().invokeMethodAsync(socketService.getService(), RESOURCE_ON_ERROR,
-                    null, null, new TCPSocketCallback(socketService), null, params);
+                    null, null, new TCPSocketCallback(socketService), params);
         } catch (Throwable e) {
             log.error("Error while executing onError resource", e);
         }
@@ -64,8 +64,7 @@ public class SelectorDispatcher {
             final BObject caller = SocketUtils.createClient(socketService);
             Object[] params = new Object[] { caller, true, error, true };
             socketService.getRuntime().invokeMethodAsync(socketService.getService(), RESOURCE_ON_ERROR,
-                    null, null, callback, null,
-                    params);
+                    null, null, callback, params);
         } catch (Throwable e) {
             log.error("Error while executing onError resource", e);
         }
@@ -80,7 +79,7 @@ public class SelectorDispatcher {
         try {
             Object[] params = getReadReadyResourceSignature(socketService);
             socketService.getRuntime().invokeMethodAsync(socketService.getService(), RESOURCE_ON_READ_READY,
-                    null, null, new TCPSocketReadCallback(socketService), null, params);
+                    null, null, new TCPSocketReadCallback(socketService), params);
         } catch (BError e) {
             invokeOnError(socketService, e.getMessage());
         }
@@ -96,7 +95,7 @@ public class SelectorDispatcher {
             final BObject clientObj = SocketUtils.createClient(socketService);
             Object[] params = new Object[] { clientObj, true };
             socketService.getRuntime().invokeMethodAsync(socketService.getService(), RESOURCE_ON_CONNECT,
-                    null, null, new TCPSocketCallback(socketService), null, params);
+                    null, null, new TCPSocketCallback(socketService), params);
         } catch (BError e) {
             invokeOnError(socketService, e.getMessage());
         }
