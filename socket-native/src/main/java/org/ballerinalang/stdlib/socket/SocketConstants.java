@@ -31,13 +31,11 @@ public class SocketConstants {
 
     public static final String SERVER_SOCKET_KEY = "ServerSocket";
     public static final String SOCKET_KEY = "Socket";
-    public static final String SOCKET_PACKAGE = "ballerina/socket";
     public static final Module SOCKET_PACKAGE_ID = new Module(BALLERINA_BUILTIN_PKG_PREFIX, "socket", "0.7.2");
     public static final String RESOURCE_ON_CONNECT = "onConnect";
     public static final String RESOURCE_ON_READ_READY = "onReadReady";
     public static final String RESOURCE_ON_ERROR = "onError";
     public static final String CLIENT = "Client";
-    public static final String UDP_CLIENT = "UdpClient";
     public static final String CONFIG_FIELD_INTERFACE = "interface";
     public static final String CONFIG_FIELD_HOST = "host";
     public static final String CONFIG_FIELD_PORT = "port";

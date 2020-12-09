@@ -22,11 +22,8 @@ import io.ballerina.runtime.api.PredefinedTypes;
 import io.ballerina.runtime.api.creators.TypeCreator;
 import io.ballerina.runtime.api.creators.ValueCreator;
 import io.ballerina.runtime.api.types.TupleType;
-import io.ballerina.runtime.api.utils.StringUtils;
 import io.ballerina.runtime.api.values.BArray;
 import io.ballerina.runtime.api.values.BError;
-import io.ballerina.runtime.api.values.BMap;
-import io.ballerina.runtime.api.values.BString;
 import org.ballerinalang.stdlib.socket.SocketConstants;
 import org.ballerinalang.stdlib.socket.SocketThreadFactory;
 import org.ballerinalang.stdlib.socket.exceptions.SelectorInitializeException;
@@ -34,14 +31,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.net.InetSocketAddress;
 import java.net.SocketException;
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousCloseException;
 import java.nio.channels.CancelledKeyException;
 import java.nio.channels.ClosedByInterruptException;
 import java.nio.channels.ClosedChannelException;
-import java.nio.channels.DatagramChannel;
 import java.nio.channels.NotYetConnectedException;
 import java.nio.channels.SelectableChannel;
 import java.nio.channels.SelectionKey;
@@ -57,8 +52,6 @@ import java.util.concurrent.ThreadFactory;
 
 import static java.nio.channels.SelectionKey.OP_READ;
 import static org.ballerinalang.stdlib.socket.SocketConstants.DEFAULT_EXPECTED_READ_LENGTH;
-import static org.ballerinalang.stdlib.socket.SocketConstants.ErrorType.ReadTimedOutError;
-import static org.ballerinalang.stdlib.socket.SocketConstants.SOCKET_PACKAGE_ID;
 
 /**
  * This will manage the Selector instance and handle the accept, read and write operations.
@@ -77,9 +70,6 @@ public class SelectorManager {
     private ConcurrentLinkedQueue<ChannelRegisterCallback> registerPendingSockets = new ConcurrentLinkedQueue<>();
     private ConcurrentLinkedQueue<Integer> readReadySockets = new ConcurrentLinkedQueue<>();
     private final Object startStopLock = new Object();
-    private static final TupleType receiveFromResultTuple = TypeCreator.createTupleType(
-            Arrays.asList(TypeCreator.createArrayType(PredefinedTypes.TYPE_BYTE), PredefinedTypes.TYPE_INT,
-                    ValueCreator.createRecordValue(SOCKET_PACKAGE_ID, "Address").getType()));
     private static final TupleType tcpReadResultTuple = TypeCreator.createTupleType(
             Arrays.asList(TypeCreator.createArrayType(PredefinedTypes.TYPE_BYTE), PredefinedTypes.TYPE_INT));
 
@@ -294,12 +284,7 @@ public class SelectorManager {
                     SocketReader socketReader = readReadySocketMap.remove(socketHashId);
                     ReadPendingCallback callback = readPendingSocketMap.remove(socketHashId);
                     // Read ready socket available.
-                    SelectableChannel channel = socketReader.getSocketService().getSocketChannel();
-                    if (channel instanceof SocketChannel) {
-                        readTcpSocket(socketReader, callback);
-                    } else if (channel instanceof DatagramChannel) {
-                        readUdpSocket(socketReader, callback);
-                    }
+                    readTcpSocket(socketReader, callback);
                 }
             }
             // If the read pending socket not available then do nothing. Above will be invoked once read ready
@@ -308,45 +293,6 @@ public class SelectorManager {
             // No caller->read pending actions hence try to dispatch to onReadReady resource if read ready available.
             final SocketReader socketReader = ReadReadySocketMap.getInstance().get(socketHashId);
             invokeReadReadyResource(socketReader.getSocketService());
-        }
-    }
-
-    private void readUdpSocket(SocketReader socketReader, ReadPendingCallback callback) {
-        DatagramChannel channel = (DatagramChannel) socketReader.getSocketService().getSocketChannel();
-        try {
-            ByteBuffer buffer = createBuffer(callback, channel);
-            final InetSocketAddress remoteAddress = (InetSocketAddress) channel.receive(buffer);
-            callback.resetTimeout();
-            final int bufferPosition = buffer.position();
-            callback.updateCurrentLength(bufferPosition);
-            // Re-register for read ready events.
-            socketReader.getSelectionKey().interestOps(OP_READ);
-            selector.wakeup();
-            if (callback.getExpectedLength() != DEFAULT_EXPECTED_READ_LENGTH) {
-                if (callback.getBuffer() == null) {
-                    callback.setBuffer(ByteBuffer.allocate(buffer.capacity()));
-                }
-                buffer.flip();
-                callback.getBuffer().put(buffer);
-            }
-            if (callback.getExpectedLength() != DEFAULT_EXPECTED_READ_LENGTH && callback.getExpectedLength() != callback
-                    .getCurrentLength()) {
-                ReadPendingSocketMap.getInstance().add(channel.hashCode(), callback);
-                invokeRead(channel.hashCode(), false);
-                return;
-            }
-            byte[] bytes = SocketUtils
-                    .getByteArrayFromByteBuffer(callback.getBuffer() == null ? buffer : callback.getBuffer());
-            callback.getFuture().complete(createUdpSocketReturnValue(callback, bytes, remoteAddress));
-            callback.cancelTimeout();
-        } catch (CancelledKeyException | ClosedChannelException e) {
-            processError(callback, null, "connection closed");
-        } catch (IOException e) {
-            log.error("Error while data receive.", e);
-            processError(callback, null, e.getMessage());
-        } catch (Throwable e) {
-            log.error(e.getMessage(), e);
-            processError(callback, ReadTimedOutError, "error while on receiveFrom operation");
         }
     }
 
@@ -405,18 +351,6 @@ public class SelectorManager {
         return contentTuple;
     }
 
-    private BArray createUdpSocketReturnValue(ReadPendingCallback callback, byte[] bytes,
-            InetSocketAddress remoteAddress) {
-        BMap<BString, Object> address = ValueCreator.createRecordValue(SOCKET_PACKAGE_ID, "Address");
-        address.put(StringUtils.fromString("port"), remoteAddress.getPort());
-        address.put(StringUtils.fromString("host"), StringUtils.fromString(remoteAddress.getHostName()));
-        BArray contentTuple = ValueCreator.createTupleValue(receiveFromResultTuple);
-        contentTuple.add(0, ValueCreator.createArrayValue(bytes));
-        contentTuple.add(1, Long.valueOf(callback.getCurrentLength()));
-        contentTuple.add(2, address);
-        return contentTuple;
-    }
-
     private ByteBuffer createBuffer(ReadPendingCallback callback, int osBufferSize) {
         ByteBuffer buffer;
         // If the length is not specified in the read action then create a byte buffer to match the size of
@@ -431,11 +365,6 @@ public class SelectorManager {
     }
 
     private ByteBuffer createBuffer(ReadPendingCallback callback, SocketChannel socketChannel) throws SocketException {
-        return createBuffer(callback, socketChannel.socket().getReceiveBufferSize());
-    }
-
-    private ByteBuffer createBuffer(ReadPendingCallback callback, DatagramChannel socketChannel)
-            throws SocketException {
         return createBuffer(callback, socketChannel.socket().getReceiveBufferSize());
     }
 

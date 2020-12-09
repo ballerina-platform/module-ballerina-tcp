@@ -23,6 +23,5 @@ module io.ballerina.stdlib.socket {
     requires org.slf4j;
     exports org.ballerinalang.stdlib.socket.compiler;
     exports org.ballerinalang.stdlib.socket.endpoint.tcp;
-    exports org.ballerinalang.stdlib.socket.endpoint.udp;
     exports org.ballerinalang.stdlib.socket.tcp;
 }
