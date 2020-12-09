@@ -16,14 +16,13 @@
  * under the License.
  */
 
-package org.ballerinalang.stdlib.socket.tcp;
+package org.ballerinalang.stdlib.tcp;
 
 import io.ballerina.runtime.api.creators.ErrorCreator;
 import io.ballerina.runtime.api.creators.ValueCreator;
 import io.ballerina.runtime.api.utils.StringUtils;
 import io.ballerina.runtime.api.values.BError;
 import io.ballerina.runtime.api.values.BObject;
-import org.ballerinalang.stdlib.socket.SocketConstants;
 
 import java.net.Socket;
 import java.nio.ByteBuffer;
@@ -31,16 +30,16 @@ import java.nio.channels.SocketChannel;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import static org.ballerinalang.stdlib.socket.SocketConstants.CLIENT;
-import static org.ballerinalang.stdlib.socket.SocketConstants.ErrorType.GenericError;
-import static org.ballerinalang.stdlib.socket.SocketConstants.ID;
-import static org.ballerinalang.stdlib.socket.SocketConstants.LOCAL_ADDRESS;
-import static org.ballerinalang.stdlib.socket.SocketConstants.LOCAL_PORT;
-import static org.ballerinalang.stdlib.socket.SocketConstants.REMOTE_ADDRESS;
-import static org.ballerinalang.stdlib.socket.SocketConstants.REMOTE_PORT;
-import static org.ballerinalang.stdlib.socket.SocketConstants.SOCKET_KEY;
-import static org.ballerinalang.stdlib.socket.SocketConstants.SOCKET_PACKAGE_ID;
-import static org.ballerinalang.stdlib.socket.SocketConstants.SOCKET_SERVICE;
+import static org.ballerinalang.stdlib.tcp.SocketConstants.CLIENT;
+import static org.ballerinalang.stdlib.tcp.SocketConstants.ErrorType.GenericError;
+import static org.ballerinalang.stdlib.tcp.SocketConstants.ID;
+import static org.ballerinalang.stdlib.tcp.SocketConstants.LOCAL_ADDRESS;
+import static org.ballerinalang.stdlib.tcp.SocketConstants.LOCAL_PORT;
+import static org.ballerinalang.stdlib.tcp.SocketConstants.REMOTE_ADDRESS;
+import static org.ballerinalang.stdlib.tcp.SocketConstants.REMOTE_PORT;
+import static org.ballerinalang.stdlib.tcp.SocketConstants.SOCKET_KEY;
+import static org.ballerinalang.stdlib.tcp.SocketConstants.SOCKET_PACKAGE_ID;
+import static org.ballerinalang.stdlib.tcp.SocketConstants.SOCKET_SERVICE;
 
 /**
  * Represents the util functions of Socket operations.
@@ -53,7 +52,7 @@ public class SocketUtils {
     }
 
     /**
-     * Create Generic socket error with given error message.
+     * Create Generic tcp error with given error message.
      *
      * @param errMsg the error message
      * @return BError instance which contains the error details
@@ -64,7 +63,7 @@ public class SocketUtils {
     }
 
     /**
-     * Create socket error with given error type and message.
+     * Create tcp error with given error type and message.
      *
      * @param type   the error type which cause for this error
      * @param errMsg the error message

@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.ballerinalang.stdlib.socket.tcp;
+package org.ballerinalang.stdlib.tcp;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.ballerinalang.stdlib.socket.exceptions;
+package org.ballerinalang.stdlib.tcp.exceptions;
 
 /**
  * This is the runtime exception throws during the

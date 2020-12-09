@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.ballerinalang.stdlib.socket.tcp;
+package org.ballerinalang.stdlib.tcp;
 
 import io.ballerina.runtime.api.Future;
 import io.ballerina.runtime.api.values.BError;

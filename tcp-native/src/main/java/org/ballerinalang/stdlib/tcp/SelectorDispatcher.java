@@ -16,16 +16,16 @@
  * under the License.
  */
 
-package org.ballerinalang.stdlib.socket.tcp;
+package org.ballerinalang.stdlib.tcp;
 
 import io.ballerina.runtime.api.values.BError;
 import io.ballerina.runtime.api.values.BObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.ballerinalang.stdlib.socket.SocketConstants.RESOURCE_ON_CONNECT;
-import static org.ballerinalang.stdlib.socket.SocketConstants.RESOURCE_ON_ERROR;
-import static org.ballerinalang.stdlib.socket.SocketConstants.RESOURCE_ON_READ_READY;
+import static org.ballerinalang.stdlib.tcp.SocketConstants.RESOURCE_ON_CONNECT;
+import static org.ballerinalang.stdlib.tcp.SocketConstants.RESOURCE_ON_ERROR;
+import static org.ballerinalang.stdlib.tcp.SocketConstants.RESOURCE_ON_READ_READY;
 
 /**
  * This will handle the dispatching for TCP listener and client.

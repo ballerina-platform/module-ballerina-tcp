@@ -16,14 +16,14 @@
  * under the License.
  */
 
-package org.ballerinalang.stdlib.socket;
+package org.ballerinalang.stdlib.tcp;
 
 import io.ballerina.runtime.api.Module;
 
 import static io.ballerina.runtime.api.constants.RuntimeConstants.BALLERINA_BUILTIN_PKG_PREFIX;
 
 /**
- * Constant variable for socket related operations.
+ * Constant variable for tcp related operations.
  */
 public class SocketConstants {
     private SocketConstants() {
@@ -59,7 +59,7 @@ public class SocketConstants {
     public static final String READ_TIMEOUT = "readTimeoutInMillis";
 
     /**
-     * Specifies the error type for socket module.
+     * Specifies the error type for tcp module.
      */
     public enum ErrorType {
 

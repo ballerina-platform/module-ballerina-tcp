@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.ballerinalang.stdlib.socket.tcp;
+package org.ballerinalang.stdlib.tcp;
 
 import io.ballerina.runtime.api.PredefinedTypes;
 import io.ballerina.runtime.api.creators.TypeCreator;
@@ -24,9 +24,7 @@ import io.ballerina.runtime.api.creators.ValueCreator;
 import io.ballerina.runtime.api.types.TupleType;
 import io.ballerina.runtime.api.values.BArray;
 import io.ballerina.runtime.api.values.BError;
-import org.ballerinalang.stdlib.socket.SocketConstants;
-import org.ballerinalang.stdlib.socket.SocketThreadFactory;
-import org.ballerinalang.stdlib.socket.exceptions.SelectorInitializeException;
+import org.ballerinalang.stdlib.tcp.exceptions.SelectorInitializeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,7 +49,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
 import static java.nio.channels.SelectionKey.OP_READ;
-import static org.ballerinalang.stdlib.socket.SocketConstants.DEFAULT_EXPECTED_READ_LENGTH;
+import static org.ballerinalang.stdlib.tcp.SocketConstants.DEFAULT_EXPECTED_READ_LENGTH;
 
 /**
  * This will manage the Selector instance and handle the accept, read and write operations.
@@ -63,7 +61,7 @@ public class SelectorManager {
     private static final Logger log = LoggerFactory.getLogger(SelectorManager.class);
 
     private Selector selector;
-    private ThreadFactory threadFactory = new SocketThreadFactory("socket-selector");
+    private ThreadFactory threadFactory = new SocketThreadFactory("tcp-selector");
     private ExecutorService executor = null;
     private boolean running = false;
     private boolean executing = true;
@@ -102,7 +100,7 @@ public class SelectorManager {
     }
 
     /**
-     * Add channel to register pending socket queue. Socket registration has to be happen in the same thread
+     * Add channel to register pending tcp queue. Socket registration has to be happen in the same thread
      * that selector loop execute.
      *
      * @param callback A {@link ChannelRegisterCallback} instance which contains the resources,
@@ -128,7 +126,7 @@ public class SelectorManager {
     /**
      * Adding onReadReady finish notification to the queue and wakeup the selector.
      *
-     * @param socketHashCode hashCode of the read ready socket.
+     * @param socketHashCode hashCode of the read ready tcp.
      */
     void invokePendingReadReadyResources(int socketHashCode) {
         readReadySockets.add(socketHashCode);
@@ -183,10 +181,10 @@ public class SelectorManager {
                 socketService.getSocketChannel()
                         .register(selector, channelRegisterCallback.getInitialInterest(), socketService);
             } catch (ClosedChannelException e) {
-                channelRegisterCallback.notifyFailure("socket already closed");
+                channelRegisterCallback.notifyFailure("tcp already closed");
                 continue;
             }
-            // Notification needs to happen to the client connection in the socket server only if the client has
+            // Notification needs to happen to the client connection in the tcp server only if the client has
             // a callback service.
             boolean serviceAttached = (socketService.getService() != null
                     && channelRegisterCallback.getInitialInterest() == OP_READ);
@@ -266,14 +264,14 @@ public class SelectorManager {
     }
 
     /**
-     * Perform the read operation for the given socket. This will either read data from the socket channel or dispatch
+     * Perform the read operation for the given tcp. This will either read data from the tcp channel or dispatch
      * to the onReadReady resource if resource's lock available.
      *
-     * @param socketHashId socket hash id
+     * @param socketHashId tcp hash id
      * @param clientServiceAttached whether client callback service attached or not
      */
     public void invokeRead(int socketHashId, boolean clientServiceAttached) {
-        // Check whether there is any caller->read pending action and read ready socket.
+        // Check whether there is any caller->read pending action and read ready tcp.
         ReadPendingSocketMap readPendingSocketMap = ReadPendingSocketMap.getInstance();
         if (readPendingSocketMap.isPending(socketHashId)) {
             // Lock the ReadPendingCallback instance. This will prevent duplicate invocation that happen from both
@@ -283,12 +281,12 @@ public class SelectorManager {
                 if (readReadySocketMap.isReadReady(socketHashId)) {
                     SocketReader socketReader = readReadySocketMap.remove(socketHashId);
                     ReadPendingCallback callback = readPendingSocketMap.remove(socketHashId);
-                    // Read ready socket available.
+                    // Read ready tcp available.
                     readTcpSocket(socketReader, callback);
                 }
             }
-            // If the read pending socket not available then do nothing. Above will be invoked once read ready
-            // socket is connected.
+            // If the read pending tcp not available then do nothing. Above will be invoked once read ready
+            // tcp is connected.
         } else if (clientServiceAttached) {
             // No caller->read pending actions hence try to dispatch to onReadReady resource if read ready available.
             final SocketReader socketReader = ReadReadySocketMap.getInstance().get(socketHashId);

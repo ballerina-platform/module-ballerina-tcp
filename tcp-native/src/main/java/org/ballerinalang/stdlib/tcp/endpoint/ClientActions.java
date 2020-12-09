@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.ballerinalang.stdlib.socket.endpoint.tcp;
+package org.ballerinalang.stdlib.tcp.endpoint;
 
 import io.ballerina.runtime.api.Environment;
 import io.ballerina.runtime.api.Future;
@@ -26,14 +26,14 @@ import io.ballerina.runtime.api.values.BError;
 import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BObject;
 import io.ballerina.runtime.api.values.BString;
-import org.ballerinalang.stdlib.socket.SocketConstants;
-import org.ballerinalang.stdlib.socket.exceptions.SelectorInitializeException;
-import org.ballerinalang.stdlib.socket.tcp.ChannelRegisterCallback;
-import org.ballerinalang.stdlib.socket.tcp.ReadPendingCallback;
-import org.ballerinalang.stdlib.socket.tcp.ReadPendingSocketMap;
-import org.ballerinalang.stdlib.socket.tcp.SelectorManager;
-import org.ballerinalang.stdlib.socket.tcp.SocketService;
-import org.ballerinalang.stdlib.socket.tcp.SocketUtils;
+import org.ballerinalang.stdlib.tcp.ChannelRegisterCallback;
+import org.ballerinalang.stdlib.tcp.ReadPendingCallback;
+import org.ballerinalang.stdlib.tcp.ReadPendingSocketMap;
+import org.ballerinalang.stdlib.tcp.SelectorManager;
+import org.ballerinalang.stdlib.tcp.SocketConstants;
+import org.ballerinalang.stdlib.tcp.SocketService;
+import org.ballerinalang.stdlib.tcp.SocketUtils;
+import org.ballerinalang.stdlib.tcp.exceptions.SelectorInitializeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,10 +74,10 @@ public class ClientActions {
             client.addNativeData(SocketConstants.SOCKET_SERVICE,
                     new SocketService(socketChannel, env.getRuntime(), callbackService, readTimeout));
         } catch (SocketException e) {
-            returnValue = SocketUtils.createSocketError("unable to bind the local socket port");
+            returnValue = SocketUtils.createSocketError("unable to bind the local tcp port");
         } catch (IOException e) {
-            log.error("Unable to initiate the client socket", e);
-            returnValue = SocketUtils.createSocketError("unable to initiate the socket");
+            log.error("Unable to initiate the client tcp", e);
+            returnValue = SocketUtils.createSocketError("unable to initiate the tcp");
         }
         return returnValue;
     }
@@ -97,7 +97,7 @@ public class ClientActions {
             }
         } catch (IOException e) {
             log.error("Unable to close the connection", e);
-            return SocketUtils.createSocketError("unable to close the client socket connection");
+            return SocketUtils.createSocketError("unable to close the client tcp connection");
         }
         return null;
     }
@@ -128,12 +128,12 @@ public class ClientActions {
                 socketChannel.shutdownInput();
             }
         } catch (ClosedChannelException e) {
-            return SocketUtils.createSocketError("socket is already closed");
+            return SocketUtils.createSocketError("tcp is already closed");
         } catch (IOException e) {
             log.error("Unable to shutdown the read", e);
             return SocketUtils.createSocketError("unable to shutdown the write");
         } catch (NotYetConnectedException e) {
-            return SocketUtils.createSocketError("socket is not yet connected");
+            return SocketUtils.createSocketError("tcp is not yet connected");
         }
         return null;
     }
@@ -146,12 +146,12 @@ public class ClientActions {
                 socketChannel.shutdownOutput();
             }
         } catch (ClosedChannelException e) {
-            return SocketUtils.createSocketError("socket is already closed");
+            return SocketUtils.createSocketError("tcp is already closed");
         } catch (IOException e) {
             log.error("Unable to shutdown the write", e);
             return SocketUtils.createSocketError("unable to shutdown the write");
         } catch (NotYetConnectedException e) {
-            return SocketUtils.createSocketError("socket is not yet connected");
+            return SocketUtils.createSocketError("tcp is not yet connected");
         }
         return null;
     }
@@ -176,18 +176,18 @@ public class ClientActions {
             log.error(e.getMessage(), e);
             error = SocketUtils.createSocketError("unable to initialize the selector");
         } catch (CancelledKeyException e) {
-            error = SocketUtils.createSocketError("unable to start the client socket");
+            error = SocketUtils.createSocketError("unable to start the client tcp");
         } catch (AlreadyBoundException e) {
-            error = SocketUtils.createSocketError("client socket is already bound to a port");
+            error = SocketUtils.createSocketError("client tcp is already bound to a port");
         } catch (UnsupportedAddressTypeException e) {
             log.error("Address not supported", e);
             error = SocketUtils.createSocketError("provided address is not supported");
         } catch (IOException e) {
             log.error(e.getMessage(), e);
-            error = SocketUtils.createSocketError("unable to start the client socket: " + e.getMessage());
+            error = SocketUtils.createSocketError("unable to start the client tcp: " + e.getMessage());
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            error = SocketUtils.createSocketError("unable to start the socket client.");
+            error = SocketUtils.createSocketError("unable to start the tcp client.");
         }
         if (error != null) {
             try {
@@ -220,12 +220,12 @@ public class ClientActions {
             }
             return (long) write;
         } catch (ClosedChannelException e) {
-            return SocketUtils.createSocketError("client socket close already.");
+            return SocketUtils.createSocketError("client tcp close already.");
         } catch (IOException e) {
             log.error("Unable to perform write[" + socketChannel.hashCode() + "]", e);
             return SocketUtils.createSocketError("write failed. " + e.getMessage());
         } catch (NotYetConnectedException e) {
-            return SocketUtils.createSocketError("client socket not connected yet.");
+            return SocketUtils.createSocketError("client tcp not connected yet.");
         }
     }
 }

@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.ballerinalang.stdlib.socket.compiler;
+package org.ballerinalang.stdlib.tcp.compiler;
 
 import io.ballerina.runtime.api.TypeTags;
 import io.ballerina.runtime.api.types.StructureType;
@@ -35,9 +35,9 @@ import java.util.List;
 
 import static org.ballerinalang.model.types.TypeKind.OBJECT;
 import static org.ballerinalang.model.types.TypeKind.RECORD;
-import static org.ballerinalang.stdlib.socket.SocketConstants.RESOURCE_ON_CONNECT;
-import static org.ballerinalang.stdlib.socket.SocketConstants.RESOURCE_ON_ERROR;
-import static org.ballerinalang.stdlib.socket.SocketConstants.RESOURCE_ON_READ_READY;
+import static org.ballerinalang.stdlib.tcp.SocketConstants.RESOURCE_ON_CONNECT;
+import static org.ballerinalang.stdlib.tcp.SocketConstants.RESOURCE_ON_ERROR;
+import static org.ballerinalang.stdlib.tcp.SocketConstants.RESOURCE_ON_READ_READY;
 
 /**
  * Compiler plugin for validating Socket services.

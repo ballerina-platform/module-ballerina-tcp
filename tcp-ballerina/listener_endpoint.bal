@@ -97,23 +97,23 @@ public type ListenerConfig record {|
 
 isolated function initServer(Listener lis, int port, ListenerConfig config) returns error? =
 @java:Method {
-    'class: "org.ballerinalang.stdlib.socket.endpoint.tcp.ServerActions"
+    'class: "org.ballerinalang.stdlib.tcp.endpoint.ServerActions"
 } external;
 
 isolated function externRegister(Listener lis, service object {} s) returns error? =
 @java:Method {
     name: "register",
-    'class: "org.ballerinalang.stdlib.socket.endpoint.tcp.ServerActions"
+    'class: "org.ballerinalang.stdlib.tcp.endpoint.ServerActions"
 } external;
 
 isolated function startService(Listener lis) returns error? =
 @java:Method {
     name: "start",
-    'class: "org.ballerinalang.stdlib.socket.endpoint.tcp.ServerActions"
+    'class: "org.ballerinalang.stdlib.tcp.endpoint.ServerActions"
 } external;
 
 isolated function externStop(Listener lis, boolean graceful) returns error? =
 @java:Method {
     name: "stop",
-    'class: "org.ballerinalang.stdlib.socket.endpoint.tcp.ServerActions"
+    'class: "org.ballerinalang.stdlib.tcp.endpoint.ServerActions"
 } external;

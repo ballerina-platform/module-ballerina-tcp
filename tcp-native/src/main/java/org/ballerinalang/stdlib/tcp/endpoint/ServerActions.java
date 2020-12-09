@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.ballerinalang.stdlib.socket.endpoint.tcp;
+package org.ballerinalang.stdlib.tcp.endpoint;
 
 import io.ballerina.runtime.api.Environment;
 import io.ballerina.runtime.api.Future;
@@ -25,12 +25,12 @@ import io.ballerina.runtime.api.utils.StringUtils;
 import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BObject;
 import io.ballerina.runtime.api.values.BString;
-import org.ballerinalang.stdlib.socket.SocketConstants;
-import org.ballerinalang.stdlib.socket.exceptions.SelectorInitializeException;
-import org.ballerinalang.stdlib.socket.tcp.ChannelRegisterCallback;
-import org.ballerinalang.stdlib.socket.tcp.SelectorManager;
-import org.ballerinalang.stdlib.socket.tcp.SocketService;
-import org.ballerinalang.stdlib.socket.tcp.SocketUtils;
+import org.ballerinalang.stdlib.tcp.ChannelRegisterCallback;
+import org.ballerinalang.stdlib.tcp.SelectorManager;
+import org.ballerinalang.stdlib.tcp.SocketConstants;
+import org.ballerinalang.stdlib.tcp.SocketService;
+import org.ballerinalang.stdlib.tcp.SocketUtils;
+import org.ballerinalang.stdlib.tcp.exceptions.SelectorInitializeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,7 +45,7 @@ import java.nio.channels.UnsupportedAddressTypeException;
 import java.util.concurrent.RejectedExecutionException;
 
 import static java.nio.channels.SelectionKey.OP_ACCEPT;
-import static org.ballerinalang.stdlib.socket.SocketConstants.READ_TIMEOUT;
+import static org.ballerinalang.stdlib.tcp.SocketConstants.READ_TIMEOUT;
 
 /**
  * Native function implementations of the TCP Listener.
@@ -66,9 +66,9 @@ public class ServerActions {
             final long timeout = config.getIntValue(StringUtils.fromString(READ_TIMEOUT));
             listener.addNativeData(READ_TIMEOUT, timeout);
         } catch (SocketException e) {
-            return SocketUtils.createSocketError("unable to bind the socket port");
+            return SocketUtils.createSocketError("unable to bind the tcp port");
         } catch (IOException e) {
-            log.error("Unable to initiate the socket listener", e);
+            log.error("Unable to initiate the tcp listener", e);
             return SocketUtils.createSocketError("unable to initiate the tcp listener");
         }
         return null;
@@ -115,15 +115,15 @@ public class ServerActions {
             log.error(e.getMessage(), e);
             balFuture.complete(SocketUtils.createSocketError("unable to initialize the selector"));
         } catch (CancelledKeyException e) {
-            balFuture.complete(SocketUtils.createSocketError("server socket registration is failed"));
+            balFuture.complete(SocketUtils.createSocketError("server tcp registration is failed"));
         } catch (AlreadyBoundException e) {
-            balFuture.complete(SocketUtils.createSocketError("server socket service is already bound to a port"));
+            balFuture.complete(SocketUtils.createSocketError("server tcp service is already bound to a port"));
         } catch (UnsupportedAddressTypeException e) {
             log.error("Address not supported", e);
             balFuture.complete(SocketUtils.createSocketError("provided address is not supported"));
         } catch (IOException e) {
             log.error(e.getMessage(), e);
-            balFuture.complete(SocketUtils.createSocketError("unable to start the socket service: " + e.getMessage()));
+            balFuture.complete(SocketUtils.createSocketError("unable to start the tcp service: " + e.getMessage()));
         } catch (RejectedExecutionException e) {
             log.error(e.getMessage(), e);
             balFuture.complete(SocketUtils.createSocketError("unable to start the tcp listener."));
