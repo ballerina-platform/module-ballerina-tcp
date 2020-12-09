@@ -17,8 +17,8 @@
 # This will returns once the given read timed out time exceed for socket reads.
 public type ReadTimedOutError distinct error;
 
-# Represents generic socket error, which contains the information related to the error.
+# Represents generic tcp error, which contains the information related to the error.
 public type GenericError distinct error;
 
-# Represents socket module related errors.
+# Represents tcp module related errors.
 public type Error GenericError|ReadTimedOutError;

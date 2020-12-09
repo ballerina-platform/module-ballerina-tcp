@@ -45,8 +45,8 @@ import static org.ballerinalang.stdlib.socket.SocketConstants.RESOURCE_ON_READ_R
  * @since 0.985.0
  */
 @SupportedResourceParamTypes(
-        expectedListenerType = @SupportedResourceParamTypes.Type(packageName = "socket", name = "Listener"),
-        paramTypes = { @SupportedResourceParamTypes.Type(packageName = "socket", name = "Client") }
+        expectedListenerType = @SupportedResourceParamTypes.Type(packageName = "tcp", name = "Listener"),
+        paramTypes = { @SupportedResourceParamTypes.Type(packageName = "tcp", name = "Client") }
 )
 public class SocketCompilerPlugin extends AbstractCompilerPlugin {
 
@@ -97,7 +97,7 @@ public class SocketCompilerPlugin extends AbstractCompilerPlugin {
         final List<BLangSimpleVariable> readReadyParams = resource.getParameters();
         if (readReadyParams.size() != 2) {
             String msg = String
-                    .format(INVALID_RESOURCE_SIGNATURE + "Parameters should be a 'socket:Caller' and 'error'",
+                    .format(INVALID_RESOURCE_SIGNATURE + "Parameters should be a 'tcp:Caller' and 'error'",
                             resource.getName().getValue(), serviceName);
             diagnosticLog.logDiagnostic(DiagnosticSeverity.ERROR, resource.getPosition(), msg);
             return;
@@ -117,7 +117,7 @@ public class SocketCompilerPlugin extends AbstractCompilerPlugin {
         final List<BLangSimpleVariable> readReadyParams = resource.getParameters();
         if (readReadyParams.size() != 1) {
             String msg = String
-                    .format(INVALID_RESOURCE_SIGNATURE + "Parameters should be a 'socket:Caller'",
+                    .format(INVALID_RESOURCE_SIGNATURE + "Parameters should be a 'tcp:Caller'",
                             resource.getName().getValue(), serviceName);
             diagnosticLog.logDiagnostic(DiagnosticSeverity.ERROR, resource.getPosition(), msg);
             return;
@@ -128,7 +128,7 @@ public class SocketCompilerPlugin extends AbstractCompilerPlugin {
     private void validateOnAccept(String serviceName, BLangFunction resource, DiagnosticLog diagnosticLog) {
         final List<BLangSimpleVariable> acceptParams = resource.getParameters();
         if (acceptParams.size() != 1) {
-            String msg = String.format(INVALID_RESOURCE_SIGNATURE + "The parameter should be a 'socket:Caller'",
+            String msg = String.format(INVALID_RESOURCE_SIGNATURE + "The parameter should be a 'tcp:Caller'",
                     resource.getName().getValue(), serviceName);
             diagnosticLog.logDiagnostic(DiagnosticSeverity.ERROR, resource.getPosition(), msg);
             return;
@@ -140,8 +140,8 @@ public class SocketCompilerPlugin extends AbstractCompilerPlugin {
     private void validateEndpointCaller(String serviceName, BLangFunction resource, DiagnosticLog diagnosticLog,
             StructureType event) {
         String eventType = event.getQualifiedName();
-        if (!("ballerina/socket:Listener".equals(eventType) || "ballerina/socket:Client".equals(eventType))) {
-            String msg = String.format(INVALID_RESOURCE_SIGNATURE + "The parameter should be a 'socket:Caller'",
+        if (!("ballerina/tcp:Listener".equals(eventType) || "ballerina/tcp:Client".equals(eventType))) {
+            String msg = String.format(INVALID_RESOURCE_SIGNATURE + "The parameter should be a 'tcp:Caller'",
                     resource.getName().getValue(), serviceName);
             diagnosticLog.logDiagnostic(DiagnosticSeverity.ERROR, resource.getPosition(), msg);
         }

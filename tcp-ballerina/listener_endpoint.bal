@@ -16,13 +16,13 @@
 
 import ballerina/java;
 
-# Represents the socket listener on which the socket listener service is registered and started.
+# Represents the tcp listener on which the socket listener service is registered and started.
 public class Listener {
 
-    # Creates a new socket Listener.
+    # Creates a new tcp Listener.
     #
     # + port - The port number of the remote service
-    # + config - Configurations related to the `socket:Listener`
+    # + config - Configurations related to the `tcp:Listener`
     public isolated function init(int port, ListenerConfig? config = ()) {
         var result = initServer(self, port, config ?: {});
         if (result is error) {
@@ -30,57 +30,57 @@ public class Listener {
         }
     }
 
-    # Starts the `socket:Listener`.
+    # Starts the `tcp:Listener`.
     # ```ballerina
-    # socket:error? result = socketListener.start();
+    # tcp:error? result = socketListener.start();
     # ```
     #
-    # + return - `()` or else a `socket:Error` upon failure to start the listener
+    # + return - `()` or else a `tcp:Error` upon failure to start the listener
     public isolated function 'start() returns error? {
         return startService(self);
     }
 
-    # Stops the `socket:Listener` gracefully.
+    # Stops the `tcp:Listener` gracefully.
     # ```ballerina
-    # socket:error? result = socketListener.gracefulStop();
+    # tcp:error? result = socketListener.gracefulStop();
     # ```
     #
-    # + return - `()` or else a `socket:Error` upon failure to stop the listener
+    # + return - `()` or else a `tcp:Error` upon failure to stop the listener
     public isolated function gracefulStop() returns error? {
         return externStop(self, true);
     }
 
-    # Stops the `socket:Listener` forcefully.
+    # Stops the `tcp:Listener` forcefully.
     # ```ballerina
-    # socket:error? result = socketListener.immediateStop();
+    # tcp:error? result = socketListener.immediateStop();
     # ```
     #
-    # + return - `()` or else a `socket:Error` upon failure to stop the listener
+    # + return - `()` or else a `tcp:Error` upon failure to stop the listener
     public isolated function immediateStop() returns error? {
         return externStop(self, false);
     }
 
-    # Binds a service to the `socket:Listener`.
+    # Binds a service to the `tcp:Listener`.
     # ```ballerina
-    # socket:error? result = socketListener.attach(helloService);
+    # tcp:error? result = socketListener.attach(helloService);
     # ```
     #
     # + s - Type descriptor of the service
     # + name - Name of the service
-    # + return - `()` or else a `socket:Error` upon failure to register the listener
+    # + return - `()` or else a `tcp:Error` upon failure to register the listener
     public isolated function attach(service object {} s, string[]|string? name = ()) returns error? {
         return externRegister(self, s);
     }
 
-    # Stops consuming messages and detaches the service from the `socket:Listener`.
+    # Stops consuming messages and detaches the service from the `tcp:Listener`.
     # ```ballerina
-    # socket:error? result = socketListener.detach(helloService);
+    # tcp:error? result = socketListener.detach(helloService);
     # ```
     #
     # + s - Type descriptor of the service
-    # + return - `()` or else a `socket:Error` upon failure to detach the service
+    # + return - `()` or else a `tcp:Error` upon failure to detach the service
     public isolated function detach(service object {} s) returns error? {
-    // Socket listener operations are strictly bound to the attached service. In fact, a listener doesn't support
+    // tcp listener operations are strictly bound to the attached service. In fact, a listener doesn't support
     // multiple services. Therefore, an already attached service is not removed during the detachment.
     }
 }

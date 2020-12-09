@@ -69,7 +69,7 @@ public class ServerActions {
             return SocketUtils.createSocketError("unable to bind the socket port");
         } catch (IOException e) {
             log.error("Unable to initiate the socket listener", e);
-            return SocketUtils.createSocketError("unable to initiate the socket listener");
+            return SocketUtils.createSocketError("unable to initiate the tcp listener");
         }
         return null;
     }
@@ -108,7 +108,7 @@ public class ServerActions {
             SocketService socketService = (SocketService) listener.getNativeData(SocketConstants.SOCKET_SERVICE);
             ChannelRegisterCallback registerCallback = new ChannelRegisterCallback(socketService, balFuture, OP_ACCEPT);
             selectorManager.registerChannel(registerCallback);
-            String socketListenerStarted = "[ballerina/socket] started socket listener ";
+            String socketListenerStarted = "[ballerina/tcp] started tcp listener ";
             PrintStream console = System.out;
             console.println(socketListenerStarted + channel.socket().getLocalPort());
         } catch (SelectorInitializeException e) {
@@ -126,7 +126,7 @@ public class ServerActions {
             balFuture.complete(SocketUtils.createSocketError("unable to start the socket service: " + e.getMessage()));
         } catch (RejectedExecutionException e) {
             log.error(e.getMessage(), e);
-            balFuture.complete(SocketUtils.createSocketError("unable to start the socket listener."));
+            balFuture.complete(SocketUtils.createSocketError("unable to start the tcp listener."));
         }
         return null;
     }
@@ -141,7 +141,7 @@ public class ServerActions {
             selectorManager.stop(graceful);
         } catch (IOException e) {
             log.error(e.getMessage(), e);
-            return SocketUtils.createSocketError("unable to stop the socket listener: " + e.getMessage());
+            return SocketUtils.createSocketError("unable to stop the tcp listener: " + e.getMessage());
         }
         return null;
     }

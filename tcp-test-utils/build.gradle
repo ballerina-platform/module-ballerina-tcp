@@ -17,33 +17,16 @@
 
 plugins {
     id 'java'
-    id 'checkstyle'
 }
 
-description = 'Ballerina - Socket Java Utils'
+description = 'Ballerina - TCP Java Utils'
 
 dependencies {
-    checkstyle project(':build-config:checkstyle')
-    checkstyle "com.puppycrawl.tools:checkstyle:${puppycrawlCheckstyleVersion}"
-
     compile group: 'org.ballerinalang', name: 'ballerina-lang', version: "${ballerinaLangVersion}"
     compile group: 'org.ballerinalang', name: 'ballerina-runtime', version: "${ballerinaLangVersion}"
-    compile group: 'org.ballerinalang', name: 'ballerina-tools-api', version: "${ballerinaLangVersion}"
-    compile group: 'org.slf4j', name: 'slf4j-jdk14', version: "${slf4jVersion}"
+    compile "org.slf4j:slf4j-jdk14:${slf4jVersion}"
+    compile project(":tcp-native")
 }
-
-checkstyle {
-    toolVersion '7.8.2'
-    configFile rootProject.file("build-config/checkstyle/build/checkstyle.xml")
-    configProperties = ["suppressionFile" : file("${rootDir}/build-config/checkstyle/build/suppressions.xml")]
-}
-
-def excludePattern = '**/module-info.java'
-tasks.withType(Checkstyle) {
-    exclude excludePattern
-}
-
-checkstyleMain.dependsOn(":build-config:checkstyle:downloadMultipleFiles")
 
 compileJava {
     doFirst {

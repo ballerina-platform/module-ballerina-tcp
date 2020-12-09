@@ -16,14 +16,14 @@
 
 import ballerina/java;
 
-# Represents the socket client and related remote functions.
+# Represents the tcp client and related remote functions.
 #
 # + remotePort - The remote port number to which this socket is connected
 # + localPort - The local port number to which this socket is bound
 # + remoteAddress - The remote IP address string in textual presentation to which the socket is connected
 # + localAddress - The local IP address string in textual presentation to which the socket is bound
 # + id - A unique identifier to identify each client
-# + config - The configurations for the socket client
+# + config - The configurations for the tcp client
 public client class Client {
 
     private ClientConfig? config = ();
@@ -53,11 +53,11 @@ public client class Client {
 
     # Writes the given data to the client socket.
     # ```ballerina
-    # int|socket:Error writeResult = socketClient:write(payloadByte);
+    # int|tcp:Error writeResult = socketClient:write(payloadByte);
     # ```
     #
     # + content - The content, which will be sent to the client socket
-    # + return - The number of bytes that got written or else a `socket:Error` if the given data can't be written
+    # + return - The number of bytes that got written or else a `tcp:Error` if the given data can't be written
     isolated remote function write(byte[] content) returns int|Error {
         return externWrite(self, content);
     }
@@ -68,11 +68,11 @@ public client class Client {
     # that is currently available in the buffer.
     # Number of bytes returned will be < 0 if the client closes the connection.
     # ```ballerina
-    # [byte[], int]|socket:ReadTimedOutError result = socketClient->read();
+    # [byte[], int]|tcp:ReadTimedOutError result = socketClient->read();
     # ```
     #
     # + length - Represents the number of bytes, which should be read
-    # + return - Content as a byte array and the number of bytes read or else a `socket:ReadTimedOutError` if the data
+    # + return - Content as a byte array and the number of bytes read or else a `tcp:ReadTimedOutError` if the data
     #            can't be read from the client
     isolated remote function read(int length = -100) returns @tainted [byte[], int]|ReadTimedOutError {
         return externRead(self, length);
@@ -80,30 +80,30 @@ public client class Client {
 
     # Closes the client socket connection.
     # ```ballerina
-    # socket:Error? closeResult = socketClient->close();
+    # tcp:Error? closeResult = socketClient->close();
     # ```
     #
-    # + return - A `socket:Error` if the client can't close the connection or else `()`
+    # + return - A `tcp:Error` if the client can't close the connection or else `()`
     isolated remote function close() returns Error? {
         return closeClient(self);
     }
 
     # Shuts down any further reading from the socket.
     # ```ballerina
-    # socket:Error? result = socketClient->shutdownRead();
+    # tcp:Error? result = socketClient->shutdownRead();
     # ```
     #
-    # + return - A `socket:Error` if the client can't be shut down to stop reading from the socket or else `()`
+    # + return - A `tcp:Error` if the client can't be shut down to stop reading from the socket or else `()`
     isolated remote function shutdownRead() returns Error? {
         return externShutdownRead(self);
     }
 
     # Shuts down any further writing from the socket.
     # ```ballerina
-    # socket:Error? result = socketClient->shutdownWrite();
+    # tcp:Error? result = socketClient->shutdownWrite();
     # ```
     #
-    # + return - A `socket:Error` if the client can't shut down to stop the writing to the socket or else `()`
+    # + return - A `tcp:Error` if the client can't shut down to stop the writing to the socket or else `()`
     isolated remote function shutdownWrite() returns Error? {
         return externShutdownWrite(self);
     }

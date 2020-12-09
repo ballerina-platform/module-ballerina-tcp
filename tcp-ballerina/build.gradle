@@ -17,7 +17,7 @@
 
 import org.apache.tools.ant.taskdefs.condition.Os
 
-description = 'Ballerina - Socket Ballerina Generator'
+description = 'Ballerina - TCP Ballerina Generator'
 
 configurations {
     jbalTools
@@ -27,7 +27,7 @@ dependencies {
     jbalTools ("org.ballerinalang:jballerina-tools:${ballerinaLangVersion}") {
         transitive = false
     }
-    compile project(':socket-native')
+    compile project(':tcp-native')
 }
 
 clean {
@@ -59,7 +59,7 @@ task unpackStdLibs() {
     }
 }
 
-def packageName = "socket"
+def packageName = "tcp"
 def packageOrg = "ballerina"
 def ballerinaConfigFile = new File("$project.projectDir/Ballerina.toml")
 def artifactBallerinaDocs = file("$project.projectDir/build/docs_parent/")
@@ -107,8 +107,8 @@ task revertTomlFile {
 }
 
 task ballerinaTest {
-    dependsOn(":socket-native:build")
-    dependsOn(":socket-test-utils:build")
+    dependsOn(":tcp-native:build")
+    dependsOn(":tcp-test-utils:build")
     dependsOn(unpackJballerinaTools)
     dependsOn(unpackStdLibs)
     dependsOn(copyStdlibs)
@@ -140,8 +140,8 @@ test {
 
 task ballerinaBuild {
     inputs.dir file(project.projectDir)
-    dependsOn(":socket-native:build")
-    dependsOn(":socket-test-utils:build")
+    dependsOn(":tcp-native:build")
+    dependsOn(":tcp-test-utils:build")
     dependsOn(unpackJballerinaTools)
     dependsOn(unpackStdLibs)
     dependsOn(copyStdlibs)
@@ -222,7 +222,7 @@ publishing {
     repositories {
         maven {
             name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/ballerina-platform/module-ballerina-socket")
+            url = uri("https://maven.pkg.github.com/ballerina-platform/module-ballerina-tcp")
             credentials {
                 username = System.getenv("packageUser")
                 password = System.getenv("packagePAT")

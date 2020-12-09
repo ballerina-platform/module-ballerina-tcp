@@ -1,6 +1,6 @@
 [package]
 org = "ballerina"
-name = "socket"
+name = "tcp"
 version = "@toml.version@"
 
 [[dependency]]
@@ -14,14 +14,14 @@ name = "log"
 version = "@stdlib.log.version@"
 
 [[platform.java11.dependency]]
-path = "../socket-native/build/libs/socket-native-@project.version@.jar"
+path = "../tcp-native/build/libs/tcp-native-@project.version@.jar"
 groupId = "ballerina"
-artifactId = "socket"
+artifactId = "tcp"
 version = "@project.version@"
 
 [[platform.java11.dependency]]
-path = "../socket-test-utils/build/libs/socket-test-utils-@project.version@.jar"
-groupId = "org.ballerinalang.stdlib.socket"
+path = "../tcp-test-utils/build/libs/tcp-test-utils-@project.version@.jar"
+groupId = "org.ballerinalang.stdlib.tcp"
 scope = "testOnly"
-artifactId = "socket"
+artifactId = "tcp"
 version = "@project.version@"

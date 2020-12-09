@@ -59,7 +59,7 @@ allprojects {
         }
 
         maven {
-            url = 'https://maven.pkg.github.com/ballerina-platform/module-ballerina-socket'
+            url = 'https://maven.pkg.github.com/ballerina-platform/module-ballerina-tcp'
             credentials {
                  username System.getenv("packageUser")
                  password System.getenv("packagePAT")
@@ -115,7 +115,7 @@ release {
 }
 
 task build {
-    dependsOn('socket-ballerina:build')
+    dependsOn('tcp-ballerina:build')
 }
 
 task codeCoverageReport(type: JacocoReport) {

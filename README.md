@@ -1,16 +1,16 @@
-Ballerina Socket Library
+Ballerina TCP Library
 ===================
 
-  [![Build](https://github.com/ballerina-platform/module-ballerina-socket/workflows/Build/badge.svg)](https://github.com/ballerina-platform/module-ballerina-socket/actions?query=workflow%3ABuild)
-  [![GitHub Last Commit](https://img.shields.io/github/last-commit/ballerina-platform/module-ballerina-socket.svg)](https://github.com/ballerina-platform/module-ballerina-socket/commits/master)
-  [![Github issues](https://img.shields.io/github/issues/ballerina-platform/ballerina-standard-library/module/socket.svg?label=Open%20Issues)](https://github.com/ballerina-platform/ballerina-standard-library/labels/module%2Fsocket)
+  [![Build](https://github.com/ballerina-platform/module-ballerina-tcp/workflows/Build/badge.svg)](https://github.com/ballerina-platform/module-ballerina-socket/actions?query=workflow%3ABuild)
+  [![GitHub Last Commit](https://img.shields.io/github/last-commit/ballerina-platform/module-ballerina-tcp.svg)](https://github.com/ballerina-platform/module-ballerina-socket/commits/master)
+  [![Github issues](https://img.shields.io/github/issues/ballerina-platform/ballerina-standard-library/module/tcp.svg?label=Open%20Issues)](https://github.com/ballerina-platform/ballerina-standard-library/labels/module%2Fsocket)
   [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-The Socket library is one of the standard library modules of the<a target="_blank" href="https://ballerina.io/"> Ballerina</a> language.
+The TCP library is one of the standard library modules of the<a target="_blank" href="https://ballerina.io/"> Ballerina</a> language.
 
-This module provides an implementation for sending/receiving messages to/from another application process (local or remote) for both connection-oriented and connectionless protocols. 
+This module provides an implementation for sending/receiving messages to/from another application process (local or remote) for connection-oriented protocols. 
 
-For more information on the operations supported go to [The Socket Module](https://ballerina.io/swan-lake/learn/api-docs/ballerina/socket/).
+For more information on the operations supported go to [The TCP Module](https://ballerina.io/swan-lake/learn/api-docs/ballerina/socket/).
 
 For example demonstrations of the usage, go to [Ballerina By Examples](https://ballerina.io/swan-lake/learn/by-example/tcp-socket-listener-client.html).
 
