@@ -59,14 +59,6 @@ allprojects {
         }
 
         maven {
-            url = 'https://maven.pkg.github.com/ballerina-platform/module-ballerina-tcp'
-            credentials {
-                 username System.getenv("packageUser")
-                 password System.getenv("packagePAT")
-             }
-        }
-
-        maven {
             url = 'https://maven.pkg.github.com/ballerina-platform/module-ballerina-io'
             credentials {
                 username System.getenv("packageUser")
