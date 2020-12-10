@@ -1,0 +1,27 @@
+[package]
+org = "ballerina"
+name = "tcp"
+version = "@toml.version@"
+
+[[dependency]]
+org = "ballerina"
+name = "io"
+version = "@stdlib.io.version@"
+
+[[dependency]]
+org = "ballerina"
+name = "log"
+version = "@stdlib.log.version@"
+
+[[platform.java11.dependency]]
+path = "../tcp-native/build/libs/tcp-native-@project.version@.jar"
+groupId = "ballerina"
+artifactId = "tcp"
+version = "@project.version@"
+
+[[platform.java11.dependency]]
+path = "../tcp-test-utils/build/libs/tcp-test-utils-@project.version@.jar"
+groupId = "org.ballerinalang.stdlib.tcp"
+scope = "testOnly"
+artifactId = "tcp"
+version = "@project.version@"

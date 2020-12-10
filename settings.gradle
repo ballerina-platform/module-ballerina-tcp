@@ -11,11 +11,9 @@ plugins {
     id "com.gradle.enterprise" version "3.2"
 }
 
-rootProject.name = 'socket'
+rootProject.name = 'tcp'
 include(':build-config:checkstyle')
-include ':socket-native', ':socket-test-utils', ':socket-ballerina'
-include 'socket-test-utils'
-include 'socket-native'
+include ':tcp-native', ':tcp-test-utils', ':tcp-ballerina'
 
 gradleEnterprise {
     buildScan {
