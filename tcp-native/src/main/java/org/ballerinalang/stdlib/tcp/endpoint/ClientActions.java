@@ -77,7 +77,7 @@ public class ClientActions {
             returnValue = SocketUtils.createSocketError("unable to bind the local tcp port");
         } catch (IOException e) {
             log.error("Unable to initiate the client tcp", e);
-            returnValue = SocketUtils.createSocketError("unable to initiate the tcp");
+            returnValue = SocketUtils.createSocketError("unable to initiate the socket");
         }
         return returnValue;
     }
@@ -128,12 +128,12 @@ public class ClientActions {
                 socketChannel.shutdownInput();
             }
         } catch (ClosedChannelException e) {
-            return SocketUtils.createSocketError("tcp is already closed");
+            return SocketUtils.createSocketError("socket is already closed");
         } catch (IOException e) {
             log.error("Unable to shutdown the read", e);
             return SocketUtils.createSocketError("unable to shutdown the write");
         } catch (NotYetConnectedException e) {
-            return SocketUtils.createSocketError("tcp is not yet connected");
+            return SocketUtils.createSocketError("socket is not yet connected");
         }
         return null;
     }
@@ -146,12 +146,12 @@ public class ClientActions {
                 socketChannel.shutdownOutput();
             }
         } catch (ClosedChannelException e) {
-            return SocketUtils.createSocketError("tcp is already closed");
+            return SocketUtils.createSocketError("socket is already closed");
         } catch (IOException e) {
             log.error("Unable to shutdown the write", e);
             return SocketUtils.createSocketError("unable to shutdown the write");
         } catch (NotYetConnectedException e) {
-            return SocketUtils.createSocketError("tcp is not yet connected");
+            return SocketUtils.createSocketError("socket is not yet connected");
         }
         return null;
     }
@@ -176,15 +176,15 @@ public class ClientActions {
             log.error(e.getMessage(), e);
             error = SocketUtils.createSocketError("unable to initialize the selector");
         } catch (CancelledKeyException e) {
-            error = SocketUtils.createSocketError("unable to start the client tcp");
+            error = SocketUtils.createSocketError("unable to start the client socket");
         } catch (AlreadyBoundException e) {
-            error = SocketUtils.createSocketError("client tcp is already bound to a port");
+            error = SocketUtils.createSocketError("client socket is already bound to a port");
         } catch (UnsupportedAddressTypeException e) {
             log.error("Address not supported", e);
             error = SocketUtils.createSocketError("provided address is not supported");
         } catch (IOException e) {
             log.error(e.getMessage(), e);
-            error = SocketUtils.createSocketError("unable to start the client tcp: " + e.getMessage());
+            error = SocketUtils.createSocketError("unable to start the client socket: " + e.getMessage());
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             error = SocketUtils.createSocketError("unable to start the tcp client.");
