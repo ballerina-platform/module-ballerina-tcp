@@ -26,7 +26,7 @@ public isolated function testOneWayWrite() {
     byte[] msgByteArray = msg.toBytes();
     var writeResult = socketClient->write(msgByteArray);
     if (writeResult is int) {
-        log:printInfo("Number of bytes written: " + writeResult.toString());
+        log:print("Number of bytes written: " + writeResult.toString());
     } else {
         test:assertFail(msg = writeResult.message());
     }
@@ -52,7 +52,7 @@ isolated function testShutdownWrite() returns error? {
     byte[] msgByteArray = firstMsg.toBytes();
     var writeResult = socketClient->write(msgByteArray);
     if (writeResult is int) {
-        log:printInfo("Number of bytes written: " + writeResult.toString());
+        log:print("Number of bytes written: " + writeResult.toString());
     } else {
         test:assertFail(msg = writeResult.message());
     }
@@ -110,7 +110,7 @@ isolated function testEcho() {
 isolated function testInvalidReadParam() {
     var result = invalidReadParam();
     if (result is error) {
-        log:printInfo(result.message());
+        log:print(result.message());
     } else {
         test:assertFail("Expected: {ballerina/socket}ReadTimedOut, not found");
     }
@@ -122,7 +122,7 @@ isolated function testInvalidReadParam() {
 isolated function testInvalidAddress() {
     var result = invalidAddress();
     if (result is error) {
-        log:printInfo(result.message());
+        log:print(result.message());
     } else {
         test:assertFail("Expected error unable to start the client socket: Connection refused, not found");
     }
@@ -165,6 +165,6 @@ isolated function closeClientConnection(Client socketClient) {
     if (closeResult is error) {
         log:printError(closeResult.message());
     } else {
-        log:printInfo("Client connection closed successfully.");
+        log:print("Client connection closed successfully.");
     }
 }

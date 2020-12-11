@@ -29,7 +29,7 @@ public isolated function testPartialRead() {
     writeResult = socketClient->write(msg2.toBytes());
     writeResult = socketClient->write(msg3.toBytes());
     if (writeResult is int) {
-        log:printInfo("Number of bytes written: " + writeResult.toString());
+        log:print("Number of bytes written: " + writeResult.toString());
     } else {
         test:assertFail(msg = writeResult.message());
     }
@@ -49,7 +49,7 @@ public isolated function testBlockingRead() {
     var writeResult = socketClient->write(msg1.toBytes());
     writeResult = socketClient->write(msg2.toBytes());
     if (writeResult is int) {
-        log:printInfo("Number of bytes written: " + writeResult.toString());
+        log:print("Number of bytes written: " + writeResult.toString());
     } else {
         test:assertFail(msg = writeResult.message());
     }
@@ -87,7 +87,7 @@ isolated function passMessageToSocketServer(string msg, int port) {
     byte[] msgByteArray = msg.toBytes();
     var writeResult = socketClient->write(msgByteArray);
     if (writeResult is int) {
-        log:printInfo("Number of bytes written: " + writeResult.toString());
+        log:print("Number of bytes written: " + writeResult.toString());
     } else {
         test:assertFail(msg = writeResult.message());
     }

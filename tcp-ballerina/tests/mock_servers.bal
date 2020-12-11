@@ -37,7 +37,7 @@ listener Listener server5 = new Listener(PORT5, {readTimeoutInMillis: 20000});
 service "echoServer" on server1 {
 
     remote isolated function onConnect(Caller caller) {
-        log:printInfo("Join: " + caller.remotePort.toString());
+        log:print("Join: " + caller.remotePort.toString());
     }
 
     remote isolated function onReadReady(Caller caller) {
@@ -46,24 +46,24 @@ service "echoServer" on server1 {
             var [content, length] = result;
             if (length > 0) {
                 _ = checkpanic caller->write(content);
-                log:printInfo("Server write");
+                log:print("Server write");
             } else {
-                log:printInfo("Client close: " + caller.remotePort.toString());
+                log:print("Client close: " + caller.remotePort.toString());
             }
         } else {
-            log:printError("Error on echo server read", <error>result);
+            log:printError("Error on echo server read", err = <error>result);
         }
     }
 
     remote isolated function onError(Caller caller, error er) {
-        log:printError("Error on echo service", <error>er);
+        log:printError("Error on echo service", err = <error>er);
     }
 }
 
 service "helloServer" on server2 {
 
     remote isolated function onConnect(Caller caller) {
-        log:printInfo("Join: " + caller.remotePort.toString());
+        log:print("Join: " + caller.remotePort.toString());
     }
 
     remote function onReadReady(Caller caller) {
@@ -79,14 +79,14 @@ service "helloServer" on server2 {
     }
 
     remote isolated function onError(Caller caller, error er) {
-        log:printError("Error on hello server", <error>er);
+        log:printError("Error on hello server", err = <error>er);
     }
 }
 
 service "blockingReadServer" on server3 {
 
     remote isolated function onConnect(Caller caller) {
-        log:printInfo("Join: " + caller.remotePort.toString());
+        log:print("Join: " + caller.remotePort.toString());
     }
 
     remote isolated function onReadReady(Caller caller) {
@@ -95,17 +95,17 @@ service "blockingReadServer" on server3 {
             var [content, length] = result;
             if (length > 0) {
                 _ = checkpanic caller->write(content);
-                log:printInfo("Server write");
+                log:print("Server write");
             } else {
-                log:printInfo("Client close: " + caller.remotePort.toString());
+                log:print("Client close: " + caller.remotePort.toString());
             }
         } else {
-            log:printError("Error while read data", <error>result);
+            log:printError("Error while read data", err = <error>result);
         }
     }
 
     remote isolated function onError(Caller caller, error er) {
-        log:printError("Error on blocking read server", <error>er);
+        log:printError("Error on blocking read server", err = <error>er);
     }
 }
 
@@ -151,7 +151,7 @@ service "echoOnReadyServer" on server4 {
 service "timeoutServer" on server5 {
 
     remote isolated function onConnect(Caller caller) {
-        log:printInfo("Join: " + caller.remotePort.toString());
+        log:print("Join: " + caller.remotePort.toString());
     }
 
     remote isolated function onReadReady(Caller caller) {
@@ -160,9 +160,9 @@ service "timeoutServer" on server5 {
             var [content, length] = result;
             if (length > 0) {
                 _ = checkpanic caller->write(content);
-                log:printInfo("Server write");
+                log:print("Server write");
             } else {
-                log:printInfo("Client close: " + caller.remotePort.toString());
+                log:print("Client close: " + caller.remotePort.toString());
             }
         } else {
             io:println(result.message());
@@ -170,7 +170,7 @@ service "timeoutServer" on server5 {
     }
 
     remote isolated function onError(Caller caller, error er) {
-        log:printError("Error on timeout server", <error> er);
+        log:printError("Error on timeout server", err = <error> er);
     }
 }
 
@@ -190,10 +190,10 @@ function process(any|error result, Caller caller) {
         if (length > 0) {
             totalLength = totalLength + <@untainted>length;
         } else {
-            log:printInfo("Client close: " + caller.remotePort.toString());
+            log:print("Client close: " + caller.remotePort.toString());
             return;
         }
     } else if (result is error) {
-        log:printError("Error while process data", <error>result);
+        log:printError("Error while process data", err = <error>result);
     }
 }
