@@ -79,7 +79,7 @@ service "helloServer" on server2 {
     }
 
     remote isolated function onError(Caller caller, error er) {
-        log:printError("Error on hello server", <error>er);
+        log:printError("Error on hello server", err = <error>er);
     }
 }
 
