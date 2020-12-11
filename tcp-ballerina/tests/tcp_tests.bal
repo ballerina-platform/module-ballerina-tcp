@@ -163,7 +163,7 @@ isolated function readClientMessage(Client socketClient) returns @tainted string
 isolated function closeClientConnection(Client socketClient) {
     var closeResult = socketClient->close();
     if (closeResult is error) {
-        log:printError(err = closeResult.message());
+        log:printError(closeResult.message());
     } else {
         log:print("Client connection closed successfully.");
     }
