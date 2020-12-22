@@ -18,6 +18,7 @@
 
 package org.ballerinalang.stdlib.tcp;
 
+import io.ballerina.runtime.api.Module;
 import io.ballerina.runtime.api.creators.ErrorCreator;
 import io.ballerina.runtime.api.creators.ValueCreator;
 import io.ballerina.runtime.api.utils.StringUtils;
@@ -38,7 +39,6 @@ import static org.ballerinalang.stdlib.tcp.SocketConstants.LOCAL_PORT;
 import static org.ballerinalang.stdlib.tcp.SocketConstants.REMOTE_ADDRESS;
 import static org.ballerinalang.stdlib.tcp.SocketConstants.REMOTE_PORT;
 import static org.ballerinalang.stdlib.tcp.SocketConstants.SOCKET_KEY;
-import static org.ballerinalang.stdlib.tcp.SocketConstants.SOCKET_PACKAGE_ID;
 import static org.ballerinalang.stdlib.tcp.SocketConstants.SOCKET_SERVICE;
 
 /**
@@ -58,7 +58,7 @@ public class SocketUtils {
      * @return BError instance which contains the error details
      */
     public static BError createSocketError(String errMsg) {
-        return ErrorCreator.createDistinctError(GenericError.errorType(), SOCKET_PACKAGE_ID,
+        return ErrorCreator.createDistinctError(GenericError.errorType(), getTcpPackage(),
                                                  StringUtils.fromString(errMsg));
     }
 
@@ -70,7 +70,7 @@ public class SocketUtils {
      * @return BError instance which contains the error details
      */
     public static BError createSocketError(SocketConstants.ErrorType type, String errMsg) {
-        return ErrorCreator.createDistinctError(type.errorType(), SOCKET_PACKAGE_ID, StringUtils.fromString(errMsg));
+        return ErrorCreator.createDistinctError(type.errorType(), getTcpPackage(), StringUtils.fromString(errMsg));
     }
 
     /**
@@ -81,7 +81,7 @@ public class SocketUtils {
      */
     static BObject createClient(SocketService socketService) {
         Object[] args = new Object[] { null };
-        final BObject caller = ValueCreator.createObjectValue(SOCKET_PACKAGE_ID, CLIENT, args);
+        final BObject caller = ValueCreator.createObjectValue(getTcpPackage(), CLIENT, args);
         caller.addNativeData(SOCKET_SERVICE, socketService);
         SocketChannel client = null;
         // An error can be thrown during the onAccept function. So there is a possibility of client not
@@ -140,5 +140,14 @@ public class SocketUtils {
      */
     public static void shutdownExecutorImmediately(ExecutorService executorService) {
         executorService.shutdownNow();
+    }
+
+    /**
+     * Gets ballerina tcp package.
+     *
+     * @return io package.
+     */
+    public static Module getTcpPackage() {
+        return ModuleUtils.getModule();
     }
 }
