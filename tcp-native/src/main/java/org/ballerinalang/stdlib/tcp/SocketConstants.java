@@ -31,7 +31,14 @@ public class SocketConstants {
 
     public static final String SERVER_SOCKET_KEY = "ServerSocket";
     public static final String SOCKET_KEY = "Socket";
+
+     /**
+     * tcp standard library package ID.
+     * @deprecated Use SocketUtils.getIOPackage().
+     */
+    @Deprecated
     public static final Module SOCKET_PACKAGE_ID = new Module(BALLERINA_BUILTIN_PKG_PREFIX, "tcp", "0.7.2");
+
     public static final String RESOURCE_ON_CONNECT = "onConnect";
     public static final String RESOURCE_ON_READ_READY = "onReadReady";
     public static final String RESOURCE_ON_ERROR = "onError";
