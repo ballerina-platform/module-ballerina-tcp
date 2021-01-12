@@ -21,10 +21,26 @@ description = 'Ballerina - TCP Ballerina Generator'
 
 configurations {
     jbalTools
+    externalJars
 }
 
 dependencies {
     jbalTools ("org.ballerinalang:jballerina-tools:${ballerinaLangVersion}") {
+        transitive = false
+    }
+    externalJars (group: 'io.netty', name: 'netty-buffer', version: "${nettyVersion}") {
+        transitive = false
+    }
+    externalJars (group: 'io.netty', name: 'netty-handler', version: "${nettyVersion}") {
+        transitive = false
+    }
+    externalJars (group: 'io.netty', name: 'netty-transport', version: "${nettyVersion}") {
+        transitive = false
+    }
+    externalJars (group: 'io.netty', name: 'netty-common', version: "${nettyVersion}") {
+        transitive = false
+    }
+    externalJars (group: 'io.netty', name: 'netty-resolver', version: "${nettyVersion}") {
         transitive = false
     }
     compile project(':tcp-native')
@@ -46,6 +62,11 @@ task unpackJballerinaTools(type: Copy) {
         from zipTree(artifact.getFile())
         into new File("${buildDir}/target/extracted-distributions", "jballerina-tools-zip")
     }
+}
+
+task copyToLib(type: Copy) {
+    into "$project.projectDir/build/libs"
+    from configurations.externalJars
 }
 
 task unpackStdLibs() {
@@ -91,11 +112,13 @@ task updateTomlFile {
     doLast {
         def stdlibDependentIoVersion = project.stdlibIoVersion.split("-")[0]
         def stdlibDependentLogVersion = project.stdlibLogVersion.split("-")[0]
+        def nettyVersion = project.nettyVersion.split("-")[0]
 
         def newConfig = ballerinaConfigFile.text.replace("@project.version@", project.version)
         newConfig = newConfig.replace("@toml.version@", tomlVersion)
         newConfig = newConfig.replace("@stdlib.io.version@", stdlibDependentIoVersion)
         newConfig = newConfig.replace("@stdlib.log.version@", stdlibDependentLogVersion)
+        newConfig = newConfig.replace("@netty.version@", nettyVersion)
         ballerinaConfigFile.text = newConfig
     }
 }
@@ -142,6 +165,7 @@ task ballerinaBuild {
     inputs.dir file(project.projectDir)
     dependsOn(":tcp-native:build")
     dependsOn(":tcp-test-utils:build")
+    dependsOn(copyToLib)
     dependsOn(unpackJballerinaTools)
     dependsOn(unpackStdLibs)
     dependsOn(copyStdlibs)
