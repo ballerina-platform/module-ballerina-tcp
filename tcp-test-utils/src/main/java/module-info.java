@@ -17,5 +17,10 @@
  */
 
 module io.ballerina.stdlib.socket.testutils {
-
+    requires io.ballerina.runtime;
+    requires org.slf4j;
+    requires io.ballerina.stdlib.socket;
+    requires io.netty.buffer;
+    requires io.netty.transport;
+    exports org.ballerinalang.stdlib.tcp.testutils;
 }
