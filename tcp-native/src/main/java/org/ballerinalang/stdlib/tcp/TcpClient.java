@@ -94,7 +94,7 @@ public class TcpClient {
     }
 
     public void close() throws InterruptedException {
-        // if channel disconnected  then handler already null
+        // if channel disconnected already then handler value is null
         TcpClientHandler handler = (TcpClientHandler) channel.pipeline().get(Constants.CLIENT_HANDLER);
         if (handler != null) {
             handler.setIsCloseTriggered();
