@@ -53,16 +53,16 @@ public class TcpListener {
                 .childHandler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel ch) throws Exception {
-                        ch.pipeline().addLast(Constants.LISTENER_HANDLER, new TcpListenerHandler(tcpService));
                         ch.pipeline().addLast(Constants.READ_TIMEOUT_HANDLER,
                                 new IdleStateHandler(0, 0, tcpService.getTimeout(), TimeUnit.MILLISECONDS));
+                        ch.pipeline().addLast(Constants.LISTENER_HANDLER, new TcpListenerHandler(tcpService));
                     }
                 });
 
-        ChannelFuture future = listenerBootstrap.bind(localAddress).sync();
-        channel = future.sync().channel();
-        future.addListener((ChannelFutureListener) channelFuture -> {
+        ChannelFuture future = listenerBootstrap.bind(localAddress).sync()
+                .addListener((ChannelFutureListener) channelFuture -> {
             if (channelFuture.isSuccess()) {
+                channel = channelFuture.channel();
                 callback.complete(null);
             } else {
                 callback.complete(Utils.createSocketError("Error initializing the server."));
@@ -70,14 +70,18 @@ public class TcpListener {
         });
     }
 
-    public static void send(byte[] bytes, Channel channel, Future callback) {
-        channel.writeAndFlush(Unpooled.wrappedBuffer(bytes)).addListener((ChannelFutureListener) future -> {
-            if (future.isSuccess()) {
-                callback.complete(null);
-            } else {
-                callback.complete(Utils.createSocketError("Failed to send data."));
-            }
-        });
+    public static void send(byte[] bytes, Channel channel, Future callback, TcpService tcpService) {
+        if (!tcpService.getIsCallerClosed() && channel.isActive()) {
+            channel.writeAndFlush(Unpooled.wrappedBuffer(bytes)).addListener((ChannelFutureListener) future -> {
+                if (future.isSuccess()) {
+                    callback.complete(null);
+                } else {
+                    callback.complete(Utils.createSocketError("Failed to send data."));
+                }
+            });
+            return;
+        }
+        callback.complete(Utils.createSocketError("Socket connection already closed."));
     }
 
     // pause the network read operation until the onConnect method get invoked
@@ -92,13 +96,15 @@ public class TcpListener {
 
     //close caller
     public static void close(Channel channel, Future callback) throws Exception {
-        channel.close().sync().addListener((ChannelFutureListener) future -> {
-            if (future.isSuccess()) {
-                callback.complete(null);
-            } else {
-                callback.complete(Utils.createSocketError("Failed to gracefully shutdown the Listener."));
-            }
-        });
+        if (channel != null) {
+            channel.close().sync().addListener((ChannelFutureListener) future -> {
+                if (future.isSuccess()) {
+                    callback.complete(null);
+                } else {
+                    callback.complete(Utils.createSocketError("Failed to close the client connection"));
+                }
+            });
+        }
     }
 
     // shutdown the server

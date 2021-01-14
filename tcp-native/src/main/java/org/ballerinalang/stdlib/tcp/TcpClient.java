@@ -38,7 +38,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class TcpClient {
 
-    private final Channel channel;
+    private Channel channel;
     private final EventLoopGroup group;
     private final Bootstrap clientBootstrap;
 
@@ -55,11 +55,11 @@ public class TcpClient {
                         ch.pipeline().addLast(Constants.CLIENT_HANDLER, new TcpClientHandler());
                     }
                 });
-        ChannelFuture future = clientBootstrap.connect(remoteAddress, localAddress).sync();
-        channel = future.sync().channel();
-        channel.config().setAutoRead(false);
-        future.addListener((ChannelFutureListener) channelFuture -> {
+        ChannelFuture future = clientBootstrap.connect(remoteAddress, localAddress).sync()
+                .addListener((ChannelFutureListener) channelFuture -> {
             if (channelFuture.isSuccess()) {
+                channelFuture.channel().config().setAutoRead(false);
+                channel = channelFuture.channel();
                 callback.complete(null);
             } else {
                 callback.complete(Utils.createSocketError("Unable to connect with remote host."));
@@ -68,24 +68,37 @@ public class TcpClient {
     }
 
     public void writeData(byte[] bytes, Future callback) throws InterruptedException {
-        channel.writeAndFlush(Unpooled.wrappedBuffer(bytes)).addListener((ChannelFutureListener) future -> {
-            if (future.isSuccess()) {
-                callback.complete(null);
-            } else {
-                callback.complete(Utils.createSocketError("Failed to send data"));
-            }
-        });
+        if (channel.isActive()) {
+            channel.writeAndFlush(Unpooled.wrappedBuffer(bytes)).addListener((ChannelFutureListener) future -> {
+                if (future.isSuccess()) {
+                    callback.complete(null);
+                } else {
+                    callback.complete(Utils.createSocketError("Failed to send data"));
+                }
+            });
+            return;
+        }
+        callback.complete(Utils.createSocketError("Socket connection already closed."));
     }
 
     public void readData(long readTimeout, Future callback) throws InterruptedException {
-        channel.pipeline().addFirst(Constants.READ_TIMEOUT_HANDLER, new IdleStateHandler(readTimeout, 0, 0,
-                TimeUnit.MILLISECONDS));
-        TcpClientHandler handler = (TcpClientHandler) channel.pipeline().get(Constants.CLIENT_HANDLER);
-        handler.setCallback(callback);
-        channel.read();
+        if (channel.isActive()) {
+            channel.pipeline().addFirst(Constants.READ_TIMEOUT_HANDLER, new IdleStateHandler(readTimeout, 0, 0,
+                    TimeUnit.MILLISECONDS));
+            TcpClientHandler handler = (TcpClientHandler) channel.pipeline().get(Constants.CLIENT_HANDLER);
+            handler.setCallback(callback);
+            channel.read();
+            return;
+        }
+        callback.complete(Utils.createSocketError("Socket connection already closed."));
     }
 
     public void close() throws InterruptedException {
+        // if channel disconnected  then handler already null
+        TcpClientHandler handler = (TcpClientHandler) channel.pipeline().get(Constants.CLIENT_HANDLER);
+        if (handler != null) {
+            handler.setIsCloseTriggered();
+        }
         channel.close().sync();
     }
 }

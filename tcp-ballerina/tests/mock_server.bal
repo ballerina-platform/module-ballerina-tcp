@@ -18,9 +18,11 @@ import ballerina/io;
 
 const int PORT1 = 8809;
 const int PORT2 = 8023;
+const int PORT3 = 8639;
 
 listener Listener echoServer = check new Listener(PORT1);
 listener Listener discardServer = check new Listener(PORT2);
+listener Listener closeServer = check new Listener(PORT3);
 
 service on echoServer {
 
@@ -71,8 +73,6 @@ service class DiscardService {
     remote function onBytes(byte[] data) returns Error? {
         // read and discard the message
         io:println("Discard: ", getString(data));
-        // close the connection
-        check self.caller->close();
     }
 
     remote function onError(readonly & Error err) returns Error? {
@@ -80,4 +80,27 @@ service class DiscardService {
     }
 
     remote function onClose() returns Error? {}
+}
+
+service on closeServer {
+    remote function onConnect(Caller caller) returns ConnectionService|Error {
+        io:println("Client connected to closeServer: ", caller.remotePort);
+        check caller->close();
+        return new EchoService(caller);
+    }
+}
+
+service class closeService {
+    *ConnectionService;
+    Caller caller;
+
+    public function init(Caller c) {self.caller = c;}
+
+    remote function onBytes(byte[] data) returns Error? {
+      io:println("this won't be executed");
+    }
+
+    remote function onError(readonly & Error err) returns Error? {  }
+
+    remote function onClose() returns Error? {  }
 }

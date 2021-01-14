@@ -30,6 +30,7 @@ public class TcpService {
     private final BObject service;
     private BObject connectionService;
     private final long timeout;
+    private boolean isCallerClosed;
 
     public TcpService(Runtime runtime, BObject service, long timeout) {
         this.runtime = runtime;
@@ -55,5 +56,13 @@ public class TcpService {
 
     public long getTimeout() {
         return timeout;
+    }
+
+    public boolean getIsCallerClosed() {
+        return isCallerClosed;
+    }
+
+    public void setIsCallerClosed(boolean callerClosed) {
+        isCallerClosed = callerClosed;
     }
 }

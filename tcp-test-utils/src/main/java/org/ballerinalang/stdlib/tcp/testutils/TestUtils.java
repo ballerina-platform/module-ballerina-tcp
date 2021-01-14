@@ -8,11 +8,11 @@ import java.util.concurrent.Executors;
 
 public class TestUtils {
     private static final Logger log = LoggerFactory.getLogger(TestUtils.class);
-    private static EchoServer echoServer;
+    private static Server echoServer;
 
     public static Object startEchoServer() {
         ExecutorService executor = Executors.newSingleThreadExecutor();
-        echoServer = new EchoServer();
+        echoServer = new Server();
         executor.execute(echoServer);
         return null;
     }

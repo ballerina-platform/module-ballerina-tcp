@@ -38,8 +38,8 @@ public class Caller {
         final Future callback = env.markAsync();
         byte[] byteContent = data.getBytes();
         Channel channel = (Channel) caller.getNativeData(Constants.CHANNEL);
-
-        TcpListener.send(byteContent, channel, callback);
+        TcpService tcpService = (TcpService) caller.getNativeData(Constants.SERVICE);
+        TcpListener.send(byteContent, channel, callback, tcpService);
         return null;
     }
 
@@ -48,6 +48,7 @@ public class Caller {
 
         Channel channel = (Channel) caller.getNativeData(Constants.CHANNEL);
         TcpService tcpService = (TcpService) caller.getNativeData(Constants.SERVICE);
+        tcpService.setIsCallerClosed(true);
         try {
             TcpListener.close(channel, callback);
             Dispatcher.invokeOnClose(tcpService);

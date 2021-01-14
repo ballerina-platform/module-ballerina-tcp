@@ -30,30 +30,43 @@ import io.netty.handler.timeout.IdleStateEvent;
 public class TcpClientHandler extends SimpleChannelInboundHandler<ByteBuf> {
 
     private Future callback;
+    private boolean isCloseTriggered = false;
+
+    @Override
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        if (!isCloseTriggered && callback != null) {
+            callback.complete(Utils.createSocketError("Connection closed by the server."));
+        }
+        ctx.channel().close();
+    }
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, ByteBuf msg) throws Exception {
-        callback.complete(Utils.returnBytes(msg));
         ctx.channel().pipeline().remove(Constants.READ_TIMEOUT_HANDLER);
+        callback.complete(Utils.returnBytes(msg));
     }
 
     @Override
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
         if (evt instanceof IdleStateEvent) {
             // return timeout error
-            callback.complete(Utils.createSocketError("Read timed out"));
             ctx.channel().pipeline().remove(Constants.READ_TIMEOUT_HANDLER);
+            callback.complete(Utils.createSocketError("Read timed out"));
         }
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        callback.complete(Utils.createSocketError(cause.getMessage()));
         ctx.channel().pipeline().remove(Constants.READ_TIMEOUT_HANDLER);
+        callback.complete(Utils.createSocketError(cause.getMessage()));
     }
 
     public void setCallback(Future callback) {
         this.callback = callback;
+    }
+
+    public void setIsCloseTriggered() {
+        isCloseTriggered = true;
     }
 }
 

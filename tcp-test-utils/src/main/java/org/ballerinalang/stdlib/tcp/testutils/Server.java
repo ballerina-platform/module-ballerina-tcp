@@ -10,7 +10,7 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 
 import java.net.InetSocketAddress;
 
-public class EchoServer implements Runnable {
+public class Server implements Runnable {
     private static int PORT = 3000;
     private static EventLoopGroup group;
 
@@ -25,7 +25,6 @@ public class EchoServer implements Runnable {
 
     @Override
     public void run() {
-        final EchoServerHandler serverHandler = new EchoServerHandler();
         group = new NioEventLoopGroup();
         try {
             ServerBootstrap b = new ServerBootstrap();
@@ -36,7 +35,7 @@ public class EchoServer implements Runnable {
                         @Override
                         public void initChannel(SocketChannel ch)
                                 throws Exception {
-                            ch.pipeline().addLast(serverHandler);
+                            ch.pipeline().addLast(new ServerHandler());
                         }
                     });
 
