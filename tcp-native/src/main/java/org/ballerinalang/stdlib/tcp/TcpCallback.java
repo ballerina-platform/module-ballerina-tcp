@@ -51,9 +51,9 @@ public class TcpCallback implements Callback {
     }
 
     @Override
-    public void notifySuccess(Object o) {
+    public void notifySuccess(Object object) {
         if (isOnConnectInvoked) {
-            this.tcpService.setConnectionService((BObject) o);
+            this.tcpService.setConnectionService((BObject) object);
             TcpListener.resumeRead(channel);
         }
         log.debug("Method successfully dispatched.");

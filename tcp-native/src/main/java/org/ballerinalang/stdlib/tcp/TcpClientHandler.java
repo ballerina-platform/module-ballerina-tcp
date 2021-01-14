@@ -25,7 +25,7 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.timeout.IdleStateEvent;
 
 /**
- * {@link TcpClientHandler} ia a ChannelInboundHandler implementation for tcp client.
+ * {@link TcpClientHandler} is a ChannelInboundHandler implementation for tcp client.
  */
 public class TcpClientHandler extends SimpleChannelInboundHandler<ByteBuf> {
 

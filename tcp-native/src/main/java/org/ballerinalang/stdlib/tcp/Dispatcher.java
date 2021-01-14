@@ -49,11 +49,9 @@ public class Dispatcher {
         }
     }
 
-
     public static void invokeOnError(TcpService tcpService, String message) {
         try {
             Object params[] = getOnErrorSignature(message);
-
             tcpService.getRuntime().invokeMethodAsync(tcpService.getConnectionService(), Constants.ON_ERROR, null, null,
                     new TcpCallback(tcpService), params);
         } catch (Throwable t) {
@@ -65,7 +63,6 @@ public class Dispatcher {
         byte[] byteContent = new byte[buffer.readableBytes()];
         buffer.readBytes(byteContent);
         BArray bytes = ValueCreator.createArrayValue(byteContent);
-
         return new Object[]{bytes, true};
     }
 
@@ -101,10 +98,8 @@ public class Dispatcher {
     public static void invokeOnConnect(TcpService tcpService, Channel channel) {
         try {
             Object[] params = getOnConnectSignature(channel, tcpService);
-
             tcpService.getRuntime().invokeMethodAsync(tcpService.getService(), Constants.ON_CONNECT,
                     null, null, new TcpCallback(tcpService, true, channel), params);
-
         } catch (BError e) {
             Dispatcher.invokeOnError(tcpService, e.getMessage());
         }
