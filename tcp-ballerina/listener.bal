@@ -82,7 +82,6 @@ public class Listener {
 
 public type ListenerConfig record {|
    string? localhost = ();
-   int timeoutInMillis = 30000;
 |};
 
 isolated function initListener(Listener listenerObj, int localPort, ListenerConfig config) returns error? = @java:Method {
