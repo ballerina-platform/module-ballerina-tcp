@@ -38,7 +38,7 @@ function testClientEcho() returns  @tainted error? {
 }
 
 @test:Config {
-    dependsOn: ["testListenerEcho"]
+    dependsOn: [testListenerEcho]
 }
 function testClientReadTimeout() returns  @tainted error? {
     Client socketClient = check new ("localhost", PORT2, timeoutInMillis = 100);
@@ -59,7 +59,7 @@ function testClientReadTimeout() returns  @tainted error? {
 }
 
 @test:Config {
-    dependsOn: ["testClientReadTimeout"]
+    dependsOn: [testClientReadTimeout]
 }
 function testServerAlreadyClosed() returns  @tainted error? {
     Client socketClient = check new ("localhost", PORT3, timeoutInMillis = 100);

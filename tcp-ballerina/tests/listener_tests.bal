@@ -18,7 +18,7 @@ import ballerina/test;
 import ballerina/io;
 
 @test:Config {
-    dependsOn: ["testClientEcho"]
+    dependsOn: [testClientEcho]
 }
 function testListenerEcho() returns  @tainted error? {
     Client socketClient = check new ("localhost", PORT1);
