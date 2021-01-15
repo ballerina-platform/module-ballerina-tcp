@@ -1,4 +1,4 @@
-// Copyright (c) 2018 WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+// Copyright (c) 2021 WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 //
 // WSO2 Inc. licenses this file to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file except
@@ -14,7 +14,15 @@
 // specific language governing permissions and limitations
 // under the License.
 
+# Represent TCP Listener service type.
+public type Service service object {
+  remote function onConnect(Caller caller) returns ConnectionService|Error;
+};
 
-# Represents caller object in socket service resources and client callback service resources.
-# This has all the remote functions expose by tcp:Client.
-public type Caller Client;
+# Represent TCP Listener service type.
+public type ConnectionService service object {
+  remote function onError(readonly & Error err) returns Error?;
+  remote function onBytes(readonly & byte[] data) returns Error?;
+  //remote function onBlockAsStream(readonly & stream<byte[]> dataStream) returns Error?;
+  remote function onClose() returns Error?;
+};

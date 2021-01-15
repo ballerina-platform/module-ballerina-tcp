@@ -21,5 +21,5 @@ function init() {
 }
 
 function setModule() = @java:Method {
-    'class: "org.ballerinalang.stdlib.tcp.ModuleUtils"
+    'class: "org.ballerinalang.stdlib.tcp.Utils"
 } external;

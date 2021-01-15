@@ -25,12 +25,39 @@ import static io.ballerina.runtime.api.constants.RuntimeConstants.BALLERINA_BUIL
 /**
  * Constant variable for tcp related operations.
  */
-public class SocketConstants {
-    private SocketConstants() {
-    }
+public class Constants {
 
-    public static final String SERVER_SOCKET_KEY = "ServerSocket";
-    public static final String SOCKET_KEY = "Socket";
+    // constants related to client config
+    public static final String CONFIG_LOCALHOST = "localHost";
+    public static final String CONFIG_READ_TIMEOUT = "timeoutInMillis";
+
+    // constant listener handler names
+    public static final String LISTENER_HANDLER = "listenerHandler";
+    public static final String READ_TIMEOUT_HANDLER = "readTimeoutHandler";
+    public static final String CLIENT_HANDLER = "clientHandler";
+
+    // remote method names
+    public static final String ON_BYTES = "onBytes";
+    public static final String ON_ERROR = "onError";
+    public static final String ON_CONNECT = "onConnect";
+    public static final String ON_CLOSE = "onClose";
+
+    // constants related to tcp caller
+    public static final String CALLER = "Caller";
+    public static final String CALLER_REMOTE_PORT = "remotePort";
+    public static final String CALLER_REMOTE_HOST = "remoteHost";
+    public static final String CHANNEL = "channel";
+    public static final String CALLER_LOCAL_PORT = "localPort";
+    public static final String CALLER_LOCAL_HOST = "localHost";
+
+    // constant used for adding native data
+    public static final String LISTENER = "listener";
+    public static final String LISTENER_CONFIG = "listenerConfig";
+    public static final String LOCAL_PORT = "localPort";
+    public static final String SERVICE = "Service";
+    public static final String CLIENT = "Client";
+
+    private Constants() {}
 
      /**
      * tcp standard library package ID.
@@ -38,32 +65,6 @@ public class SocketConstants {
      */
     @Deprecated
     public static final Module SOCKET_PACKAGE_ID = new Module(BALLERINA_BUILTIN_PKG_PREFIX, "tcp", "0.7.2");
-
-    public static final String RESOURCE_ON_CONNECT = "onConnect";
-    public static final String RESOURCE_ON_READ_READY = "onReadReady";
-    public static final String RESOURCE_ON_ERROR = "onError";
-    public static final String CLIENT = "Client";
-    public static final String CONFIG_FIELD_INTERFACE = "interface";
-    public static final String CONFIG_FIELD_HOST = "host";
-    public static final String CONFIG_FIELD_PORT = "port";
-    public static final String LISTENER_CONFIG = "config";
-    public static final String CLIENT_CONFIG = "config";
-
-    public static final String REMOTE_PORT = "remotePort";
-    public static final String LOCAL_PORT = "localPort";
-    public static final String REMOTE_ADDRESS = "remoteAddress";
-    public static final String LOCAL_ADDRESS = "localAddress";
-    public static final String ID = "id";
-
-    public static final String CLIENT_SERVICE_CONFIG = "callbackService";
-    public static final String SOCKET_SERVICE = "socketService";
-    public static final String IS_CLIENT = "isClient";
-
-    // If default length pass as the read length then the entire buffer read.
-    public static final int DEFAULT_EXPECTED_READ_LENGTH = -100;
-
-    // Default read timeout set as 5 min.
-    public static final String READ_TIMEOUT = "readTimeoutInMillis";
 
     /**
      * Specifies the error type for tcp module.
@@ -82,5 +83,4 @@ public class SocketConstants {
             return errorType;
         }
     }
-
 }

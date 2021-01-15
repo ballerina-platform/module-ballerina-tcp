@@ -21,7 +21,10 @@ module io.ballerina.stdlib.socket {
     requires io.ballerina.lang;
     requires io.ballerina.tools.api;
     requires org.slf4j;
-    exports org.ballerinalang.stdlib.tcp.compiler;
-    exports org.ballerinalang.stdlib.tcp.endpoint;
+    requires io.netty.transport;
+    requires io.netty.handler;
+    requires io.netty.buffer;
+    exports org.ballerinalang.stdlib.tcp.nativeclient;
+    exports org.ballerinalang.stdlib.tcp.nativelistener;
     exports org.ballerinalang.stdlib.tcp;
 }
