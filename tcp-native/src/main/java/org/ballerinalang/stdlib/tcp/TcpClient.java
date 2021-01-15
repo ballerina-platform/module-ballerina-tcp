@@ -76,9 +76,9 @@ public class TcpClient {
                     callback.complete(Utils.createSocketError("Failed to send data"));
                 }
             });
-            return;
+        } else {
+            callback.complete(Utils.createSocketError("Socket connection already closed."));
         }
-        callback.complete(Utils.createSocketError("Socket connection already closed."));
     }
 
     public void readData(long readTimeout, Future callback) throws InterruptedException {
@@ -88,9 +88,9 @@ public class TcpClient {
             TcpClientHandler handler = (TcpClientHandler) channel.pipeline().get(Constants.CLIENT_HANDLER);
             handler.setCallback(callback);
             channel.read();
-            return;
+        } else {
+            callback.complete(Utils.createSocketError("Socket connection already closed."));
         }
-        callback.complete(Utils.createSocketError("Socket connection already closed."));
     }
 
     public void close() throws InterruptedException {

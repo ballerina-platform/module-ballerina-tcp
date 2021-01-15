@@ -79,9 +79,9 @@ public class TcpListener {
                     callback.complete(Utils.createSocketError("Failed to send data."));
                 }
             });
-            return;
+        } else {
+            callback.complete(Utils.createSocketError("Socket connection already closed."));
         }
-        callback.complete(Utils.createSocketError("Socket connection already closed."));
     }
 
     // pause the network read operation until the onConnect method get invoked
