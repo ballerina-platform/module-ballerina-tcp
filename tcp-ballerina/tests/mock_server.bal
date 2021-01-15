@@ -37,7 +37,7 @@ service class EchoService {
 
     public function init(Caller c) {self.caller = c;}
 
-    remote function onBytes(byte[] data) returns Error? {
+    remote function onBytes(readonly & byte[] data) returns Error? {
         io:println("Echo: ", getString(data));
         // Echo service sends data back
         check self.caller->writeBytes(data);
@@ -68,7 +68,7 @@ service class DiscardService {
 
     public function init(Caller c) {self.caller = c;}
 
-    remote function onBytes(byte[] data) returns Error? {
+    remote function onBytes(readonly & byte[] data) returns Error? {
         // read and discard the message
         io:println("Discard: ", getString(data));
     }
@@ -92,5 +92,5 @@ service class closeService {
     Caller caller;
 
     public function init(Caller c) {self.caller = c;}
-    
+
 }
