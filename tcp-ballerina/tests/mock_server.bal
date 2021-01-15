@@ -33,7 +33,6 @@ service on echoServer {
 }
 
 service class EchoService {
-    *ConnectionService;
     Caller caller;
 
     public function init(Caller c) {self.caller = c;}
@@ -65,7 +64,6 @@ service on discardServer {
 }
 
 service class DiscardService {
-    *ConnectionService;
     Caller caller;
 
     public function init(Caller c) {self.caller = c;}
@@ -91,16 +89,8 @@ service on closeServer {
 }
 
 service class closeService {
-    *ConnectionService;
     Caller caller;
 
     public function init(Caller c) {self.caller = c;}
-
-    remote function onBytes(byte[] data) returns Error? {
-      io:println("this won't be executed");
-    }
-
-    remote function onError(readonly & Error err) returns Error? {  }
-
-    remote function onClose() returns Error? {  }
+    
 }
