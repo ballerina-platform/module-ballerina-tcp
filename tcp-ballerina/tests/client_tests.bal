@@ -31,7 +31,7 @@ function testClientEcho() returns  @tainted error? {
     byte[] msgByteArray = msg.toBytes();
     check  socketClient->writeBytes(msgByteArray);
 
-    byte[] receivedData = check socketClient->readBytes();
+    readonly & byte[] receivedData = check socketClient->readBytes();
     test:assertEquals(check getString(receivedData), msg, "Found unexpected output");
 
     check socketClient->close();
@@ -47,8 +47,8 @@ function testClientReadTimeout() returns  @tainted error? {
     byte[] msgByteArray = msg.toBytes();
     check  socketClient->writeBytes(msgByteArray);
 
-    Error|byte[] res = socketClient->readBytes();
-    if (res is byte[]) {
+    Error|(readonly & byte[]) res = socketClient->readBytes();
+    if (res is (readonly & byte[])) {
         test:assertFail(msg = "Read timeout test failed");
         io:println(res.length());
     }
@@ -64,8 +64,8 @@ function testClientReadTimeout() returns  @tainted error? {
 function testServerAlreadyClosed() returns  @tainted error? {
     Client socketClient = check new ("localhost", PORT3, timeoutInMillis = 100);
 
-    Error|byte[] res = socketClient->readBytes();
-    if (res is byte[]) {
+    Error|(readonly & byte[]) res = socketClient->readBytes();
+    if (res is (readonly & byte[])) {
         test:assertFail(msg = "Test for server already disconnected failed");
         io:println(res.length());
     }
@@ -75,7 +75,7 @@ function testServerAlreadyClosed() returns  @tainted error? {
     check socketClient->close();
 }
 
-function getString(byte[] content) returns @tainted string|io:Error {
+function getString(readonly & byte[] content) returns @tainted string|io:Error {
     io:ReadableByteChannel byteChannel = check io:createReadableChannel(content);
     io:ReadableCharacterChannel characterChannel = new io:ReadableCharacterChannel(byteChannel, "UTF-8");
 

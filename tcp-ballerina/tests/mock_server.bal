@@ -33,12 +33,11 @@ service on echoServer {
 }
 
 service class EchoService {
-    *ConnectionService;
     Caller caller;
 
     public function init(Caller c) {self.caller = c;}
 
-    remote function onBytes(byte[] data) returns Error? {
+    remote function onBytes(readonly & byte[] data) returns Error? {
         io:println("Echo: ", getString(data));
         // Echo service sends data back
         check self.caller->writeBytes(data);
@@ -65,12 +64,11 @@ service on discardServer {
 }
 
 service class DiscardService {
-    *ConnectionService;
     Caller caller;
 
     public function init(Caller c) {self.caller = c;}
 
-    remote function onBytes(byte[] data) returns Error? {
+    remote function onBytes(readonly & byte[] data) returns Error? {
         // read and discard the message
         io:println("Discard: ", getString(data));
     }
@@ -91,16 +89,8 @@ service on closeServer {
 }
 
 service class closeService {
-    *ConnectionService;
     Caller caller;
 
     public function init(Caller c) {self.caller = c;}
 
-    remote function onBytes(byte[] data) returns Error? {
-      io:println("this won't be executed");
-    }
-
-    remote function onError(readonly & Error err) returns Error? {  }
-
-    remote function onClose() returns Error? {  }
 }

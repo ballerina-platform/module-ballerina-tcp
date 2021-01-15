@@ -39,7 +39,7 @@ public class Listener {
     # + name - Name of the service
     # + return - `()` or else a `tcp:Error` upon failure to register
     #             the listener
-    public isolated function attach(service object {} s, string[]|string? name = ()) returns error? {
+    public isolated function attach(service object {} s, () name = ()) returns error? {
         return externAttach(self, s);
     }
 
@@ -82,7 +82,6 @@ public class Listener {
 
 public type ListenerConfig record {|
    string? localhost = ();
-   int timeoutInMillis = 30000;
 |};
 
 isolated function initListener(Listener listenerObj, int localPort, ListenerConfig config) returns error? = @java:Method {

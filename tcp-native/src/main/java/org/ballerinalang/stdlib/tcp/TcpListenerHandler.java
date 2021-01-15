@@ -21,10 +21,6 @@ package org.ballerinalang.stdlib.tcp;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
-import io.netty.handler.timeout.IdleStateEvent;
-import io.netty.handler.timeout.IdleStateHandler;
-
-import java.util.concurrent.TimeUnit;
 
 /**
  * {@link TcpListenerHandler} is a ChannelInboundHandler implementation for tcp listener.
@@ -45,7 +41,6 @@ public class TcpListenerHandler extends SimpleChannelInboundHandler<ByteBuf> {
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, ByteBuf msg) throws Exception {
-        reRegisterReadTimeoutHandler(ctx);
         Dispatcher.invokeRead(tcpService, msg, ctx.channel());
     }
 
@@ -58,19 +53,5 @@ public class TcpListenerHandler extends SimpleChannelInboundHandler<ByteBuf> {
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         Dispatcher.invokeOnError(tcpService, cause.getMessage());
-    }
-
-    @Override
-    public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
-        if (evt instanceof IdleStateEvent) {
-            reRegisterReadTimeoutHandler(ctx);
-            Dispatcher.invokeOnError(tcpService, "Read timed out.");
-        }
-    }
-
-    private void reRegisterReadTimeoutHandler(ChannelHandlerContext ctx) {
-        ctx.channel().pipeline().remove(Constants.READ_TIMEOUT_HANDLER);
-        ctx.channel().pipeline().addFirst(Constants.READ_TIMEOUT_HANDLER, new IdleStateHandler(tcpService.getTimeout(),
-                0, 0, TimeUnit.MILLISECONDS));
     }
 }

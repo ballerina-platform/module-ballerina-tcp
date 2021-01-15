@@ -47,10 +47,7 @@ public class Listener {
     }
 
     public static Object register(Environment env, BObject listener, BObject service) {
-        BMap<BString, Object> config = (BMap<BString, Object>) listener.getNativeData(Constants.LISTENER_CONFIG);
-        long timeout = config.getIntValue(StringUtils.fromString(Constants.CONFIG_READ_TIMEOUT));
-
-        listener.addNativeData(Constants.SERVICE, new TcpService(env.getRuntime(), service, timeout));
+        listener.addNativeData(Constants.SERVICE, new TcpService(env.getRuntime(), service));
         return null;
     }
 

@@ -28,10 +28,8 @@ import io.netty.channel.ChannelInitializer;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.handler.timeout.IdleStateHandler;
 
 import java.net.InetSocketAddress;
-import java.util.concurrent.TimeUnit;
 
 /**
  * {@link TcpListener} creates the tcp client and handles all the network operations.
@@ -53,8 +51,6 @@ public class TcpListener {
                 .childHandler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel ch) throws Exception {
-                        ch.pipeline().addLast(Constants.READ_TIMEOUT_HANDLER,
-                                new IdleStateHandler(0, 0, tcpService.getTimeout(), TimeUnit.MILLISECONDS));
                         ch.pipeline().addLast(Constants.LISTENER_HANDLER, new TcpListenerHandler(tcpService));
                     }
                 });

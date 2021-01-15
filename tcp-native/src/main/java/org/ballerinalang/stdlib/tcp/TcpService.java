@@ -29,13 +29,11 @@ public class TcpService {
     private final Runtime runtime;
     private final BObject service;
     private BObject connectionService;
-    private final long timeout;
     private boolean isCallerClosed;
 
-    public TcpService(Runtime runtime, BObject service, long timeout) {
+    public TcpService(Runtime runtime, BObject service) {
         this.runtime = runtime;
         this.service = service;
-        this.timeout = timeout;
     }
 
     public Runtime getRuntime() {
@@ -52,10 +50,6 @@ public class TcpService {
 
     public BObject getConnectionService() {
         return connectionService;
-    }
-
-    public long getTimeout() {
-        return timeout;
     }
 
     public boolean getIsCallerClosed() {

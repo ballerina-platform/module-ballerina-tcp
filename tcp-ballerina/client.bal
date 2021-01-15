@@ -53,7 +53,7 @@ public client class Client {
     #
     # + return - The byte[], or else a `tcp:Error` if the data
     #            can't be read from the remote host
-    remote function readBytes() returns byte[]|Error {
+    remote function readBytes() returns (readonly & byte[])|Error {
         return externReadBytes(self);
     }
  
@@ -93,7 +93,7 @@ isolated function externWriteBytes(Client clientObj, byte[] content) returns Err
     'class: "org.ballerinalang.stdlib.tcp.nativeclient.Client"
 } external;
 
-isolated function externReadBytes(Client clientObj) returns byte[]|Error =
+isolated function externReadBytes(Client clientObj) returns (readonly & byte[])|Error =
 @java:Method {
     name: "readBytes",
     'class: "org.ballerinalang.stdlib.tcp.nativeclient.Client"

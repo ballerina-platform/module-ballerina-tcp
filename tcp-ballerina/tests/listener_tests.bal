@@ -27,7 +27,7 @@ function testListenerEcho() returns  @tainted error? {
     byte[] msgByteArray = msg.toBytes();
     check  socketClient->writeBytes(msgByteArray);
 
-    byte[] receivedData = check socketClient->readBytes();
+    readonly & byte[] receivedData = check socketClient->readBytes();
     io:println(check getString(receivedData));
     check socketClient->close();
 }

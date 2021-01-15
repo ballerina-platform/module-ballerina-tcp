@@ -30,6 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
+import java.util.Arrays;
 
 /**
  * Dispatch async methods.
@@ -51,9 +52,13 @@ public class Dispatcher {
 
     public static void invokeOnError(TcpService tcpService, String message) {
         try {
-            Object params[] = getOnErrorSignature(message);
-            tcpService.getRuntime().invokeMethodAsync(tcpService.getConnectionService(), Constants.ON_ERROR, null, null,
-                    new TcpCallback(tcpService), params);
+            MethodType methodType = Arrays.stream(tcpService.getConnectionService().getType().getMethods())
+                    .filter(m -> m.getName().equals(Constants.ON_CLOSE)).findFirst().orElse(null);
+            if (methodType != null) {
+                Object params[] = getOnErrorSignature(message);
+                tcpService.getRuntime().invokeMethodAsync(tcpService.getConnectionService(), Constants.ON_ERROR,
+                        null, null, new TcpCallback(tcpService), params);
+            }
         } catch (Throwable t) {
             log.error("Error while executing onError function", t);
         }
@@ -112,9 +117,13 @@ public class Dispatcher {
 
     public static void invokeOnClose(TcpService tcpService) {
         try {
-            Object[] params = {};
-            tcpService.getRuntime().invokeMethodAsync(tcpService.getConnectionService(), Constants.ON_CLOSE, null, null,
-                    new TcpCallback(), params);
+            MethodType methodType = Arrays.stream(tcpService.getConnectionService().getType().getMethods())
+                    .filter(m -> m.getName().equals(Constants.ON_CLOSE)).findFirst().orElse(null);
+            if (methodType != null) {
+                Object[] params = {};
+                tcpService.getRuntime().invokeMethodAsync(tcpService.getConnectionService(), Constants.ON_CLOSE,
+                        null, null, new TcpCallback(), params);
+            }
         } catch (BError e) {
             Dispatcher.invokeOnError(tcpService, e.getMessage());
         }

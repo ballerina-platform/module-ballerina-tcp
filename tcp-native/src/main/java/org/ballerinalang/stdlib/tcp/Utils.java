@@ -66,10 +66,10 @@ public class Utils {
         return ErrorCreator.createDistinctError(type.errorType(), getTcpPackage(), StringUtils.fromString(errMsg));
     }
 
-    public static BArray returnBytes(ByteBuf buf) {
+    public static BArray returnReadOnlyBytes(ByteBuf buf) {
         byte[] byteContent = new byte[buf.readableBytes()];
         buf.readBytes(byteContent);
-        return ValueCreator.createArrayValue(byteContent);
+        return ValueCreator.createReadonlyArrayValue(byteContent);
     }
 
     /**

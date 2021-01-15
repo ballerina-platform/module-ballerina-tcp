@@ -43,7 +43,7 @@ public class TcpClientHandler extends SimpleChannelInboundHandler<ByteBuf> {
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, ByteBuf msg) throws Exception {
         ctx.channel().pipeline().remove(Constants.READ_TIMEOUT_HANDLER);
-        callback.complete(Utils.returnBytes(msg));
+        callback.complete(Utils.returnReadOnlyBytes(msg));
     }
 
     @Override
