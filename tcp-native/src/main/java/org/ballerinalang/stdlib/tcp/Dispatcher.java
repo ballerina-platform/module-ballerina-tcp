@@ -44,7 +44,7 @@ public class Dispatcher {
             Object[] params = getOnBytesSignature(buffer, channel);
 
             tcpService.getRuntime().invokeMethodAsync(tcpService.getConnectionService(), Constants.ON_BYTES, null, null,
-                    new TcpCallback(), params);
+                    new TcpCallback(tcpService, false, channel), params);
         } catch (BError e) {
             Dispatcher.invokeOnError(tcpService, e.getMessage());
         }

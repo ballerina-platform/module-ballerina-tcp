@@ -37,12 +37,9 @@ service class EchoService {
 
     public function init(Caller c) {self.caller = c;}
 
-    remote function onBytes(readonly & byte[] data) returns Error? {
+    remote function onBytes(readonly & byte[] data) returns (readonly & byte[])|Error? {
         io:println("Echo: ", getString(data));
-        // Echo service sends data back
-        check self.caller->writeBytes(data);
-        // close the connection
-        check self.caller->close();
+        return data;
     }
 
     remote function onError(readonly & Error err) returns Error? {
