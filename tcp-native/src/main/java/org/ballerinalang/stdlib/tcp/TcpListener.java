@@ -66,6 +66,7 @@ public class TcpListener {
         });
     }
 
+    // invoke when the caller call writeBytes
     public static void send(byte[] bytes, Channel channel, Future callback, TcpService tcpService) {
         if (!tcpService.getIsCallerClosed() && channel.isActive()) {
             channel.writeAndFlush(Unpooled.wrappedBuffer(bytes)).addListener((ChannelFutureListener) future -> {
@@ -77,6 +78,19 @@ public class TcpListener {
             });
         } else {
             callback.complete(Utils.createSocketError("Socket connection already closed."));
+        }
+    }
+
+    // invoke when the listener onBytes return readonly & byte[]
+    public static void send(byte[] bytes, Channel channel, TcpService tcpService) {
+        if (!tcpService.getIsCallerClosed() && channel.isActive()) {
+            channel.writeAndFlush(Unpooled.wrappedBuffer(bytes)).addListener((ChannelFutureListener) future -> {
+                if (!future.isSuccess()) {
+                    Dispatcher.invokeOnError(tcpService, "Failed to send data.");
+                }
+            });
+        } else {
+            Dispatcher.invokeOnError(tcpService, "Socket connection already closed.");
         }
     }
 

@@ -19,6 +19,7 @@
 package org.ballerinalang.stdlib.tcp;
 
 import io.ballerina.runtime.api.async.Callback;
+import io.ballerina.runtime.api.values.BArray;
 import io.ballerina.runtime.api.values.BError;
 import io.ballerina.runtime.api.values.BObject;
 import io.netty.channel.Channel;
@@ -52,7 +53,11 @@ public class TcpCallback implements Callback {
 
     @Override
     public void notifySuccess(Object object) {
-        if (isOnConnectInvoked) {
+        if (object instanceof BArray) {
+            // call writeBytes if the service returns byte[]
+            byte[] byteContent = ((BArray) object).getBytes();
+            TcpListener.send(byteContent, channel, tcpService);
+        } else if (isOnConnectInvoked) {
             this.tcpService.setConnectionService((BObject) object);
             TcpListener.resumeRead(channel);
         }
