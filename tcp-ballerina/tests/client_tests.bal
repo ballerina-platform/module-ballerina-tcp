@@ -75,6 +75,43 @@ function testServerAlreadyClosed() returns  @tainted error? {
     check socketClient->close();
 }
 
+@test:Config {
+    dependsOn: [testServerAlreadyClosed]
+}
+function testReadBytesAsStream() returns  @tainted error? {
+    Client socketClient = check new ("localhost", PORT4);
+
+    Error|(stream<readonly & byte[]>) res = socketClient->readBytesAsStream();
+    if (res is stream<readonly & byte[]>) {
+        error? e = res.forEach(function (readonly & byte[] bytes) {
+                io:println(getString(bytes));
+            });
+        if (e is error) {
+            io:println(e.message());
+            check socketClient->close();
+        }
+    } else {
+        io:println(res.message());
+    }
+
+    check socketClient->close();
+}
+
+
+@test:Config {
+    dependsOn: [testReadBytesAsStream]
+}
+function testWriteBytesFromStream() returns  @tainted error? {
+    Client socketClient = check new ("localhost", PORT2);
+
+    string[] numbers = ["one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"];
+    stream<byte[]> byteStream = numbers
+                                    .map(function (string number) returns byte[] { return number.toBytes();})
+                                    .toStream();
+    check socketClient->writeBytesFromStream(byteStream);
+    check socketClient->close();
+}
+
 function getString(readonly & byte[] content) returns @tainted string|io:Error {
     io:ReadableByteChannel byteChannel = check io:createReadableChannel(content);
     io:ReadableCharacterChannel characterChannel = new io:ReadableCharacterChannel(byteChannel, "UTF-8");

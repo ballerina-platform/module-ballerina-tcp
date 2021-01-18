@@ -44,20 +44,58 @@ public client class Client {
         return externWriteBytes(self, data);
     }
  
-    // remote function writeBlocksFromStream(stream<byte[]> dataStream) returns Error? { }
+    # Sends the given stream of data to the connected remote host.
+    # ```ballerina
+    # tcp:Error? result = socketClient->writeBytes("msg".toBytes());
+    # ```
+    #
+    # + data - The data need to be sent to the connected remote host
+    # + return - () or else a `tcp:Error` if the given data can't be sent
+    remote function writeBytesFromStream(stream<byte[]> dataStream) returns Error? {
+        var iterator = dataStream.iterator();
+        Error? writeError = ();
+        while(true) {
+            record {|byte[] value;|}? bytes = iterator.next();
+            if (bytes is record {|byte[] value;|}) {
+                check self->writeBytes(bytes.value);
+                if (writeError is Error) {
+                    break;
+                }
+            } else {
+                _ = dataStream.close();
+                break;
+            }
+       }
+
+        if (writeError is Error) {
+            return writeError;
+        }
+
+        return ();
+    }
 
     # Reads data only from the connected remote host. 
     # ```ballerina
-    # tcp:Datagram|tcp:Error result = socketClient->receiveDatagram();
+    # (readonly & byte[])|tcp:Error result = socketClient->readBytes();
     # ```
     #
     # + return - The byte[], or else a `tcp:Error` if the data
     #            can't be read from the remote host
-    remote function readBytes() returns (readonly & byte[])|Error {
+    isolated remote function readBytes() returns (readonly & byte[])|Error {
         return externReadBytes(self);
     }
- 
-    // remote function readBlocksAsStream() returns stream<byte[]>|Error { }
+    
+    # Reads data as stream until the connection closes. 
+    # ```ballerina
+    # stream<readonly & byte[]>|tcp:Error result = socketClient->readBytesAsStream();
+    # ```
+    #
+    # + return - The stream<readonly & byte[]>, or else a `tcp:Error` if the data
+    #            can't be read from the remote host
+    remote function readBytesAsStream() returns stream<readonly & byte[]>|Error { 
+        ByteStream byteStream = new ByteStream(self);
+        return new stream<readonly & byte[], Error>(byteStream);
+    }
 
     # Free up the occupied socket.
     # ```ballerina
@@ -96,12 +134,6 @@ isolated function externWriteBytes(Client clientObj, byte[] content) returns Err
 isolated function externReadBytes(Client clientObj) returns (readonly & byte[])|Error =
 @java:Method {
     name: "readBytes",
-    'class: "org.ballerinalang.stdlib.tcp.nativeclient.Client"
-} external;
-
-isolated function externReadBlocksAsStream(Client clientObj) returns stream<byte[]>|Error =
-@java:Method {
-    name: "readBlocksAsStream",
     'class: "org.ballerinalang.stdlib.tcp.nativeclient.Client"
 } external;
 

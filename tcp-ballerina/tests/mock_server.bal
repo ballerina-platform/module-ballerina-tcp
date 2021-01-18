@@ -15,14 +15,16 @@
 // under the License.
 
 import ballerina/io;
+import ballerina/lang.runtime as runtime;
 
 const int PORT1 = 8809;
 const int PORT2 = 8023;
 const int PORT3 = 8639;
+const int PORT4 = 8632;
 
-listener Listener echoServer = check new Listener(PORT1);
-listener Listener discardServer = check new Listener(PORT2);
-listener Listener closeServer = check new Listener(PORT3);
+listener Listener echoServer = new Listener(PORT1);
+listener Listener discardServer = new Listener(PORT2);
+listener Listener closeServer = new Listener(PORT3);
 
 service on echoServer {
 
@@ -84,13 +86,35 @@ service on closeServer {
     remote function onConnect(Caller caller) returns ConnectionService|Error {
         io:println("Client connected to closeServer: ", caller.remotePort);
         check caller->close();
-        return new EchoService(caller);
+        return new CloseService(caller);
     }
 }
 
-service class closeService {
+service class CloseService {
     Caller caller;
 
     public function init(Caller c) {self.caller = c;}
 
+}
+
+service on new Listener(PORT4) {
+
+    remote function onConnect(Caller caller) returns ConnectionService|Error {
+        io:println("Client connected to streamServer: ", caller.remotePort);
+
+        worker w1 {
+            string[] numbers = ["one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"];
+            error? e = numbers.toStream().forEach( function (string number) {
+                Error? res = caller->writeBytes(number.toBytes());
+                if (res is Error) {
+                    io:println("Error writing data :", res.message());
+                }
+                runtime:sleep(1);
+            });
+            
+            checkpanic caller->close();
+        }
+        
+        return new CloseService(caller);
+    }
 }
