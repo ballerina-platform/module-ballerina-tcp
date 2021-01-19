@@ -112,7 +112,7 @@ service on new Listener(PORT4) {
                 runtime:sleep(1);
             });
             
-            checkpanic caller->close();
+            // checkpanic caller->close();
         }
         
         return new CloseService(caller);

@@ -71,7 +71,7 @@ public class Constants {
      */
     public enum ErrorType {
 
-        GenericError("GenericError"), ReadTimedOutError("ReadTimedOut");
+        GenericError("GenericError"), ReadTimedOutError("ReadTimedOutError");
 
         private String errorType;
 

@@ -79,7 +79,7 @@ function testServerAlreadyClosed() returns  @tainted error? {
     dependsOn: [testServerAlreadyClosed]
 }
 function testReadBytesAsStream() returns  @tainted error? {
-    Client socketClient = check new ("localhost", PORT4);
+    Client socketClient = check new ("localhost", PORT4, timeoutInMillis = 1500);
 
     Error|(stream<readonly & byte[]>) res = socketClient->readBytesAsStream();
     if (res is stream<readonly & byte[]>) {
@@ -87,7 +87,8 @@ function testReadBytesAsStream() returns  @tainted error? {
                 io:println(getString(bytes));
             });
         if (e is error) {
-            io:println(e.message());
+            // since streamServer don't close the connection this should only result in ReadTimeOutError
+            test:assertTrue(e is ReadTimedOutError, msg = "AssertTrue failed");
             check socketClient->close();
         }
     } else {

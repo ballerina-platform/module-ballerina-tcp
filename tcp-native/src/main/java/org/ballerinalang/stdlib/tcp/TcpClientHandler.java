@@ -23,6 +23,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.timeout.IdleStateEvent;
+import org.ballerinalang.stdlib.tcp.Constants.ErrorType;
 
 /**
  * {@link TcpClientHandler} is a ChannelInboundHandler implementation for tcp client.
@@ -51,7 +52,7 @@ public class TcpClientHandler extends SimpleChannelInboundHandler<ByteBuf> {
         if (evt instanceof IdleStateEvent) {
             // return timeout error
             ctx.channel().pipeline().remove(Constants.READ_TIMEOUT_HANDLER);
-            callback.complete(Utils.createSocketError("Read timed out"));
+            callback.complete(Utils.createSocketError(ErrorType.ReadTimedOutError, "Read timed out"));
         }
     }
 
