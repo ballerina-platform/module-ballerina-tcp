@@ -1,48 +1,64 @@
 ## Module Overview
 
-This module provides an implementation for sending/receiving messages to/from another application process (local or remote) for both connection-oriented and connectionless protocols.
+This module provides an implementation for sending/receiving messages to/from another application process (local or remote) for both connection-oriented protocols.
 
 #### Client
 
-The `tcp:Client` is used to connect to a socket server and interact with it. The client can only send the data to the server and the client's call-back service can retrieve the data from the server and do multiple requests/responses between the client and the server.
+The `tcp:Client` is used to connect to a socket server and interact with it.
+The client can simply send the data to the server and retrieve the data from the server.
 
-A Client can be defined by providing the host, port, and callbackService as follows.
+A Client can be defined by providing the `remoteHost` and the `remotePort`. 
+A simple Client code as follows.
 
 ```ballerina
-tcp:Client socketClient = new ({host: "localhost", port: 61598, callbackService: ClientService});
-string msg = "Hello Ballerina\n";
-byte[] message = msg.toBytes();
-var writeResult = socketClient->write(message);
-```
+tcp:Client socketClient = check new ("localhost", 3000);
 
-A client's call-back service can be defined as follows:
+string msg = "Hello Ballerina";
+byte[] msgByteArray = msg.toBytes();
+check  socketClient->writeBytes(msgByteArray);
 
-```ballerina 
-service ClientService = service {
-    resource function onConnect(tcp:Caller caller) {
-        io:println("connect: ", caller.remotePort);
-    }
-}
+readonly & byte[] receivedData = check socketClient->readBytes();
+
+check socketClient->close();
 ```
 
 #### Listener
-The `tcp:Listener` is used to listen to the incoming socket request. The `onConnect(tcp:Caller)` resource function gets invoked when a new client is connected. The new client is represented using the `tcp:Caller`.
-The `onReadReady(tcp:Caller)` resource gets invoked once the remote client sends some data.
+The `tcp:Listener` is used to listen to the incoming socket request. The `onConnect(tcp:Caller)` remote method gets invoked when a new client is connected. The new client is represented using the `tcp:Caller`. The `onConnect(tcp:Caller)` method may return `tcp:ConnectionService|tcp:Error`.
+
+The `tcp:ConnectionService` can have following remote methods
+`onBytes(readonly & byte[] data)` - This remote method is invoked once the content is received from the client.
+`onError(readonly & tcp:Error err)` - This remote method is invoked in an error situation.
+`onClose()` - This remote method is invoked when the connection is closed.
 
 A `tcp:Listener` can be defined as follows:
 ```ballerina
-listener tcp:Listener server = new(61598);
-service echoServer on server {
+service on new tcp:Listener(3000) {
+    remote function onConnect(tcp:Caller caller) returns tcp:ConnectionService {
+        io:println("Client connected to echoServer: ", caller.remotePort);
+        return new EchoService(caller);
+    }
+}
 
-    resource function onConnect(tcp:Caller caller) {
-        io:println("connect: ", caller.remotePort);
+service class EchoService {
+    tcp:Caller caller;
+
+    public function init(tcp:Caller c) {self.caller = c;}
+
+    remote function onBytes(readonly & byte[] data) returns tcp:Error? {
+        // echo back the data to the client
+        return data;
     }
 
-    resource function onReadReady(tcp:Caller caller) {
-        [byte[], int]|tcp:ReadTimedOutError result = caller->read();
+    remote function onError(readonly & tcp:Error err) returns tcp:Error? {
+        log:printError("An error occurred", err = err);
+    }
+
+    remote function onClose() returns tcp:Error? {
+         io:println("Client left: ", self.caller.remotePort);
     }
 }
 ```
 
 For information on the operations, which you can perform with this module, see the below **Functions**. For examples on the usage of the operations, see the following.
- * [Basic TCP Socket Example](https://ballerina.io/learn/by-example/tcp-socket-listener-client.html)
+ * [Basic TCP Client Example](https://ballerina.io/learn/by-example/tcp-client.html)
+ * [Basic TCP Listener Example](https://ballerina.io/learn/by-example/tcp-listener.html)

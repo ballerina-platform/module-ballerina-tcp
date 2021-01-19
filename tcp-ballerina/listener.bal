@@ -81,7 +81,7 @@ public class Listener {
 }
 
 public type ListenerConfig record {|
-   string? localhost = ();
+   string? localHost = ();
 |};
 
 isolated function initListener(Listener listenerObj, int localPort, ListenerConfig config) returns error? = @java:Method {
