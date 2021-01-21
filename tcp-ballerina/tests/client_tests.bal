@@ -16,7 +16,7 @@
 
 import ballerina/test;
 import ballerina/io;
-import ballerina/java;
+import ballerina/jballerina.java;
 
 @test:BeforeSuite
 function setup() {
