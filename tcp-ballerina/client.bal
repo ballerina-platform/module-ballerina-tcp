@@ -26,7 +26,7 @@ public client class Client {
     # tcp:Client|tcp:Error? socketClient = new("www.remote.com", 80,
     #                              localHost = "localHost");
     # ```
-    # + remoteHost - The hostname of the remote host
+    # + remoteHost - The hostname or the IP address of the remote host
     # + remotePort - The port number of the remmote host
     # + config - Connection oriented client related configuration
     public isolated function init(string remoteHost, int remotePort, *ClientConfig config) returns Error? {
@@ -48,10 +48,10 @@ public client class Client {
 
     # Reads data only from the connected remote host. 
     # ```ballerina
-    # tcp:Datagram|tcp:Error result = socketClient->receiveDatagram();
+    # (readonly & byte[])|tcp:Error result = socketClient->readBytes();
     # ```
     #
-    # + return - The byte[], or else a `tcp:Error` if the data
+    # + return - The `readonly & byte[]`, or else a `tcp:Error` if the data
     #            can't be read from the remote host
     remote function readBytes() returns (readonly & byte[])|Error {
         return externReadBytes(self);
@@ -72,7 +72,7 @@ public client class Client {
 
 # Configurations for the connection oriented tcp client.
 # 
-# + localHost - Local binding of the interface
+# + localHost - Local binding of the interface.
 # + timeoutInMillis - The socket reading timeout value to be used 
 #                     in milliseconds. If this is not set,the default value
 #                     of 300000 milliseconds (5 minutes) will be used.

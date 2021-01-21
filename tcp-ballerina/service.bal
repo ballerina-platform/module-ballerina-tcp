@@ -19,7 +19,7 @@ public type Service service object {
   remote function onConnect(Caller caller) returns ConnectionService|Error;
 };
 
-# Represent TCP Listener service type.
+# Represent TCP Listener ConnectionService service type.
 public type ConnectionService service object {
   // ConnectionService can have these optional remote methods
   // remote function onError(readonly & Error err) returns Error?;
