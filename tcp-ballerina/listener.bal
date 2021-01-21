@@ -16,8 +16,9 @@
 
 import ballerina/java;
 
-# This is used for creating TCP server endpoints. A TCP server endpoint is capable of responding to
-# remote callers. The `Listener` is responsible for initializing the endpoint using the provided configurations.
+# This is used for creating TCP server endpoints. A TCP server endpoint is
+# capable of responding to remote callers. The `Listener` is responsible for
+# initializing the endpoint using the provided configurations.
 public class Listener {
 
     # Initializes the TCP listener based on the privovided configurations. 

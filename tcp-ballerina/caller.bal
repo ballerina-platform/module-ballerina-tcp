@@ -18,7 +18,7 @@ import ballerina/java;
 
 # Represents caller object in tcp service remote methods
 # 
-# + remoteHost - The hostname of the remote host
+# + remoteHost - The hostname or the IP address of the remote host
 # + remotePort - The port number of the remote host
 # + localHost - The hostname which the binded
 # + localPort - The port number which the socket is binded
@@ -40,7 +40,7 @@ public client class Caller {
     return externSendBytes(self, data);
   }
 
-  # Close the remote connection
+  # Close the remote connection.
   # 
   # + return - () or else a `tcp:Error` if the connection can't be properly
   #            closed
