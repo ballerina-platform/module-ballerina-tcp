@@ -228,8 +228,6 @@ task ballerinaBuild {
             from file("$project.projectDir/target/apidocs/${packageName}")
             into file("$project.projectDir/build/docs_parent/docs/${packageName}")
         }
-        ballerinaConfigFile.text = originalConfig
-        ballerinaDependencyFile.text = originalDependencyConfig
     }
 
     outputs.dir artifactCacheParent
