@@ -92,6 +92,7 @@ def ballerinaCentralAccessToken = System.getenv('BALLERINA_CENTRAL_ACCESS_TOKEN'
 def distributionPath =  project.projectDir.absolutePath + "/build/target/extracted-distributions/jballerina-tools-zip/jballerina-tools-${ballerinaLangVersion}"
 def distributionBinPath = distributionPath + "/bin"
 def originalConfig = ballerinaConfigFile.text
+def originalDependencyConfig = ballerinaDependencyFile.text
 
 task copyStdlibs(type: Copy) {
     dependsOn(unpackStdLibs)
@@ -129,6 +130,7 @@ task updateTomlFile {
 task revertTomlFile {
     doLast {
         ballerinaConfigFile.text = originalConfig
+        ballerinaDependencyFile.text = originalDependencyConfig
     }
 }
 
@@ -227,6 +229,7 @@ task ballerinaBuild {
             into file("$project.projectDir/build/docs_parent/docs/${packageName}")
         }
         ballerinaConfigFile.text = originalConfig
+        ballerinaDependencyFile.text = originalDependencyConfig
     }
 
     outputs.dir artifactCacheParent
