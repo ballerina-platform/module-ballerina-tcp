@@ -3,16 +3,6 @@ org = "ballerina"
 name = "tcp"
 version = "@toml.version@"
 
-[[dependency]]
-org = "ballerina"
-name = "io"
-version = "@stdlib.io.version@"
-
-[[dependency]]
-org = "ballerina"
-name = "log"
-version = "@stdlib.log.version@"
-
 [[platform.java11.dependency]]
 path = "../tcp-native/build/libs/tcp-native-@project.version@.jar"
 groupId = "ballerina"
