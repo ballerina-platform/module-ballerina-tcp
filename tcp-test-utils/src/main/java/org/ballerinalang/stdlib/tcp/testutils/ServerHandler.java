@@ -11,6 +11,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<ByteBuf> {
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, ByteBuf buf) throws Exception {
+        System.out.println("Received by test server :" + buf.toString(CharsetUtil.UTF_8));
         if (!buf.toString(CharsetUtil.UTF_8).equals("Do not reply")) {
             ctx.channel().writeAndFlush(buf);
         }

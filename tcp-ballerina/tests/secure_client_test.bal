@@ -10,7 +10,7 @@ function setupServer() {
 
 @test:Config {dependsOn: [testServerAlreadyClosed]}
 function testSecureClientEcho() returns @tainted error? {
-    Client socketClient = checkpanic new ("localhost", 9002, secureSocket = {
+    Client socketClient = check new ("localhost", 9002, secureSocket = {
         certificate: {path: certPath},
         protocol: {
             name: "TLS",
@@ -19,7 +19,7 @@ function testSecureClientEcho() returns @tainted error? {
         ciphers: ["TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA"]
     });
 
-    string msg = "Hello Ballerina Echo from client";
+    string msg = "Hello Ballerina Echo from secure client";
     byte[] msgByteArray = msg.toBytes();
     check socketClient->writeBytes(msgByteArray);
 
@@ -31,7 +31,7 @@ function testSecureClientEcho() returns @tainted error? {
 
 @test:Config {dependsOn: [testSecureClientEcho]}
 function testProtocolVersion() returns @tainted error? {
-    Client socketClient = checkpanic new ("localhost", 9002, secureSocket = {
+    Client socketClient = check new ("localhost", 9002, secureSocket = {
         certificate: {path: certPath},
         protocol: {
             name: "TLS",
@@ -51,7 +51,7 @@ function testProtocolVersion() returns @tainted error? {
 
 @test:Config {dependsOn: [testProtocolVersion]}
 function testCiphers() returns @tainted error? {
-    Client socketClient = checkpanic new ("localhost", 9002, secureSocket = {
+    Client socketClient = check new ("localhost", 9002, secureSocket = {
         certificate: {path: certPath},
         protocol: {
             name: "TLS",
