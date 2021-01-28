@@ -51,7 +51,8 @@ public class SecureServer implements Runnable {
                             ch.pipeline().addLast(new ServerHandler());
                             // set ssl handler
                             SslHandler handler = sslContext.newHandler(ch.alloc());
-                            handler.engine().setEnabledProtocols(new String[]{"TLSv1.2"});
+                            handler.engine().setEnabledProtocols(new String[]{"TLSv1.2" });
+                            handler.engine().setEnabledCipherSuites(new String[] {"TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA"});
                             ch.pipeline().addFirst(handler);
                         }
                     });

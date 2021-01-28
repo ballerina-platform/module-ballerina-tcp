@@ -48,6 +48,26 @@ function testProtocolVersion() returns @tainted error? {
     check socketClient->close();
 }
 
+
+@test:Config {dependsOn: [testProtocolVersion]}
+function testCiphers() returns @tainted error? {
+    Client socketClient = checkpanic new ("localhost", 9002, secureSocket = {
+        certificate: {path: certPath},
+        protocol: {
+            name: "TLS",
+            versions: ["TLSv1.2", "TLSv1.1"]
+        },
+        ciphers: ["TLS_RSA_WITH_AES_128_CBC_SHA"] // server only support TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA write should fail
+    });
+
+    Error? res = socketClient->writeBytes("Hello Ballerina Echo from client".toBytes());
+    if (res is ()) {
+        test:assertFail(msg = "Server only support TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA cipher writeBytes should fail.");
+    }
+    
+    check socketClient->close();
+}
+
 @test:AfterSuite {}
 function stopServer() {
     var result = stopSecureServer();
