@@ -18,10 +18,6 @@
 
 package org.ballerinalang.stdlib.tcp;
 
-import io.ballerina.runtime.api.Module;
-
-import static io.ballerina.runtime.api.constants.RuntimeConstants.BALLERINA_BUILTIN_PKG_PREFIX;
-
 /**
  * Constant variable for tcp related operations.
  */
@@ -35,6 +31,7 @@ public class Constants {
     public static final String LISTENER_HANDLER = "listenerHandler";
     public static final String READ_TIMEOUT_HANDLER = "readTimeoutHandler";
     public static final String CLIENT_HANDLER = "clientHandler";
+    public static final String SSL_HANDLER = "SSL_Handler";
 
     // remote method names
     public static final String ON_BYTES = "onBytes";
@@ -57,14 +54,15 @@ public class Constants {
     public static final String SERVICE = "Service";
     public static final String CLIENT = "Client";
 
-    private Constants() {}
+    // constants related to secureSocket configuration
+    public static final String SECURE_SOCKET = "secureSocket";
+    public static final String CERTIFICATE = "certificate";
+    public static final String CERTIFICATE_PATH = "path";
+    public static final String PROTOCOL_VERSIONS = "versions";
+    public static final String PROTOCOL = "protocol";
+    public static final String CIPHERS = "ciphers";
 
-     /**
-     * tcp standard library package ID.
-     * @deprecated Use SocketUtils.getIOPackage().
-     */
-    @Deprecated
-    public static final Module SOCKET_PACKAGE_ID = new Module(BALLERINA_BUILTIN_PKG_PREFIX, "tcp", "0.7.2");
+    private Constants() {}
 
     /**
      * Specifies the error type for tcp module.

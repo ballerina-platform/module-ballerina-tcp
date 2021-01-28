@@ -9,6 +9,7 @@ import java.util.concurrent.Executors;
 public class TestUtils {
     private static final Logger log = LoggerFactory.getLogger(TestUtils.class);
     private static Server echoServer;
+    private static SecureServer secureServer;
 
     public static Object startEchoServer() {
         ExecutorService executor = Executors.newSingleThreadExecutor();
@@ -19,6 +20,18 @@ public class TestUtils {
 
     public static Object stopEchoServer() {
         echoServer.stop();
+        return null;
+    }
+
+    public static Object startSecureServer() {
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        secureServer = new SecureServer();
+        executor.execute(secureServer);
+        return null;
+    }
+
+    public static Object stopSecureServer() {
+        secureServer.stop();
         return null;
     }
 

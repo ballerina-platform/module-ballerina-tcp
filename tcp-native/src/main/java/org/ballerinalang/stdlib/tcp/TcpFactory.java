@@ -19,6 +19,8 @@
 package org.ballerinalang.stdlib.tcp;
 
 import io.ballerina.runtime.api.Future;
+import io.ballerina.runtime.api.values.BMap;
+import io.ballerina.runtime.api.values.BString;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 
@@ -47,8 +49,8 @@ public class TcpFactory {
     }
 
     public static TcpClient createTcpClient(InetSocketAddress localAddress, InetSocketAddress remoteAddress,
-                                            Future callback) throws Exception {
-        return new TcpClient(localAddress, remoteAddress, getInstance().workerGroup, callback);
+                                            Future callback, BMap<BString, Object> secureSocket) throws Exception {
+        return new TcpClient(localAddress, remoteAddress, getInstance().workerGroup, callback, secureSocket);
     }
 
     public static TcpListener createTcpListener(InetSocketAddress localAddress, Future callback,

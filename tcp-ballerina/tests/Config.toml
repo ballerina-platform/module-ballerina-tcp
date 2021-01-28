@@ -1,0 +1,2 @@
+[tcp]
+certPath = "tests/etc/cert.pem"
