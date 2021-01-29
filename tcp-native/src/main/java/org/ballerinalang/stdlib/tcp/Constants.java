@@ -23,7 +23,7 @@ package org.ballerinalang.stdlib.tcp;
  */
 public class Constants {
 
-    // constants related to client config
+    // Constants related to client config
     public static final String CONFIG_LOCALHOST = "localHost";
     public static final String CONFIG_READ_TIMEOUT = "timeoutInMillis";
 
@@ -33,13 +33,13 @@ public class Constants {
     public static final String CLIENT_HANDLER = "clientHandler";
     public static final String SSL_HANDLER = "SSL_Handler";
 
-    // remote method names
+    // Remote method names
     public static final String ON_BYTES = "onBytes";
     public static final String ON_ERROR = "onError";
     public static final String ON_CONNECT = "onConnect";
     public static final String ON_CLOSE = "onClose";
 
-    // constants related to tcp caller
+    // Constants related to tcp caller
     public static final String CALLER = "Caller";
     public static final String CALLER_REMOTE_PORT = "remotePort";
     public static final String CALLER_REMOTE_HOST = "remoteHost";
@@ -47,14 +47,14 @@ public class Constants {
     public static final String CALLER_LOCAL_PORT = "localPort";
     public static final String CALLER_LOCAL_HOST = "localHost";
 
-    // constant used for adding native data
+    // Constants used for adding native data
     public static final String LISTENER = "listener";
     public static final String LISTENER_CONFIG = "listenerConfig";
     public static final String LOCAL_PORT = "localPort";
     public static final String SERVICE = "Service";
     public static final String CLIENT = "Client";
 
-    // constants related to secureSocket configuration
+    // Constants related to secureSocket configuration
     public static final String SECURE_SOCKET = "secureSocket";
     public static final String CERTIFICATE = "certificate";
     public static final String CERTIFICATE_PATH = "path";

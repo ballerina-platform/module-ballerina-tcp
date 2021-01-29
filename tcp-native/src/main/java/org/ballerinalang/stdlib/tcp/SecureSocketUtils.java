@@ -62,17 +62,17 @@ public class SecureSocketUtils {
 
     public static KeyStore truststore(String certificateLocation) throws CertificateException, IOException,
             KeyStoreException, NoSuchAlgorithmException {
-        // load the certificate
-        InputStream is = new FileInputStream(certificateLocation);
-        CertificateFactory cf = CertificateFactory.getInstance("X.509");
-        X509Certificate cert = (X509Certificate) cf.generateCertificate(is);
+        // Load the certificate
+        InputStream inputStream = new FileInputStream(certificateLocation);
+        CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
+        X509Certificate cert = (X509Certificate) certificateFactory.generateCertificate(inputStream);
 
-        // store the certificate key truststore
-        KeyStore ts = KeyStore.getInstance(KeyStore.getDefaultType());
-        ts.load(null); // create truststore on the fly
-        ts.setCertificateEntry(Constants.CLIENT, cert); // store the certificate
+        // Store the certificate key truststore
+        KeyStore truststore = KeyStore.getInstance(KeyStore.getDefaultType());
+        truststore.load(null); // Create truststore on the fly
+        truststore.setCertificateEntry(Constants.CLIENT, cert); // Store the certificate
 
-        return ts;
+        return truststore;
     }
 
     public static KeyStore keystore(String certificateChainFileLocation, String privateKeyLocation) throws IOException,

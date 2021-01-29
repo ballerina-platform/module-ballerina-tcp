@@ -90,8 +90,8 @@ public class TcpClient {
                 });
     }
 
-    private void setSSLHandler(SocketChannel ch, BMap<BString, Object> secureSocket) throws NoSuchAlgorithmException,
-            CertificateException, KeyStoreException, IOException {
+    private void setSSLHandler(SocketChannel channel, BMap<BString, Object> secureSocket)
+            throws NoSuchAlgorithmException, CertificateException, KeyStoreException, IOException {
         BMap<BString, Object> certificate = (BMap<BString, Object>) secureSocket.getMapValue(StringUtils
                 .fromString(Constants.CERTIFICATE));
         BMap<BString, Object> protocol = (BMap<BString, Object>) secureSocket.getMapValue(StringUtils
@@ -107,14 +107,14 @@ public class TcpClient {
         sslContextBuilder.trustManager(tmf);
         SslContext sslContext = sslContextBuilder.build();
 
-        SslHandler sslHandler = sslContext.newHandler(ch.alloc());
+        SslHandler sslHandler = sslContext.newHandler(channel.alloc());
         if (protocolVersions.length > 0) {
             sslHandler.engine().setEnabledProtocols(protocolVersions);
         }
         if (ciphers != null && ciphers.length > 0) {
             sslHandler.engine().setEnabledCipherSuites(ciphers);
         }
-        ch.pipeline().addFirst(Constants.SSL_HANDLER, sslHandler);
+        channel.pipeline().addFirst(Constants.SSL_HANDLER, sslHandler);
     }
 
     public void writeData(byte[] bytes, Future callback) throws InterruptedException {
@@ -144,7 +144,7 @@ public class TcpClient {
     }
 
     public void close() throws InterruptedException {
-        // if channel disconnected already then handler value is null
+        // If channel disconnected already then handler value is null
         TcpClientHandler handler = (TcpClientHandler) channel.pipeline().get(Constants.CLIENT_HANDLER);
         if (handler != null) {
             handler.setIsCloseTriggered();
