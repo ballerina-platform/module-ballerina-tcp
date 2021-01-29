@@ -70,13 +70,13 @@ public class SecureSocketUtils {
         // store the certificate key truststore
         KeyStore ts = KeyStore.getInstance(KeyStore.getDefaultType());
         ts.load(null); // create truststore on the fly
-        ts.setCertificateEntry("client", cert); // store the certificate
+        ts.setCertificateEntry(Constants.CLIENT, cert); // store the certificate
 
         return ts;
     }
 
-    public static KeyStore keystore(String certificateChainFileLocation, String privateKeyLocation,
-                                    Optional<String> keyPassword) throws IOException, GeneralSecurityException {
+    public static KeyStore keystore(String certificateChainFileLocation, String privateKeyLocation) throws IOException,
+            GeneralSecurityException {
         PKCS8EncodedKeySpec encodedKeySpec =
                 SecureSocketUtils.readPrivateKey(new File(privateKeyLocation), Optional.empty());
         PrivateKey key = null;
@@ -89,12 +89,11 @@ public class SecureSocketUtils {
             rasInvalidKeySpecException = true;
         }
 
-        // if RSA failed then try with DSA
+        // If RSA got failed then try with DSA
         if (rasInvalidKeySpecException) {
             KeyFactory keyFactory = KeyFactory.getInstance("DSA");
             key = keyFactory.generatePrivate(encodedKeySpec);
         }
-
 
         List<X509Certificate> certificateChain =
                 SecureSocketUtils.readCertificateChain(new File(certificateChainFileLocation));
@@ -104,9 +103,9 @@ public class SecureSocketUtils {
         }
 
         KeyStore keyStore = KeyStore.getInstance("JKS");
-        keyStore.load(null, "secret".toCharArray());
+        keyStore.load(null, null);
 
-        keyStore.setKeyEntry("key", key, keyPassword.orElse("secret").toCharArray(),
+        keyStore.setKeyEntry("key", key, Constants.PRIVATE_KEY_ENTRY_PASSWORD.toCharArray(),
                 certificateChain.stream().toArray(Certificate[]::new));
 
         return keyStore;
@@ -121,7 +120,7 @@ public class SecureSocketUtils {
 
         Matcher matcher = keyPattern.matcher(content);
         if (!matcher.find()) {
-            throw new KeyStoreException("found no private key: " + keyFile);
+            throw new KeyStoreException("Found no private key: " + keyFile);
         }
         byte[] encodedKey = base64Decode(matcher.group(1));
 

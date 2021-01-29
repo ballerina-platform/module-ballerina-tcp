@@ -35,7 +35,7 @@ public class SecureServer implements Runnable {
         group = new NioEventLoopGroup();
         try {
             // create ssl context
-            KeyStore ks = SecureSocketUtils.keystore("../tcp-test-utils/etc/cert.pem", "../tcp-test-utils/etc/key.pem", Optional.empty());
+            KeyStore ks = SecureSocketUtils.keystore("../tcp-test-utils/etc/cert.pem", "../tcp-test-utils/etc/key.pem");
             KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
             kmf.init(ks, "secret".toCharArray());
             SslContext sslContext = SslContextBuilder.forServer(kmf).build();
