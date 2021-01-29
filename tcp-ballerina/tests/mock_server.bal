@@ -16,9 +16,13 @@
 
 import ballerina/io;
 
+configurable string keyPath = ?;
+configurable string certPath = ?;
+
 const int PORT1 = 8809;
 const int PORT2 = 8023;
 const int PORT3 = 8639;
+const int PORT4 = 8641;
 
 listener Listener echoServer = check new Listener(PORT1);
 listener Listener discardServer = check new Listener(PORT2);
@@ -35,7 +39,9 @@ service on echoServer {
 service class EchoService {
     Caller caller;
 
-    public function init(Caller c) {self.caller = c;}
+    public function init(Caller c) {
+        self.caller = c;
+    }
 
     remote function onBytes(readonly & byte[] data) returns (readonly & byte[])|Error? {
         io:println("Echo: ", getString(data));
@@ -51,7 +57,6 @@ service class EchoService {
     }
 }
 
-
 service on discardServer {
 
     remote function onConnect(Caller caller) returns ConnectionService {
@@ -63,7 +68,9 @@ service on discardServer {
 service class DiscardService {
     Caller caller;
 
-    public function init(Caller c) {self.caller = c;}
+    public function init(Caller c) {
+        self.caller = c;
+    }
 
     remote function onBytes(readonly & byte[] data) returns Error? {
         // read and discard the message
@@ -74,7 +81,8 @@ service class DiscardService {
         io:println(err.message());
     }
 
-    remote function onClose() returns Error? {}
+    remote function onClose() returns Error? {
+    }
 }
 
 service on closeServer {
@@ -88,6 +96,23 @@ service on closeServer {
 service class closeService {
     Caller caller;
 
-    public function init(Caller c) {self.caller = c;}
+    public function init(Caller c) {
+        self.caller = c;
+    }
+}
 
+service on new Listener(PORT4, secureSocket = {
+    certificate: {path: certPath},
+    privateKey: {path: keyPath},
+    protocol: {
+        name: "TLS",
+        versions: ["TLSv1.2", "TLSv1.1"]
+    },
+    ciphers: ["TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA"]
+}) {
+
+    remote function onConnect(Caller caller) returns ConnectionService {
+        io:println("Client connected to secureEchoServer: ", caller.remotePort);
+        return new EchoService(caller);
+    }
 }

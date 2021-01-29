@@ -106,7 +106,7 @@ public class SecureSocketUtils {
         keyStore.load(null, null);
 
         keyStore.setKeyEntry("key", key, Constants.PRIVATE_KEY_ENTRY_PASSWORD.toCharArray(),
-                certificateChain.stream().toArray(Certificate[]::new));
+                certificateChain.toArray(Certificate[]::new));
 
         return keyStore;
     }

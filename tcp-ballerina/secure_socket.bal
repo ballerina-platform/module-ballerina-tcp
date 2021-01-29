@@ -14,7 +14,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-# Secure Socket configuration.
+# Secure Socket configuration for TCP Client.
 #
 # + certificate - Server certificate
 # + protocol - SSL or TLS protocol
@@ -25,10 +25,25 @@ public type SecureSocket record {|
     string[] ciphers = [];
 |};
 
+# Secure Socket configuration for TCP Listener.
+#
+# + privateKey - Server private key
+public type ListenerSecureSocket record {|
+    *SecureSocket;
+    PrivateKey privateKey;
+|};
+
 # Certificate configuration.
 #
 # + path - Certificate file location
 public type Certificate record {|
+    string path;
+|};
+
+# Private key configuration.
+#
+# + path - private key file location
+public type PrivateKey record {|
     string path;
 |};
 

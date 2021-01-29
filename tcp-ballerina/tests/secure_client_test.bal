@@ -1,8 +1,6 @@
 import ballerina/test;
 import ballerina/jballerina.java;
 
-configurable string certPath = ?;
-
 @test:BeforeSuite
 function setupServer() {
     var result = startSecureServer();

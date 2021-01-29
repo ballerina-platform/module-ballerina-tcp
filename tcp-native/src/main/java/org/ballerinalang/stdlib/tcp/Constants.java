@@ -62,6 +62,9 @@ public class Constants {
     public static final String PROTOCOL = "protocol";
     public static final String CIPHERS = "ciphers";
     public static final String PRIVATE_KEY_ENTRY_PASSWORD = "secret";
+    public static final String PRIVATE_KEY = "privateKey";
+    public static final String PRIVATE_KEY_PATH = "path";
+    public static final String KEY_STORE_PASSWORD = "secret";
 
     private Constants() {}
 

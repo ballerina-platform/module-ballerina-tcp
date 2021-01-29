@@ -83,6 +83,7 @@ public class Listener {
 
 public type ListenerConfig record {|
    string? localHost = ();
+   ListenerSecureSocket? secureSocket = (); 
 |};
 
 isolated function initListener(Listener listenerObj, int localPort, ListenerConfig config) returns error? = @java:Method {

@@ -19,17 +19,28 @@
 package org.ballerinalang.stdlib.tcp;
 
 import io.ballerina.runtime.api.Future;
+import io.ballerina.runtime.api.utils.StringUtils;
+import io.ballerina.runtime.api.values.BMap;
+import io.ballerina.runtime.api.values.BString;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.ssl.SslContext;
+import io.netty.handler.ssl.SslContextBuilder;
+import io.netty.handler.ssl.SslHandler;
 
+import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.security.GeneralSecurityException;
+import java.security.KeyStore;
+
+import javax.net.ssl.KeyManagerFactory;
 
 /**
  * {@link TcpListener} creates the tcp client and handles all the network operations.
@@ -42,7 +53,7 @@ public class TcpListener {
     private final ServerBootstrap listenerBootstrap;
 
     public TcpListener(InetSocketAddress localAddress, EventLoopGroup bossGroup, EventLoopGroup workerGroup,
-                       Future callback, TcpService tcpService) throws Exception {
+                       Future callback, TcpService tcpService, BMap<BString, Object> secureSocket) throws Exception {
         this.bossGroup = bossGroup;
         this.workerGroup = workerGroup;
         listenerBootstrap = new ServerBootstrap();
@@ -52,21 +63,58 @@ public class TcpListener {
                     @Override
                     protected void initChannel(SocketChannel ch) throws Exception {
                         ch.pipeline().addLast(Constants.LISTENER_HANDLER, new TcpListenerHandler(tcpService));
+                        if (secureSocket != null) {
+                            setSSLHandler(ch, secureSocket);
+                        }
+                    }
+
+                    @Override
+                    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+                        callback.complete(Utils.createSocketError(cause.getMessage()));
+                        ctx.close();
+                    }
+                }).bind(localAddress).sync()
+                .addListener((ChannelFutureListener) channelFuture -> {
+                    if (channelFuture.isSuccess()) {
+                        channel = channelFuture.channel();
+                        callback.complete(null);
+                    } else {
+                        callback.complete(Utils.createSocketError("Error initializing the server."));
                     }
                 });
-
-        ChannelFuture future = listenerBootstrap.bind(localAddress).sync()
-                .addListener((ChannelFutureListener) channelFuture -> {
-            if (channelFuture.isSuccess()) {
-                channel = channelFuture.channel();
-                callback.complete(null);
-            } else {
-                callback.complete(Utils.createSocketError("Error initializing the server."));
-            }
-        });
     }
 
-    // invoke when the caller call writeBytes
+    private void setSSLHandler(SocketChannel channel, BMap<BString, Object> secureSocket)
+            throws GeneralSecurityException, IOException {
+        BMap<BString, Object> certificate = (BMap<BString, Object>) secureSocket.getMapValue(StringUtils
+                .fromString(Constants.CERTIFICATE));
+        BMap<BString, Object> privateKey = (BMap<BString, Object>) secureSocket.getMapValue(StringUtils
+                .fromString(Constants.PRIVATE_KEY));
+        BMap<BString, Object> protocol = (BMap<BString, Object>) secureSocket.getMapValue(StringUtils
+                .fromString(Constants.PROTOCOL));
+        String[] protocolVersions = protocol == null ? new String[]{} : protocol.getArrayValue(StringUtils.
+                fromString(Constants.PROTOCOL_VERSIONS)).getStringArray();
+        String[] ciphers = secureSocket.getArrayValue(StringUtils.fromString(Constants.CIPHERS)).getStringArray();
+
+        KeyStore ks = SecureSocketUtils.keystore(certificate == null ? null : certificate
+                        .getStringValue(StringUtils.fromString(Constants.CERTIFICATE_PATH)).getValue(),
+                privateKey == null ? null : privateKey
+                        .getStringValue(StringUtils.fromString(Constants.PRIVATE_KEY_PATH)).getValue());
+        KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+        kmf.init(ks, Constants.KEY_STORE_PASSWORD.toCharArray());
+        SslContext sslContext = SslContextBuilder.forServer(kmf).build();
+
+        SslHandler sslHandler = sslContext.newHandler(channel.alloc());
+        if (protocolVersions.length > 0) {
+            sslHandler.engine().setEnabledProtocols(protocolVersions);
+        }
+        if (ciphers != null && ciphers.length > 0) {
+            sslHandler.engine().setEnabledCipherSuites(ciphers);
+        }
+        channel.pipeline().addFirst(Constants.SSL_HANDLER, sslHandler);
+    }
+
+    // Invoke when the caller call writeBytes
     public static void send(byte[] bytes, Channel channel, Future callback, TcpService tcpService) {
         if (!tcpService.getIsCallerClosed() && channel.isActive()) {
             channel.writeAndFlush(Unpooled.wrappedBuffer(bytes)).addListener((ChannelFutureListener) future -> {
@@ -81,7 +129,7 @@ public class TcpListener {
         }
     }
 
-    // invoke when the listener onBytes return readonly & byte[]
+    // Invoke when the listener onBytes return readonly & byte[]
     public static void send(byte[] bytes, Channel channel, TcpService tcpService) {
         if (!tcpService.getIsCallerClosed() && channel.isActive()) {
             channel.writeAndFlush(Unpooled.wrappedBuffer(bytes)).addListener((ChannelFutureListener) future -> {
@@ -94,17 +142,17 @@ public class TcpListener {
         }
     }
 
-    // pause the network read operation until the onConnect method get invoked
+    // Pause the network read operation until the onConnect method get invoked
     public static void pauseRead(Channel channel) {
         channel.config().setAutoRead(false);
     }
 
-    // resume the network read operation after onConnect execution completed
+    // Resume the network read operation after onConnect execution completed
     public static void resumeRead(Channel channel) {
         channel.config().setAutoRead(true);
     }
 
-    //close caller
+    // Close caller
     public static void close(Channel channel, Future callback) throws Exception {
         if (channel != null) {
             channel.close().sync().addListener((ChannelFutureListener) future -> {
@@ -117,7 +165,7 @@ public class TcpListener {
         }
     }
 
-    // shutdown the server
+    // Shutdown the server
     public void close(Future callback) throws InterruptedException {
         channel.close().sync().addListener((ChannelFutureListener) future -> {
             if (future.isSuccess()) {

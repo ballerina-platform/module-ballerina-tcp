@@ -32,8 +32,8 @@ import java.net.InetSocketAddress;
 public class TcpFactory {
 
     private static TcpFactory tcpFactory;
-    private EventLoopGroup bossGroup;
-    private EventLoopGroup workerGroup;
+    private final EventLoopGroup bossGroup;
+    private final EventLoopGroup workerGroup;
 
     private TcpFactory() {
         int totalNumberOfThreads = (Runtime.getRuntime().availableProcessors() * 2);
@@ -53,8 +53,9 @@ public class TcpFactory {
         return new TcpClient(localAddress, remoteAddress, getInstance().workerGroup, callback, secureSocket);
     }
 
-    public static TcpListener createTcpListener(InetSocketAddress localAddress, Future callback,
-                                                TcpService tcpService) throws Exception {
-        return new TcpListener(localAddress, getInstance().bossGroup, getInstance().workerGroup, callback, tcpService);
+    public static TcpListener createTcpListener(InetSocketAddress localAddress, Future callback, TcpService tcpService,
+                                                BMap<BString, Object> secureSocket) throws Exception {
+        return new TcpListener(localAddress, getInstance().bossGroup, getInstance().workerGroup, callback, tcpService,
+                secureSocket);
     }
 }
