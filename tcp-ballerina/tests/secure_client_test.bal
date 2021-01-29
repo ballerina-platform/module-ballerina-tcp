@@ -9,27 +9,6 @@ function setupServer() {
 }
 
 @test:Config {dependsOn: [testServerAlreadyClosed]}
-function testSecureClientEcho() returns @tainted error? {
-    Client socketClient = check new ("localhost", 9002, secureSocket = {
-        certificate: {path: certPath},
-        protocol: {
-            name: "TLS",
-            versions: ["TLSv1.2", "TLSv1.1"]
-        },
-        ciphers: ["TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA"]
-    }, timeoutInMillis = 100);
-
-    string msg = "Hello Ballerina Echo from secure client";
-    byte[] msgByteArray = msg.toBytes();
-    check socketClient->writeBytes(msgByteArray);
-
-    readonly & byte[] receivedData = check socketClient->readBytes();
-    test:assertEquals(check getString(receivedData), msg, "Found unexpected output");
-
-    check socketClient->close();
-}
-
-@test:Config {dependsOn: [testSecureClientEcho]}
 function testProtocolVersion() returns @tainted error? {
     Client socketClient = check new ("localhost", 9002, secureSocket = {
         certificate: {path: certPath},
@@ -65,6 +44,27 @@ function testCiphers() returns @tainted error? {
         test:assertFail(msg = "Server only support TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA cipher writeBytes should fail.");
     }
     
+    check socketClient->close();
+}
+
+@test:Config {dependsOn: [testCiphers]}
+function testSecureClientEcho() returns @tainted error? {
+    Client socketClient = check new ("localhost", 9002, secureSocket = {
+        certificate: {path: certPath},
+        protocol: {
+            name: "TLS",
+            versions: ["TLSv1.2", "TLSv1.1"]
+        },
+        ciphers: ["TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA"]
+    }, timeoutInMillis = 100);
+
+    string msg = "Hello Ballerina Echo from secure client";
+    byte[] msgByteArray = msg.toBytes();
+    check socketClient->writeBytes(msgByteArray);
+
+    readonly & byte[] receivedData = check socketClient->readBytes();
+    test:assertEquals(check getString(receivedData), msg, "Found unexpected output");
+
     check socketClient->close();
 }
 
