@@ -48,7 +48,7 @@ public class SecureServer implements Runnable {
                         @Override
                         public void initChannel(SocketChannel ch)
                                 throws Exception {
-                            ch.pipeline().addLast(new ServerHandler());
+                            ch.pipeline().addLast(new SecureServerHandler());
                             // Set ssl handler
                             SslHandler handler = sslContext.newHandler(ch.alloc());
                             handler.engine().setEnabledProtocols(new String[]{"TLSv1.2" });

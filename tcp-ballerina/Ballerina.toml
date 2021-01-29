@@ -1,53 +1,53 @@
 [package]
 org = "ballerina"
 name = "tcp"
-version = "@toml.version@"
+version = "0.7.4"
 
 [[platform.java11.dependency]]
-path = "../tcp-native/build/libs/tcp-native-@project.version@.jar"
+path = "../tcp-native/build/libs/tcp-native-0.7.4-SNAPSHOT.jar"
 groupId = "ballerina"
 artifactId = "tcp"
-version = "@project.version@"
+version = "0.7.4-SNAPSHOT"
 
 [[platform.java11.dependency]]
-path = "../tcp-test-utils/build/libs/tcp-test-utils-@project.version@.jar"
+path = "../tcp-test-utils/build/libs/tcp-test-utils-0.7.4-SNAPSHOT.jar"
 groupId = "org.ballerinalang.stdlib.tcp"
 scope = "testOnly"
 artifactId = "tcp"
-version = "@project.version@"
+version = "0.7.4-SNAPSHOT"
 
 [[platform.java11.dependency]]
 artifactId = "netty-handler"
-version = "@netty.version@"
-path = "./build/libs/netty-handler-@netty.version@.jar"
+version = "4.1.50.Final"
+path = "./build/libs/netty-handler-4.1.50.Final.jar"
 groupId = "io.netty"
 
 [[platform.java11.dependency]]
 artifactId = "netty-buffer"
-version = "@netty.version@"
-path = "./build/libs/netty-buffer-@netty.version@.jar"
+version = "4.1.50.Final"
+path = "./build/libs/netty-buffer-4.1.50.Final.jar"
 groupId = "io.netty"
 
 [[platform.java11.dependency]]
 artifactId = "netty-transport"
-version = "@netty.version@"
-path = "./build/libs/netty-transport-@netty.version@.jar"
+version = "4.1.50.Final"
+path = "./build/libs/netty-transport-4.1.50.Final.jar"
 groupId = "io.netty"
 
 [[platform.java11.dependency]]
 artifactId = "netty-common"
-version = "@netty.version@"
-path = "./build/libs/netty-common-@netty.version@.jar"
+version = "4.1.50.Final"
+path = "./build/libs/netty-common-4.1.50.Final.jar"
 groupId = "io.netty"
 
 [[platform.java11.dependency]]
 artifactId = "netty-resolver"
-version = "@netty.version@"
-path = "./build/libs/netty-resolver-@netty.version@.jar"
+version = "4.1.50.Final"
+path = "./build/libs/netty-resolver-4.1.50.Final.jar"
 groupId = "io.netty"
 
 [[platform.java11.dependency]]
 artifactId = "netty-resolver"
-version = "@netty.version@"
-path = "./build/libs/netty-codec-@netty.version@.jar"
+version = "4.1.50.Final"
+path = "./build/libs/netty-codec-4.1.50.Final.jar"
 groupId = "io.netty"
