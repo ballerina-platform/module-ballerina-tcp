@@ -15,5 +15,6 @@ public class ServerHandler extends SimpleChannelInboundHandler<ByteBuf> {
         if (!buf.toString(CharsetUtil.UTF_8).equals("Do not reply")) {
             ctx.channel().writeAndFlush(buf);
         }
+        ctx.close();
     }
 }
