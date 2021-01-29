@@ -62,7 +62,10 @@ public client class Client {
                     break;
                 }
             } else {
-                _ = dataStream.close();
+                error? closeResult = dataStream.close();
+                if (closeResult is error) {
+                    return <GenericError>closeResult;
+                }
                 break;
             }
        }
