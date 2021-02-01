@@ -73,7 +73,8 @@ public class TcpListener {
                         callback.complete(Utils.createSocketError(cause.getMessage()));
                         ctx.close();
                     }
-                }).bind(localAddress).sync()
+                })
+                .bind(localAddress).sync()
                 .addListener((ChannelFutureListener) channelFuture -> {
                     if (channelFuture.isSuccess()) {
                         channel = channelFuture.channel();
@@ -96,9 +97,9 @@ public class TcpListener {
                 fromString(Constants.PROTOCOL_VERSIONS)).getStringArray();
         String[] ciphers = secureSocket.getArrayValue(StringUtils.fromString(Constants.CIPHERS)).getStringArray();
 
-        KeyStore ks = SecureSocketUtils.keystore(certificate == null ? null : certificate
+        KeyStore ks = SecureSocketUtils.keystore(certificate == null ? "" : certificate
                         .getStringValue(StringUtils.fromString(Constants.CERTIFICATE_PATH)).getValue(),
-                privateKey == null ? null : privateKey
+                privateKey == null ? "" : privateKey
                         .getStringValue(StringUtils.fromString(Constants.PRIVATE_KEY_PATH)).getValue());
         KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
         kmf.init(ks, Constants.KEY_STORE_PASSWORD.toCharArray());

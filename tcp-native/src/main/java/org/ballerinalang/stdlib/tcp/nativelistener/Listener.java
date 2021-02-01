@@ -70,7 +70,8 @@ public class Listener {
                 .fromString(Constants.SECURE_SOCKET));
         try {
             TcpService tcpService = (TcpService) listener.getNativeData(Constants.SERVICE);
-            TcpListener tcpListener = TcpFactory.createTcpListener(localAddress, balFuture, tcpService, secureSocket);
+            TcpListener tcpListener = TcpFactory.getInstance()
+                    .createTcpListener(localAddress, balFuture, tcpService, secureSocket);
             listener.addNativeData(Constants.LISTENER, tcpListener);
         } catch (Exception e) {
             balFuture.complete(Utils.createSocketError(e.getMessage()));

@@ -65,7 +65,8 @@ public class Client {
                 .fromString(Constants.SECURE_SOCKET));
 
         try {
-            TcpClient tcpClient = TcpFactory.createTcpClient(localAddress, remoteAddress, balFuture, secureSocket);
+            TcpClient tcpClient = TcpFactory.getInstance().
+                    createTcpClient(localAddress, remoteAddress, balFuture, secureSocket);
             client.addNativeData(Constants.CLIENT, tcpClient);
         } catch (Exception e) {
             balFuture.complete(Utils.createSocketError(e.getMessage()));

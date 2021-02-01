@@ -43,7 +43,9 @@ public class TcpClientHandler extends SimpleChannelInboundHandler<ByteBuf> {
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, ByteBuf msg) throws Exception {
         ctx.channel().pipeline().remove(Constants.READ_TIMEOUT_HANDLER);
-        callback.complete(Utils.returnReadOnlyBytes(msg));
+        if (callback != null) {
+            callback.complete(Utils.returnReadOnlyBytes(msg));
+        }
     }
 
     @Override
@@ -51,14 +53,18 @@ public class TcpClientHandler extends SimpleChannelInboundHandler<ByteBuf> {
         if (evt instanceof IdleStateEvent) {
             // return timeout error
             ctx.channel().pipeline().remove(Constants.READ_TIMEOUT_HANDLER);
-            callback.complete(Utils.createSocketError("Read timed out"));
+            if (callback != null) {
+                callback.complete(Utils.createSocketError("Read timed out"));
+            }
         }
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         ctx.channel().pipeline().remove(Constants.READ_TIMEOUT_HANDLER);
-        callback.complete(Utils.createSocketError(cause.getMessage()));
+        if (callback != null) {
+            callback.complete(Utils.createSocketError(cause.getMessage()));
+        }
     }
 
     public void setCallback(Future callback) {

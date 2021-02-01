@@ -63,9 +63,11 @@ public class SecureSocketUtils {
     public static KeyStore truststore(String certificateLocation) throws CertificateException, IOException,
             KeyStoreException, NoSuchAlgorithmException {
         // Load the certificate
-        InputStream inputStream = new FileInputStream(certificateLocation);
-        CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
-        X509Certificate cert = (X509Certificate) certificateFactory.generateCertificate(inputStream);
+        X509Certificate cert;
+        try (InputStream inputStream = new FileInputStream(certificateLocation)) {
+            CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
+            cert = (X509Certificate) certificateFactory.generateCertificate(inputStream);
+        }
 
         // Store the certificate key truststore
         KeyStore truststore = KeyStore.getInstance(KeyStore.getDefaultType());

@@ -96,6 +96,7 @@ public class Dispatcher {
                 case Constants.ON_BYTES:
                     Dispatcher.invokeOnBytes(tcpService, buffer, channel);
                     break;
+                default:break;
             }
         }
     }
