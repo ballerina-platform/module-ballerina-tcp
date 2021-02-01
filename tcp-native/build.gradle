@@ -68,7 +68,7 @@ spotbugsMain {
         html.enabled true
         text.enabled = true
     }
-    def excludeFile = file("${rootDir}/spotbugs-exclude.xml")
+    def excludeFile = file("${rootDir}/build-config/spotbugs-exclude.xml")
     if(excludeFile.exists()) {
         excludeFilter = excludeFile
     }

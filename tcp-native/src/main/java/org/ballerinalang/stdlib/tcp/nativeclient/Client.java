@@ -62,7 +62,7 @@ public class Client {
         client.addNativeData(Constants.CONFIG_READ_TIMEOUT, timeout);
 
         try {
-            TcpClient tcpClient = TcpFactory.createTcpClient(localAddress, remoteAddress, balFuture);
+            TcpClient tcpClient = TcpFactory.getInstance().createTcpClient(localAddress, remoteAddress, balFuture);
             client.addNativeData(Constants.CLIENT, tcpClient);
         } catch (Exception e) {
             balFuture.complete(Utils.createSocketError(e.getMessage()));
