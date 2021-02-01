@@ -73,3 +73,7 @@ spotbugsMain {
         excludeFilter = excludeFile
     }
 }
+
+spotbugsTest {
+    enabled = false
+}

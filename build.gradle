@@ -16,15 +16,15 @@
  */
 
 plugins {
-    id "com.github.spotbugs" version "4.0.5"
-    id "com.github.johnrengelman.shadow" version "5.2.0"
-    id "de.undercouch.download" version "4.0.4"
-    id "net.researchgate.release" version "2.8.0"
+    id "com.github.spotbugs" version "${githubSpotbugsVersion}"
+    id "com.github.johnrengelman.shadow" version "${githubJohnrengelmanShadowVersion}"
+    id "de.undercouch.download" version "${underCouchDownloadVersion}"
+    id "net.researchgate.release" version "${researchgateReleaseVersion}"
 }
 
 ext.puppycrawlCheckstyleVersion = project.puppycrawlCheckstyleVersion
 ext.ballerinaLangVersion = project.ballerinaLangVersion
-ext.slf4jVersion = "1.7.30"
+ext.slf4jVersion = project.slf4jVersion
 ext.stdlibIoVersion = project.stdlibIoVersion
 ext.stdlibLogVersion = project.stdlibLogVersion
 
