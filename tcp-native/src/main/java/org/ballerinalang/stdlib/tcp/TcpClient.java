@@ -22,7 +22,6 @@ import io.ballerina.runtime.api.Future;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.EventLoopGroup;
@@ -39,13 +38,11 @@ import java.util.concurrent.TimeUnit;
 public class TcpClient {
 
     private Channel channel;
-    private final EventLoopGroup group;
     private final Bootstrap clientBootstrap;
 
     public TcpClient(InetSocketAddress localAddress, InetSocketAddress remoteAddress, EventLoopGroup group,
                      Future callback)
             throws Exception {
-        this.group = group;
         clientBootstrap = new Bootstrap();
         clientBootstrap.group(group)
                 .channel(NioSocketChannel.class)
@@ -54,8 +51,8 @@ public class TcpClient {
                     protected void initChannel(SocketChannel ch) throws Exception {
                         ch.pipeline().addLast(Constants.CLIENT_HANDLER, new TcpClientHandler());
                     }
-                });
-        ChannelFuture future = clientBootstrap.connect(remoteAddress, localAddress).sync()
+                })
+                .connect(remoteAddress, localAddress).sync()
                 .addListener((ChannelFutureListener) channelFuture -> {
             if (channelFuture.isSuccess()) {
                 channelFuture.channel().config().setAutoRead(false);

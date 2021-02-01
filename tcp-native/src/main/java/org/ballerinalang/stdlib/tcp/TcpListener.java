@@ -22,7 +22,6 @@ import io.ballerina.runtime.api.Future;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.EventLoopGroup;
@@ -53,9 +52,8 @@ public class TcpListener {
                     protected void initChannel(SocketChannel ch) throws Exception {
                         ch.pipeline().addLast(Constants.LISTENER_HANDLER, new TcpListenerHandler(tcpService));
                     }
-                });
-
-        ChannelFuture future = listenerBootstrap.bind(localAddress).sync()
+                })
+                .bind(localAddress).sync()
                 .addListener((ChannelFutureListener) channelFuture -> {
             if (channelFuture.isSuccess()) {
                 channel = channelFuture.channel();

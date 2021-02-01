@@ -29,7 +29,7 @@ import java.net.InetSocketAddress;
  */
 public class TcpFactory {
 
-    private static TcpFactory tcpFactory;
+    private static volatile TcpFactory tcpFactory;
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;
 
@@ -39,19 +39,19 @@ public class TcpFactory {
         workerGroup = new NioEventLoopGroup(totalNumberOfThreads - totalNumberOfThreads / 4);
     }
 
-    private static TcpFactory getInstance() {
+    public static TcpFactory getInstance() {
         if (tcpFactory == null) {
             tcpFactory = new TcpFactory();
         }
         return tcpFactory;
     }
 
-    public static TcpClient createTcpClient(InetSocketAddress localAddress, InetSocketAddress remoteAddress,
+    public TcpClient createTcpClient(InetSocketAddress localAddress, InetSocketAddress remoteAddress,
                                             Future callback) throws Exception {
         return new TcpClient(localAddress, remoteAddress, getInstance().workerGroup, callback);
     }
 
-    public static TcpListener createTcpListener(InetSocketAddress localAddress, Future callback,
+    public TcpListener createTcpListener(InetSocketAddress localAddress, Future callback,
                                                 TcpService tcpService) throws Exception {
         return new TcpListener(localAddress, getInstance().bossGroup, getInstance().workerGroup, callback, tcpService);
     }
