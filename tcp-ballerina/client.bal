@@ -76,10 +76,11 @@ public client class Client {
 # + timeoutInMillis - The socket reading timeout value to be used 
 #                     in milliseconds. If this is not set,the default value
 #                     of 300000 milliseconds (5 minutes) will be used.
+# + secureSocket - secureSocket configuratoin.
 public type ClientConfig record {|
-    string? localHost = ();
+    string localHost?;
     int timeoutInMillis = 300000;
-    SecureSocket? secureSocket = ();
+    SecureSocket secureSocket?;
 |};
 
 isolated function initNewClient(Client clientObj, string remoteHost, int remotePort, ClientConfig config) 
