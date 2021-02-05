@@ -117,13 +117,13 @@ public class TcpClient {
 
     public void writeData(byte[] bytes, Future callback) throws InterruptedException {
         if (channel.isActive()) {
-            channel.writeAndFlush(Unpooled.wrappedBuffer(bytes)).addListener((ChannelFutureListener) future -> {
-                if (future.isSuccess()) {
-                    callback.complete(null);
-                } else {
-                    callback.complete(Utils.createSocketError("Failed to send data " + future.cause().getMessage()));
-                }
-            });
+            WriteCallbackService writeCallbackService = new WriteCallbackService(Unpooled.wrappedBuffer(bytes),
+                    callback, channel);
+            writeCallbackService.writeData();
+            if (!writeCallbackService.isWriteCalledForData()) {
+                TcpClientHandler tcpClientHandler = (TcpClientHandler) channel.pipeline().get(Constants.CLIENT_HANDLER);
+                tcpClientHandler.addWriteCallback(writeCallbackService);
+            }
         } else {
             callback.complete(Utils.createSocketError("Socket connection already closed."));
         }
