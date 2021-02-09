@@ -30,7 +30,7 @@ listener Listener closeServer = check new Listener(PORT3);
 
 service on echoServer {
 
-    remote function onConnect(Caller caller) returns ConnectionService {
+    isolated remote function onConnect(Caller caller) returns ConnectionService {
         io:println("Client connected to echoServer: ", caller.remotePort);
         return new EchoService(caller);
     }
@@ -39,7 +39,7 @@ service on echoServer {
 service class EchoService {
     Caller caller;
 
-    public function init(Caller c) {
+    public isolated function init(Caller c) {
         self.caller = c;
     }
 
@@ -48,18 +48,18 @@ service class EchoService {
         return data;
     }
 
-    remote function onError(readonly & Error err) returns Error? {
+    isolated remote function onError(readonly & Error err) returns Error? {
         io:println(err.message());
     }
 
-    remote function onClose() returns Error? {
+    isolated remote function onClose() returns Error? {
         io:println("invoke on close");
     }
 }
 
 service on discardServer {
 
-    remote function onConnect(Caller caller) returns ConnectionService {
+    isolated remote function onConnect(Caller caller) returns ConnectionService {
         io:println("Client connected to discardServer: ", caller.remotePort);
         return new DiscardService(caller);
     }
@@ -68,7 +68,7 @@ service on discardServer {
 service class DiscardService {
     Caller caller;
 
-    public function init(Caller c) {
+    public isolated function init(Caller c) {
         self.caller = c;
     }
 
@@ -77,16 +77,16 @@ service class DiscardService {
         io:println("Discard: ", getString(data));
     }
 
-    remote function onError(readonly & Error err) returns Error? {
+    isolated remote function onError(readonly & Error err) returns Error? {
         io:println(err.message());
     }
 
-    remote function onClose() returns Error? {
+    isolated remote function onClose() returns Error? {
     }
 }
 
 service on closeServer {
-    remote function onConnect(Caller caller) returns ConnectionService|Error {
+    isolated remote function onConnect(Caller caller) returns ConnectionService|Error {
         io:println("Client connected to closeServer: ", caller.remotePort);
         check caller->close();
         return new EchoService(caller);
@@ -96,7 +96,7 @@ service on closeServer {
 service class closeService {
     Caller caller;
 
-    public function init(Caller c) {
+    public isolated function init(Caller c) {
         self.caller = c;
     }
 }
@@ -111,7 +111,7 @@ service on new Listener(PORT4, secureSocket = {
     ciphers: ["TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA"]
 }) {
 
-    remote function onConnect(Caller caller) returns ConnectionService {
+    isolated remote function onConnect(Caller caller) returns ConnectionService {
         io:println("Client connected to secureEchoServer: ", caller.remotePort);
         return new EchoService(caller);
     }
