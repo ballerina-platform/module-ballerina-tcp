@@ -62,9 +62,11 @@ public class TcpListener {
                 .childHandler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel ch) throws Exception {
-                        ch.pipeline().addLast(Constants.LISTENER_HANDLER, new TcpListenerHandler(tcpService));
+                        TcpListenerHandler tcpListenerHandler = new TcpListenerHandler(tcpService);
                         if (secureSocket != null) {
-                            setSSLHandler(ch, secureSocket);
+                            setSSLHandler(ch, secureSocket, tcpListenerHandler);
+                        } else {
+                            ch.pipeline().addLast(Constants.LISTENER_HANDLER, tcpListenerHandler);
                         }
                     }
 
@@ -85,8 +87,8 @@ public class TcpListener {
                 });
     }
 
-    private void setSSLHandler(SocketChannel channel, BMap<BString, Object> secureSocket)
-            throws GeneralSecurityException, IOException {
+    private void setSSLHandler(SocketChannel channel, BMap<BString, Object> secureSocket,
+                               TcpListenerHandler tcpListenerHandler) throws GeneralSecurityException, IOException {
         BMap<BString, Object> certificate = (BMap<BString, Object>) secureSocket.getMapValue(StringUtils
                 .fromString(Constants.CERTIFICATE));
         BMap<BString, Object> privateKey = (BMap<BString, Object>) secureSocket.getMapValue(StringUtils
@@ -113,6 +115,7 @@ public class TcpListener {
             sslHandler.engine().setEnabledCipherSuites(ciphers);
         }
         channel.pipeline().addFirst(Constants.SSL_HANDLER, sslHandler);
+        channel.pipeline().addLast(Constants.SSL_HANDSHAKE_HANDLER, new SslHandshakeEventHandler(tcpListenerHandler));
     }
 
     // Invoke when the caller call writeBytes
