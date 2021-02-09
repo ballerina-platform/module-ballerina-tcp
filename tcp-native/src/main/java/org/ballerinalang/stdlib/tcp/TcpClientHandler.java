@@ -49,8 +49,8 @@ public class TcpClientHandler extends SimpleChannelInboundHandler<ByteBuf> {
     }
 
     @Override
-    public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
-        if (evt instanceof IdleStateEvent) {
+    public void userEventTriggered(ChannelHandlerContext ctx, Object event) throws Exception {
+        if (event instanceof IdleStateEvent) {
             // return timeout error
             ctx.channel().pipeline().remove(Constants.READ_TIMEOUT_HANDLER);
             if (callback != null) {

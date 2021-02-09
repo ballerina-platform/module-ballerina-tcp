@@ -8,9 +8,8 @@ import org.ballerinalang.stdlib.tcp.nativeclient.Client;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 /**
- * Class to handler ssl handshake event.
+ * Class to handler SSL handshake event.
  */
 public class SslHandshakeEventHandler extends ChannelInboundHandlerAdapter {
     private TcpListenerHandler tcpListenerHandler;
@@ -25,11 +24,10 @@ public class SslHandshakeEventHandler extends ChannelInboundHandlerAdapter {
         tcpClientHandler = handler;
     }
 
-
     @Override
-    public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
-        if (evt instanceof SslHandshakeCompletionEvent) {
-            if (((SslHandshakeCompletionEvent) evt).isSuccess()) {
+    public void userEventTriggered(ChannelHandlerContext ctx, Object event) throws Exception {
+        if (event instanceof SslHandshakeCompletionEvent) {
+            if (((SslHandshakeCompletionEvent) event).isSuccess()) {
                 ctx.pipeline().addLast(Constants.FLOW_CONTROL_HANDLER, new FlowControlHandler());
                 if (tcpClientHandler != null) {
                     ctx.pipeline().addLast(Constants.CLIENT_HANDLER, tcpClientHandler);
