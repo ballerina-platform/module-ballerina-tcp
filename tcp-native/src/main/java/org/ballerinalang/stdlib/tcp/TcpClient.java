@@ -64,9 +64,11 @@ public class TcpClient {
                 .handler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel ch) throws Exception {
-                        ch.pipeline().addLast(Constants.CLIENT_HANDLER, new TcpClientHandler());
+                        TcpClientHandler tcpClientHandler = new TcpClientHandler();
                         if (secureSocket != null) {
-                            setSSLHandler(ch, secureSocket);
+                            setSSLHandler(ch, secureSocket, tcpClientHandler);
+                        } else {
+                            ch.pipeline().addLast(Constants.CLIENT_HANDLER, tcpClientHandler);
                         }
                     }
 
@@ -88,8 +90,9 @@ public class TcpClient {
                 });
     }
 
-    private void setSSLHandler(SocketChannel channel, BMap<BString, Object> secureSocket)
-            throws NoSuchAlgorithmException, CertificateException, KeyStoreException, IOException {
+    private void setSSLHandler(SocketChannel channel, BMap<BString, Object> secureSocket,
+                               TcpClientHandler tcpClientHandler) throws NoSuchAlgorithmException, CertificateException,
+            KeyStoreException, IOException {
         BMap<BString, Object> certificate = (BMap<BString, Object>) secureSocket.getMapValue(StringUtils
                 .fromString(Constants.CERTIFICATE));
         BMap<BString, Object> protocol = (BMap<BString, Object>) secureSocket.getMapValue(StringUtils
@@ -113,6 +116,7 @@ public class TcpClient {
             sslHandler.engine().setEnabledCipherSuites(ciphers);
         }
         channel.pipeline().addFirst(Constants.SSL_HANDLER, sslHandler);
+        channel.pipeline().addLast(Constants.SSL_HANDSHAKE_HANDLER, new SslHandshakeEventHandler(tcpClientHandler));
     }
 
     public void writeData(byte[] bytes, Future callback) throws InterruptedException {
