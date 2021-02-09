@@ -16,9 +16,13 @@
 
 import ballerina/io;
 
+configurable string keyPath = ?;
+configurable string certPath = ?;
+
 const int PORT1 = 8809;
 const int PORT2 = 8023;
 const int PORT3 = 8639;
+const int PORT4 = 8641;
 
 listener Listener echoServer = check new Listener(PORT1);
 listener Listener discardServer = check new Listener(PORT2);
@@ -26,7 +30,7 @@ listener Listener closeServer = check new Listener(PORT3);
 
 service on echoServer {
 
-    remote function onConnect(Caller caller) returns ConnectionService {
+    isolated remote function onConnect(Caller caller) returns ConnectionService {
         io:println("Client connected to echoServer: ", caller.remotePort);
         return new EchoService(caller);
     }
@@ -35,26 +39,27 @@ service on echoServer {
 service class EchoService {
     Caller caller;
 
-    public function init(Caller c) {self.caller = c;}
+    public isolated function init(Caller c) {
+        self.caller = c;
+    }
 
     remote function onBytes(readonly & byte[] data) returns (readonly & byte[])|Error? {
         io:println("Echo: ", getString(data));
         return data;
     }
 
-    remote function onError(readonly & Error err) returns Error? {
+    isolated remote function onError(readonly & Error err) returns Error? {
         io:println(err.message());
     }
 
-    remote function onClose() returns Error? {
+    isolated remote function onClose() returns Error? {
         io:println("invoke on close");
     }
 }
 
-
 service on discardServer {
 
-    remote function onConnect(Caller caller) returns ConnectionService {
+    isolated remote function onConnect(Caller caller) returns ConnectionService {
         io:println("Client connected to discardServer: ", caller.remotePort);
         return new DiscardService(caller);
     }
@@ -63,22 +68,25 @@ service on discardServer {
 service class DiscardService {
     Caller caller;
 
-    public function init(Caller c) {self.caller = c;}
+    public isolated function init(Caller c) {
+        self.caller = c;
+    }
 
     remote function onBytes(readonly & byte[] data) returns Error? {
         // read and discard the message
         io:println("Discard: ", getString(data));
     }
 
-    remote function onError(readonly & Error err) returns Error? {
+    isolated remote function onError(readonly & Error err) returns Error? {
         io:println(err.message());
     }
 
-    remote function onClose() returns Error? {}
+    isolated remote function onClose() returns Error? {
+    }
 }
 
 service on closeServer {
-    remote function onConnect(Caller caller) returns ConnectionService|Error {
+    isolated remote function onConnect(Caller caller) returns ConnectionService|Error {
         io:println("Client connected to closeServer: ", caller.remotePort);
         check caller->close();
         return new EchoService(caller);
@@ -88,6 +96,23 @@ service on closeServer {
 service class closeService {
     Caller caller;
 
-    public function init(Caller c) {self.caller = c;}
+    public isolated function init(Caller c) {
+        self.caller = c;
+    }
+}
 
+service on new Listener(PORT4, secureSocket = {
+    certificate: {path: certPath},
+    privateKey: {path: keyPath},
+    protocol: {
+        name: "TLS",
+        versions: ["TLSv1.2", "TLSv1.1"]
+    },
+    ciphers: ["TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA"]
+}) {
+
+    isolated remote function onConnect(Caller caller) returns ConnectionService {
+        io:println("Client connected to secureEchoServer: ", caller.remotePort);
+        return new EchoService(caller);
+    }
 }

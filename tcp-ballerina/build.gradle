@@ -43,6 +43,9 @@ dependencies {
     externalJars (group: 'io.netty', name: 'netty-resolver', version: "${nettyVersion}") {
         transitive = false
     }
+    externalJars (group: 'io.netty', name: 'netty-codec', version: "${nettyVersion}") {
+        transitive = false
+    }
     compile project(':tcp-native')
 }
 

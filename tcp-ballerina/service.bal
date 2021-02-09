@@ -16,7 +16,7 @@
 
 # Represent TCP Listener service type.
 public type Service service object {
-  remote function onConnect(Caller caller) returns ConnectionService|Error;
+  remote function onConnect(Caller caller) returns ConnectionService|Error?;
 };
 
 # Represent TCP Listener ConnectionService service type.
@@ -24,6 +24,6 @@ public type ConnectionService service object {
   // ConnectionService can have these optional remote methods
   // remote function onError(readonly & Error err) returns Error?;
   // remote function onBytes(readonly & byte[] data) returns Error?;
-  //remote function onBlockAsStream(readonly & stream<byte[]> dataStream) returns Error?;
+  // remote function onBlockAsStream(readonly & stream<byte[]> dataStream) returns Error?;
   // remote function onClose() returns Error?;
 };

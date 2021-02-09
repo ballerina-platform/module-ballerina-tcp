@@ -32,6 +32,7 @@ dependencies {
     compile group: 'io.netty', name: 'netty-transport', version: "${nettyVersion}"
     compile group: 'io.netty', name: 'netty-common', version: "${nettyVersion}"
     compile group: 'io.netty', name: 'netty-resolver', version: "${nettyVersion}"
+    compile group: 'io.netty', name: 'netty-codec', version: "${nettyVersion}"
     compile group: 'org.ballerinalang', name: 'ballerina-lang', version: "${ballerinaLangVersion}"
     compile group: 'org.ballerinalang', name: 'ballerina-runtime', version: "${ballerinaLangVersion}"
     compile group: 'org.ballerinalang', name: 'ballerina-tools-api', version: "${ballerinaLangVersion}"

@@ -5,7 +5,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.util.CharsetUtil;
 
-public class ServerHandler extends SimpleChannelInboundHandler<ByteBuf> {
+public class SecureServerHandler extends SimpleChannelInboundHandler<ByteBuf> {
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, ByteBuf buf) throws Exception {
@@ -13,5 +13,10 @@ public class ServerHandler extends SimpleChannelInboundHandler<ByteBuf> {
         if (!buf.toString(CharsetUtil.UTF_8).equals("Do not reply")) {
             ctx.channel().writeAndFlush(buf);
         }
+    }
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        System.out.println("Test server : " + cause.getMessage());
     }
 }

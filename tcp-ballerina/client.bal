@@ -43,7 +43,7 @@ public client class Client {
     remote function writeBytes(byte[] data) returns Error? {
         return externWriteBytes(self, data);
     }
- 
+
     // remote function writeBlocksFromStream(stream<byte[]> dataStream) returns Error? { }
 
     # Reads data only from the connected remote host. 
@@ -56,7 +56,7 @@ public client class Client {
     remote function readBytes() returns (readonly & byte[])|Error {
         return externReadBytes(self);
     }
- 
+
     // remote function readBlocksAsStream() returns stream<byte[]>|Error { }
 
     # Free up the occupied socket.
@@ -76,37 +76,35 @@ public client class Client {
 # + timeoutInMillis - The socket reading timeout value to be used 
 #                     in milliseconds. If this is not set,the default value
 #                     of 300000 milliseconds (5 minutes) will be used.
+# + secureSocket - secureSocket configuratoin.
 public type ClientConfig record {|
-    string? localHost = ();
+    string localHost?;
     int timeoutInMillis = 300000;
+    SecureSocket secureSocket?;
 |};
 
-isolated function initNewClient(Client clientObj, string remoteHost, int remotePort, ClientConfig config) returns Error? =
-@java:Method {
+isolated function initNewClient(Client clientObj, string remoteHost, int remotePort, ClientConfig config) 
+returns Error? = @java:Method {
     name: "init",
     'class: "org.ballerinalang.stdlib.tcp.nativeclient.Client"
 } external;
 
-isolated function externWriteBytes(Client clientObj, byte[] content) returns Error? =
-@java:Method {
+isolated function externWriteBytes(Client clientObj, byte[] content) returns Error? = @java:Method {
     name: "writeBytes",
     'class: "org.ballerinalang.stdlib.tcp.nativeclient.Client"
 } external;
 
-isolated function externReadBytes(Client clientObj) returns (readonly & byte[])|Error =
-@java:Method {
+isolated function externReadBytes(Client clientObj) returns (readonly & byte[])|Error = @java:Method {
     name: "readBytes",
     'class: "org.ballerinalang.stdlib.tcp.nativeclient.Client"
 } external;
 
-isolated function externReadBlocksAsStream(Client clientObj) returns stream<byte[]>|Error =
-@java:Method {
+isolated function externReadBlocksAsStream(Client clientObj) returns stream<byte[]>|Error = @java:Method {
     name: "readBlocksAsStream",
     'class: "org.ballerinalang.stdlib.tcp.nativeclient.Client"
 } external;
 
-isolated function externClose(Client clientObj) returns Error? =
-@java:Method {
+isolated function externClose(Client clientObj) returns Error? = @java:Method {
     name: "close",
     'class: "org.ballerinalang.stdlib.tcp.nativeclient.Client"
 } external;
