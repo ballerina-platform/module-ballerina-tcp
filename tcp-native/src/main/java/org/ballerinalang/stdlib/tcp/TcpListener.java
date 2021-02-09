@@ -53,7 +53,7 @@ public class TcpListener {
     private final ServerBootstrap listenerBootstrap;
 
     public TcpListener(InetSocketAddress localAddress, EventLoopGroup bossGroup, EventLoopGroup workerGroup,
-                       Future callback, TcpService tcpService, BMap<BString, Object> secureSocket) throws Exception {
+                       Future callback, TcpService tcpService, BMap<BString, Object> secureSocket) {
         this.bossGroup = bossGroup;
         this.workerGroup = workerGroup;
         listenerBootstrap = new ServerBootstrap();
@@ -76,7 +76,7 @@ public class TcpListener {
                         ctx.close();
                     }
                 })
-                .bind(localAddress).sync()
+                .bind(localAddress)
                 .addListener((ChannelFutureListener) channelFuture -> {
                     if (channelFuture.isSuccess()) {
                         channel = channelFuture.channel();
@@ -161,9 +161,9 @@ public class TcpListener {
     }
 
     // Close caller
-    public static void close(Channel channel, Future callback) throws Exception {
+    public static void close(Channel channel, Future callback) {
         if (channel != null) {
-            channel.close().sync().addListener((ChannelFutureListener) future -> {
+            channel.close().addListener((ChannelFutureListener) future -> {
                 if (future.isSuccess()) {
                     callback.complete(null);
                 } else {
@@ -174,8 +174,8 @@ public class TcpListener {
     }
 
     // Shutdown the server
-    public void close(Future callback) throws InterruptedException {
-        channel.close().sync().addListener((ChannelFutureListener) future -> {
+    public void close(Future callback) {
+        channel.close().addListener((ChannelFutureListener) future -> {
             if (future.isSuccess()) {
                 callback.complete(null);
             } else {

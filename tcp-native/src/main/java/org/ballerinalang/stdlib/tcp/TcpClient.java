@@ -56,8 +56,7 @@ public class TcpClient {
     private final Bootstrap clientBootstrap;
 
     public TcpClient(InetSocketAddress localAddress, InetSocketAddress remoteAddress, EventLoopGroup group,
-                     Future callback, BMap<BString, Object> secureSocket)
-            throws Exception {
+                     Future callback, BMap<BString, Object> secureSocket) {
         clientBootstrap = new Bootstrap();
         clientBootstrap.group(group)
                 .channel(NioSocketChannel.class)
@@ -78,7 +77,7 @@ public class TcpClient {
                         ctx.close();
                     }
                 })
-                .connect(remoteAddress, localAddress).sync()
+                .connect(remoteAddress, localAddress)
                 .addListener((ChannelFutureListener) channelFuture -> {
                     if (channelFuture.isSuccess()) {
                         channelFuture.channel().config().setAutoRead(false);
@@ -119,7 +118,7 @@ public class TcpClient {
         channel.pipeline().addLast(Constants.SSL_HANDSHAKE_HANDLER, new SslHandshakeEventHandler(tcpClientHandler));
     }
 
-    public void writeData(byte[] bytes, Future callback) throws InterruptedException {
+    public void writeData(byte[] bytes, Future callback) {
         if (channel.isActive()) {
             WriteCallbackService writeCallbackService = new WriteCallbackService(Unpooled.wrappedBuffer(bytes),
                     callback, channel);
@@ -133,7 +132,7 @@ public class TcpClient {
         }
     }
 
-    public void readData(long readTimeout, Future callback) throws InterruptedException {
+    public void readData(long readTimeout, Future callback) {
         if (channel.isActive()) {
             channel.pipeline().addFirst(Constants.READ_TIMEOUT_HANDLER, new IdleStateHandler(readTimeout, 0, 0,
                     TimeUnit.MILLISECONDS));
@@ -145,12 +144,19 @@ public class TcpClient {
         }
     }
 
-    public void close() throws InterruptedException {
+    public void close(Future callback) {
         // If channel disconnected already then handler value is null
         TcpClientHandler handler = (TcpClientHandler) channel.pipeline().get(Constants.CLIENT_HANDLER);
         if (handler != null) {
             handler.setIsCloseTriggered();
         }
-        channel.close().sync();
+        channel.close().addListener((ChannelFutureListener) future -> {
+            if (future.isSuccess()) {
+                callback.complete(null);
+            } else {
+                callback.complete(Utils.createSocketError("Unable to close the  TCP client. "
+                        + future.cause().getMessage()));
+            }
+        });
     }
 }
