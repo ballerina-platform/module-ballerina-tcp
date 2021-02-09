@@ -35,12 +35,9 @@ import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.SslHandler;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.security.GeneralSecurityException;
-import java.security.KeyStore;
-
-import javax.net.ssl.KeyManagerFactory;
 
 /**
  * {@link TcpListener} creates the tcp client and handles all the network operations.
@@ -88,7 +85,7 @@ public class TcpListener {
     }
 
     private void setSSLHandler(SocketChannel channel, BMap<BString, Object> secureSocket,
-                               TcpListenerHandler tcpListenerHandler) throws GeneralSecurityException, IOException {
+                               TcpListenerHandler tcpListenerHandler) throws IOException {
         BMap<BString, Object> certificate = (BMap<BString, Object>) secureSocket.getMapValue(StringUtils
                 .fromString(Constants.CERTIFICATE));
         BMap<BString, Object> privateKey = (BMap<BString, Object>) secureSocket.getMapValue(StringUtils
@@ -99,13 +96,10 @@ public class TcpListener {
                 fromString(Constants.PROTOCOL_VERSIONS)).getStringArray();
         String[] ciphers = secureSocket.getArrayValue(StringUtils.fromString(Constants.CIPHERS)).getStringArray();
 
-        KeyStore ks = SecureSocketUtils.keystore(certificate == null ? "" : certificate
-                        .getStringValue(StringUtils.fromString(Constants.CERTIFICATE_PATH)).getValue(),
-                privateKey == null ? "" : privateKey
-                        .getStringValue(StringUtils.fromString(Constants.PRIVATE_KEY_PATH)).getValue());
-        KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-        kmf.init(ks, Constants.KEY_STORE_PASSWORD.toCharArray());
-        SslContext sslContext = SslContextBuilder.forServer(kmf).build();
+        SslContext sslContext = SslContextBuilder.forServer(
+                new File(certificate.getStringValue(StringUtils.fromString(Constants.CERTIFICATE_PATH)).getValue()),
+                new File(privateKey.getStringValue(StringUtils.fromString(Constants.PRIVATE_KEY_PATH)).getValue()))
+                .build();
 
         SslHandler sslHandler = sslContext.newHandler(channel.alloc());
         if (protocolVersions.length > 0) {
