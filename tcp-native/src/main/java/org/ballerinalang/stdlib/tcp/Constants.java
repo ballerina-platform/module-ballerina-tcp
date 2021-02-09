@@ -32,6 +32,9 @@ public class Constants {
     public static final String READ_TIMEOUT_HANDLER = "readTimeoutHandler";
     public static final String CLIENT_HANDLER = "clientHandler";
     public static final String SSL_HANDLER = "SSL_Handler";
+    public static final String SSL_HANDSHAKE_HANDLER = "SSL_handshakeHandler";
+    public static final String FLOW_CONTROL_HANDLER = "flowControlHandler";
+
 
     // Remote method names
     public static final String ON_BYTES = "onBytes";

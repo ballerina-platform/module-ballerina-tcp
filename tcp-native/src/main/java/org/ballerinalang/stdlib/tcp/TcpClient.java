@@ -64,9 +64,10 @@ public class TcpClient {
                 .handler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel ch) throws Exception {
-                        ch.pipeline().addLast(Constants.CLIENT_HANDLER, new TcpClientHandler());
                         if (secureSocket != null) {
                             setSSLHandler(ch, secureSocket);
+                        } else {
+                            ch.pipeline().addLast(Constants.CLIENT_HANDLER, new TcpClientHandler());
                         }
                     }
 
@@ -113,6 +114,7 @@ public class TcpClient {
             sslHandler.engine().setEnabledCipherSuites(ciphers);
         }
         channel.pipeline().addFirst(Constants.SSL_HANDLER, sslHandler);
+        channel.pipeline().addLast(Constants.SSL_HANDSHAKE_HANDLER, new SslHandshakeEventHandler());
     }
 
     public void writeData(byte[] bytes, Future callback) throws InterruptedException {
