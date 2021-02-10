@@ -120,12 +120,12 @@ public class TcpClient {
 
     public void writeData(byte[] bytes, Future callback) {
         if (channel.isActive()) {
-            WriteCallbackService writeCallbackService = new WriteCallbackService(Unpooled.wrappedBuffer(bytes),
+            WriteFlowController writeFlowController = new WriteFlowController(Unpooled.wrappedBuffer(bytes),
                     callback, channel);
-            writeCallbackService.writeData();
-            if (!writeCallbackService.isWriteCalledForData()) {
+            writeFlowController.writeData();
+            if (!writeFlowController.isWriteCalledForData()) {
                 TcpClientHandler tcpClientHandler = (TcpClientHandler) channel.pipeline().get(Constants.CLIENT_HANDLER);
-                tcpClientHandler.addWriteCallback(writeCallbackService);
+                tcpClientHandler.addWriteFlowControl(writeFlowController);
             }
         } else {
             callback.complete(Utils.createSocketError("Socket connection already closed."));

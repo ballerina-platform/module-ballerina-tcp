@@ -121,13 +121,13 @@ public class TcpListener {
     // Invoke when the caller call writeBytes
     public static void send(byte[] bytes, Channel channel, Future callback, TcpService tcpService) {
         if (!tcpService.getIsCallerClosed() && channel.isActive()) {
-            WriteCallbackService writeCallbackService = new WriteCallbackService(Unpooled.wrappedBuffer(bytes),
+            WriteFlowController writeFlowController = new WriteFlowController(Unpooled.wrappedBuffer(bytes),
                     callback, channel);
-            writeCallbackService.writeData();
-            if (!writeCallbackService.isWriteCalledForData()) {
+            writeFlowController.writeData();
+            if (!writeFlowController.isWriteCalledForData()) {
                 TcpListenerHandler tcpListenerHandler = (TcpListenerHandler) channel
                         .pipeline().get(Constants.LISTENER_HANDLER);
-                tcpListenerHandler.addWriteCallback(writeCallbackService);
+                tcpListenerHandler.addWriteFlowControl(writeFlowController);
             }
         } else {
             callback.complete(Utils.createSocketError("Socket connection already closed."));
@@ -137,13 +137,13 @@ public class TcpListener {
     // Invoke when the listener onBytes return readonly & byte[]
     public static void send(byte[] bytes, Channel channel, TcpService tcpService) {
         if (!tcpService.getIsCallerClosed() && channel.isActive()) {
-            WriteCallbackService writeCallbackService = new WriteCallbackService(Unpooled.wrappedBuffer(bytes),
+            WriteFlowController writeFlowController = new WriteFlowController(Unpooled.wrappedBuffer(bytes),
                     tcpService, channel);
-            writeCallbackService.writeData();
-            if (!writeCallbackService.isWriteCalledForData()) {
+            writeFlowController.writeData();
+            if (!writeFlowController.isWriteCalledForData()) {
                 TcpListenerHandler tcpListenerHandler = (TcpListenerHandler) channel
                         .pipeline().get(Constants.LISTENER_HANDLER);
-                tcpListenerHandler.addWriteCallback(writeCallbackService);
+                tcpListenerHandler.addWriteFlowControl(writeFlowController);
             }
         } else {
             Dispatcher.invokeOnError(tcpService, "Socket connection already closed.");

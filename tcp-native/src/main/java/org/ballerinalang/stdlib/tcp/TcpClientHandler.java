@@ -33,7 +33,7 @@ public class TcpClientHandler extends SimpleChannelInboundHandler<ByteBuf> {
 
     private Future callback;
     private boolean isCloseTriggered = false;
-    private LinkedList<WriteCallbackService> writeCallbackServices = new LinkedList<>();
+    private LinkedList<WriteFlowController> writeFlowControllers = new LinkedList<>();
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
@@ -72,12 +72,12 @@ public class TcpClientHandler extends SimpleChannelInboundHandler<ByteBuf> {
 
     @Override
     public void channelWritabilityChanged(ChannelHandlerContext ctx) throws Exception {
-        if (ctx.channel().isWritable() && writeCallbackServices.size() > 0) {
-            WriteCallbackService writeCallbackService = writeCallbackServices.getFirst();
-            if (writeCallbackService != null) {
-                writeCallbackService.writeData();
-                if (writeCallbackService.isWriteCalledForData()) {
-                    writeCallbackServices.remove(writeCallbackService);
+        if (ctx.channel().isWritable() && writeFlowControllers.size() > 0) {
+            WriteFlowController writeFlowController = writeFlowControllers.getFirst();
+            if (writeFlowController != null) {
+                writeFlowController.writeData();
+                if (writeFlowController.isWriteCalledForData()) {
+                    writeFlowControllers.remove(writeFlowController);
                 }
             }
         }
@@ -91,8 +91,8 @@ public class TcpClientHandler extends SimpleChannelInboundHandler<ByteBuf> {
         isCloseTriggered = true;
     }
 
-    public void addWriteCallback(WriteCallbackService writeCallbackService) {
-        writeCallbackServices.addLast(writeCallbackService);
+    public void addWriteFlowControl(WriteFlowController writeFlowController) {
+        writeFlowControllers.addLast(writeFlowController);
     }
 }
 
