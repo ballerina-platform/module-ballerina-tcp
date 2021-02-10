@@ -10,27 +10,24 @@ import io.netty.channel.ChannelFutureListener;
  * WriteCallbackService used to write data via channelPipeline.
  */
 public class WriteFlowController {
-    private Channel channel;
     private ByteBuf buffer;
     private Future balWriteCallback;
     private TcpService tcpService;
     private boolean writeCalled;
 
-    WriteFlowController(ByteBuf buffer, Future callback, Channel channel) {
+    WriteFlowController(ByteBuf buffer, Future callback) {
         this.balWriteCallback = callback;
-        this.channel = channel;
         this.buffer = buffer;
         this.writeCalled = false;
     }
 
-    public WriteFlowController(ByteBuf buffer, TcpService tcpService, Channel channel) {
+    public WriteFlowController(ByteBuf buffer, TcpService tcpService) {
         this.tcpService = tcpService;
-        this.channel = channel;
         this.buffer = buffer;
         this.writeCalled = false;
     }
 
-    public synchronized void writeData() {
+    public synchronized void writeData(Channel channel) {
         if (channel.isWritable()) {
             channel.writeAndFlush(buffer).addListener((ChannelFutureListener) future -> {
                 if (balWriteCallback != null) {

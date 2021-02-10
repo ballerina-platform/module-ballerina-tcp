@@ -120,9 +120,8 @@ public class TcpClient {
 
     public void writeData(byte[] bytes, Future callback) {
         if (channel.isActive()) {
-            WriteFlowController writeFlowController = new WriteFlowController(Unpooled.wrappedBuffer(bytes),
-                    callback, channel);
-            writeFlowController.writeData();
+            WriteFlowController writeFlowController = new WriteFlowController(Unpooled.wrappedBuffer(bytes), callback);
+            writeFlowController.writeData(channel);
             if (!writeFlowController.isWriteCalledForData()) {
                 TcpClientHandler tcpClientHandler = (TcpClientHandler) channel.pipeline().get(Constants.CLIENT_HANDLER);
                 tcpClientHandler.addWriteFlowControl(writeFlowController);

@@ -63,7 +63,7 @@ public class TcpListenerHandler extends SimpleChannelInboundHandler<ByteBuf> {
         if (ctx.channel().isWritable() && writeFlowControllers.size() > 0) {
             WriteFlowController writeFlowController = writeFlowControllers.getFirst();
             if (writeFlowController != null) {
-                writeFlowController.writeData();
+                writeFlowController.writeData(ctx.channel());
                 if (writeFlowController.isWriteCalledForData()) {
                     writeFlowControllers.remove(writeFlowController);
                 }
