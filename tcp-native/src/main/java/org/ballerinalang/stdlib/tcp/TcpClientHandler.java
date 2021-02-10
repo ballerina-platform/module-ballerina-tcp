@@ -72,10 +72,12 @@ public class TcpClientHandler extends SimpleChannelInboundHandler<ByteBuf> {
 
     @Override
     public void channelWritabilityChanged(ChannelHandlerContext ctx) throws Exception {
-        if (ctx.channel().isWritable() && writeFlowControllers.size() > 0) {
-            WriteFlowController writeFlowController = writeFlowControllers.getFirst();
-            if (writeFlowController != null) {
-                writeFlowController.writeData(ctx.channel(), writeFlowControllers);
+        if (ctx.channel().isWritable()) {
+            while (writeFlowControllers.size() > 0) {
+                WriteFlowController writeFlowController = writeFlowControllers.getFirst();
+                if (writeFlowController != null) {
+                    writeFlowController.writeData(ctx.channel(), writeFlowControllers);
+                }
             }
         }
     }

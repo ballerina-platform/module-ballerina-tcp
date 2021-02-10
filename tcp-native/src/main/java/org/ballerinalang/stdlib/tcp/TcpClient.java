@@ -137,24 +137,6 @@ public class TcpClient {
         }
     }
 
-    private TcpClientHandler getTcpClientHandler(Future callback) {
-        TcpClientHandler tcpClientHandler = (TcpClientHandler) channel.pipeline().get(Constants.CLIENT_HANDLER);
-        if (tcpClientHandler == null) {
-            SslHandler sslHandler = (SslHandler) channel.pipeline().get(Constants.SSL_HANDLER);
-            while (!sslHandler.handshakeFuture().isDone()) {
-            }
-            if (!sslHandler.handshakeFuture().isSuccess()) {
-                callback.complete(Utils.createSocketError(sslHandler.handshakeFuture().cause().getMessage()));
-                return null;
-            } else {
-                while (tcpClientHandler == null) {
-                    tcpClientHandler = (TcpClientHandler) channel.pipeline().get(Constants.CLIENT_HANDLER);
-                }
-            }
-        }
-        return tcpClientHandler;
-    }
-
     public void readData(long readTimeout, Future callback) {
         if (channel.isActive()) {
             channel.pipeline().addFirst(Constants.READ_TIMEOUT_HANDLER, new IdleStateHandler(readTimeout, 0, 0,

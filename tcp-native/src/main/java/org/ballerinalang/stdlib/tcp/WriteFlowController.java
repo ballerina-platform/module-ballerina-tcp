@@ -12,20 +12,20 @@ import java.util.LinkedList;
  * WriteFlowController used to write data via channelPipeline.
  */
 public class WriteFlowController {
-    protected ByteBuf buffer;
+    protected ByteBuf sendBuffer;
     private Future balWriteCallback;
 
     WriteFlowController(ByteBuf buffer, Future callback) {
         this.balWriteCallback = callback;
-        this.buffer = buffer;
+        this.sendBuffer = buffer;
     }
 
     public WriteFlowController(ByteBuf buffer) {
-        this.buffer = buffer;
+        this.sendBuffer = buffer;
     }
 
     public synchronized void writeData(Channel channel, LinkedList<WriteFlowController> writeFlowControllers) {
-        channel.writeAndFlush(buffer).addListener((ChannelFutureListener) future -> {
+        channel.writeAndFlush(sendBuffer).addListener((ChannelFutureListener) future -> {
             completeCallback(future);
         });
         writeFlowControllers.remove(this);
