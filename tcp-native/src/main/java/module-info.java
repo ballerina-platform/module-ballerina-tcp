@@ -24,6 +24,7 @@ module io.ballerina.stdlib.socket {
     requires io.netty.transport;
     requires io.netty.handler;
     requires io.netty.buffer;
+    requires io.netty.common;
     exports org.ballerinalang.stdlib.tcp.nativeclient;
     exports org.ballerinalang.stdlib.tcp.nativelistener;
     exports org.ballerinalang.stdlib.tcp;

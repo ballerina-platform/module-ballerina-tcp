@@ -1,5 +1,6 @@
 package org.ballerinalang.stdlib.tcp;
 
+import io.ballerina.runtime.api.Future;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.flow.FlowControlHandler;
@@ -9,19 +10,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Class to handler SSL handshake event.
+ * Class to handle SSL handshake event of TCP Client.
  */
-public class SslHandshakeEventHandler extends ChannelInboundHandlerAdapter {
-    private TcpListenerHandler tcpListenerHandler;
+public class SslHandshakeClientEventHandler extends ChannelInboundHandlerAdapter {
     private TcpClientHandler tcpClientHandler;
+    private Future callback;
     private static final Logger log = LoggerFactory.getLogger(Client.class);
 
-    public SslHandshakeEventHandler(TcpListenerHandler handler) {
-        tcpListenerHandler = handler;
-    }
-
-    public SslHandshakeEventHandler(TcpClientHandler handler) {
+    public SslHandshakeClientEventHandler(TcpClientHandler handler, Future callback) {
         tcpClientHandler = handler;
+        this.callback = callback;
     }
 
     @Override
@@ -29,11 +27,9 @@ public class SslHandshakeEventHandler extends ChannelInboundHandlerAdapter {
         if (event instanceof SslHandshakeCompletionEvent) {
             if (((SslHandshakeCompletionEvent) event).isSuccess()) {
                 ctx.pipeline().addLast(Constants.FLOW_CONTROL_HANDLER, new FlowControlHandler());
-                if (tcpClientHandler != null) {
-                    ctx.pipeline().addLast(Constants.CLIENT_HANDLER, tcpClientHandler);
-                } else {
-                    ctx.pipeline().addLast(Constants.LISTENER_HANDLER, tcpListenerHandler);
-                    ctx.fireChannelActive();
+                ctx.pipeline().addLast(Constants.CLIENT_HANDLER, tcpClientHandler);
+                if (callback != null) {
+                    callback.complete(null);
                 }
                 ctx.pipeline().remove(this);
             } else {
@@ -45,5 +41,8 @@ public class SslHandshakeEventHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         log.error("Error while SSL handshake: " + cause.getMessage());
+        if (callback != null) {
+            callback.complete(Utils.createSocketError(cause.getMessage()));
+        }
     }
 }
