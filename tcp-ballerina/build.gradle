@@ -160,7 +160,7 @@ task initializeVariables {
 }
 
 task ballerinaTest {
-    dependsOn (":tcp-native:build")
+    dependsOn(":tcp-native:build")
     dependsOn(":tcp-test-utils:build")
     dependsOn(unpackJballerinaTools)
     dependsOn(unpackStdLibs)
