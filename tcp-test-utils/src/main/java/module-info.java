@@ -23,5 +23,6 @@ module io.ballerina.stdlib.socket.testutils {
     requires io.netty.buffer;
     requires io.netty.transport;
     requires io.netty.common;
+    requires io.netty.handler;
     exports org.ballerinalang.stdlib.tcp.testutils;
 }

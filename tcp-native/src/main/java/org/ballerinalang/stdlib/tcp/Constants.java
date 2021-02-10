@@ -18,16 +18,12 @@
 
 package org.ballerinalang.stdlib.tcp;
 
-import io.ballerina.runtime.api.Module;
-
-import static io.ballerina.runtime.api.constants.RuntimeConstants.BALLERINA_BUILTIN_PKG_PREFIX;
-
 /**
  * Constant variable for tcp related operations.
  */
 public class Constants {
 
-    // constants related to client config
+    // Constants related to client config
     public static final String CONFIG_LOCALHOST = "localHost";
     public static final String CONFIG_READ_TIMEOUT = "timeoutInMillis";
 
@@ -35,14 +31,18 @@ public class Constants {
     public static final String LISTENER_HANDLER = "listenerHandler";
     public static final String READ_TIMEOUT_HANDLER = "readTimeoutHandler";
     public static final String CLIENT_HANDLER = "clientHandler";
+    public static final String SSL_HANDLER = "SSL_Handler";
+    public static final String SSL_HANDSHAKE_HANDLER = "SSL_handshakeHandler";
+    public static final String FLOW_CONTROL_HANDLER = "flowControlHandler";
 
-    // remote method names
+
+    // Remote method names
     public static final String ON_BYTES = "onBytes";
     public static final String ON_ERROR = "onError";
     public static final String ON_CONNECT = "onConnect";
     public static final String ON_CLOSE = "onClose";
 
-    // constants related to tcp caller
+    // Constants related to tcp caller
     public static final String CALLER = "Caller";
     public static final String CALLER_REMOTE_PORT = "remotePort";
     public static final String CALLER_REMOTE_HOST = "remoteHost";
@@ -50,21 +50,26 @@ public class Constants {
     public static final String CALLER_LOCAL_PORT = "localPort";
     public static final String CALLER_LOCAL_HOST = "localHost";
 
-    // constant used for adding native data
+    // Constants used for adding native data
     public static final String LISTENER = "listener";
     public static final String LISTENER_CONFIG = "listenerConfig";
     public static final String LOCAL_PORT = "localPort";
     public static final String SERVICE = "Service";
     public static final String CLIENT = "Client";
 
-    private Constants() {}
+    // Constants related to secureSocket configuration
+    public static final String SECURE_SOCKET = "secureSocket";
+    public static final String CERTIFICATE = "certificate";
+    public static final String CERTIFICATE_PATH = "path";
+    public static final String PROTOCOL_VERSIONS = "versions";
+    public static final String PROTOCOL = "protocol";
+    public static final String CIPHERS = "ciphers";
+    public static final String PRIVATE_KEY_ENTRY_PASSWORD = "secret";
+    public static final String PRIVATE_KEY = "privateKey";
+    public static final String PRIVATE_KEY_PATH = "path";
+    public static final String KEY_STORE_PASSWORD = "secret";
 
-     /**
-     * tcp standard library package ID.
-     * @deprecated Use SocketUtils.getIOPackage().
-     */
-    @Deprecated
-    public static final Module SOCKET_PACKAGE_ID = new Module(BALLERINA_BUILTIN_PKG_PREFIX, "tcp", "0.7.2");
+    private Constants() {}
 
     /**
      * Specifies the error type for tcp module.

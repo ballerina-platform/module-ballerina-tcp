@@ -69,7 +69,7 @@ function testServerAlreadyClosed() returns  @tainted error? {
         test:assertFail(msg = "Test for server already disconnected failed");
         io:println(res.length());
     }
-    // print expected timeout error
+    // print expected error
     io:println(res);
 
     check socketClient->close();

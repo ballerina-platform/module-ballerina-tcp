@@ -43,6 +43,9 @@ dependencies {
     externalJars (group: 'io.netty', name: 'netty-resolver', version: "${nettyVersion}") {
         transitive = false
     }
+    externalJars (group: 'io.netty', name: 'netty-codec', version: "${nettyVersion}") {
+        transitive = false
+    }
     compile project(':tcp-native')
 }
 
@@ -82,12 +85,14 @@ task unpackStdLibs() {
 
 def packageName = "tcp"
 def packageOrg = "ballerina"
+def tomlVersion = project.version.split("-")[0]
 def ballerinaConfigFile = new File("$project.projectDir/Ballerina.toml")
 def ballerinaDependencyFile = new File("$project.projectDir/Dependencies.toml")
 def artifactBallerinaDocs = file("$project.projectDir/build/docs_parent/")
 def artifactCacheParent = file("$project.projectDir/build/cache_parent/")
 def artifactLibParent = file("$project.projectDir/build/lib_parent/")
-def tomlVersion = project.version.split("-")[0]
+def artifactCodeCoverageReport = file("$project.projectDir/target/cache/tests_cache/coverage/ballerina.exec")
+def artifactTestableJar = file("$project.projectDir/target/cache/${packageOrg}/${packageName}/${tomlVersion}/java11/")
 def ballerinaCentralAccessToken = System.getenv('BALLERINA_CENTRAL_ACCESS_TOKEN')
 def distributionPath =  project.projectDir.absolutePath + "/build/target/extracted-distributions/jballerina-tools-zip/jballerina-tools-${ballerinaLangVersion}"
 def distributionBinPath = distributionPath + "/bin"
@@ -95,14 +100,12 @@ def originalConfig = ballerinaConfigFile.text
 def originalDependencyConfig = ballerinaDependencyFile.text
 
 task copyStdlibs(type: Copy) {
-    dependsOn(unpackStdLibs)
-
     into distributionPath
     /* Standard Libraries */
     configurations.ballerinaStdLibs.resolvedConfiguration.resolvedArtifacts.each { artifact ->
         def artifactExtractedPath = "${buildDir}/target/extracted-distributions/" + artifact.name + "-zip"
-        into("repo/balo") {
-            from "${artifactExtractedPath}/balo/"
+        into("repo/bala") {
+            from "${artifactExtractedPath}/bala/"
         }
         into("repo/cache") {
             from "${artifactExtractedPath}/cache"
@@ -134,49 +137,53 @@ task revertTomlFile {
     }
 }
 
-task ballerinaTest {
-    dependsOn(":tcp-native:build")
-    dependsOn(":tcp-test-utils:build")
-    dependsOn(unpackJballerinaTools)
-    dependsOn(unpackStdLibs)
-    dependsOn(copyStdlibs)
-    dependsOn(updateTomlFile)
-    finalizedBy(revertTomlFile)
+def groupParams = ""
+def disableGroups = ""
+def debugParams = ""
+def balJavaDebugParam = ""
 
-    def debugParams = ""
+task initializeVariables {
+    if (project.hasProperty("groups")) {
+        groupParams = "--groups ${project.findProperty("groups")}"
+    }
+    if (project.hasProperty("disable")) {
+        disableGroups = "--disable-groups ${project.findProperty("disable")}"
+    }
     if (project.hasProperty("debug")) {
         debugParams = "--debug ${project.findProperty("debug")}"
     }
+    if (project.hasProperty("balJavaDebug")) {
+        balJavaDebugParam = "BAL_JAVA_DEBUG=${project.findProperty("balJavaDebug")}"
+    }
+}
 
+task ballerinaTest {
     doLast {
         exec {
             workingDir project.projectDir
             environment "JAVA_OPTS", "-DBALLERINA_DEV_COMPILE_BALLERINA_ORG=true"
             environment "STDLIB_VERSION", tomlVersion
             if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-                commandLine 'cmd', '/c', "$distributionBinPath/bal.bat test ${debugParams} && exit %%ERRORLEVEL%%"
+                commandLine 'cmd', '/c', "$balJavaDebugParam $distributionBinPath/bal.bat test --code-coverage --includes=* ${groupParams} ${disableGroups} ${debugParams} && exit %%ERRORLEVEL%%"
             } else {
-                commandLine 'sh', '-c', "$distributionBinPath/bal test ${debugParams}"
+                commandLine 'sh', '-c', "$balJavaDebugParam $distributionBinPath/bal test --code-coverage --includes=* ${groupParams} ${disableGroups} ${debugParams}"
             }
         }
     }
 }
 
-test {
-    dependsOn(ballerinaTest)
-}
-
 task ballerinaBuild {
     inputs.dir file(project.projectDir)
-    dependsOn(":tcp-native:build")
-    dependsOn(":tcp-test-utils:build")
-    dependsOn(copyToLib)
-    dependsOn(unpackJballerinaTools)
-    dependsOn(unpackStdLibs)
-    dependsOn(copyStdlibs)
-    dependsOn(updateTomlFile)
-    dependsOn(test)
-    finalizedBy(revertTomlFile)
+    
+    def testParams = "--skip-tests"
+    gradle.taskGraph.whenReady { graph ->
+        if (graph.hasTask(":${packageName}-ballerina:build") || graph.hasTask(":${packageName}-ballerina:publish")) {
+            ballerinaTest.enabled = false
+        }
+        if (graph.hasTask(":${packageName}-ballerina:test")) {
+            testParams = "--code-coverage --includes=*"
+        }
+    }
 
     doLast {
         // Build and populate caches
@@ -184,14 +191,14 @@ task ballerinaBuild {
             workingDir project.projectDir
             environment "JAVA_OPTS", "-DBALLERINA_DEV_COMPILE_BALLERINA_ORG=true"
             if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-                commandLine 'cmd', '/c', "$distributionBinPath/bal.bat build --skip-tests -c && exit %%ERRORLEVEL%%"
+                commandLine 'cmd', '/c', "$balJavaDebugParam $distributionBinPath/bal.bat build ${testParams} ${debugParams} && exit %%ERRORLEVEL%%"
             } else {
-                commandLine 'sh', '-c', "$distributionBinPath/bal build --skip-tests -c"
+                commandLine 'sh', '-c', "$balJavaDebugParam $distributionBinPath/bal build ${testParams} ${debugParams}"
             }
         }
         copy {
-            from file("$project.projectDir/target/balo")
-            into file("$artifactCacheParent/balo/${packageOrg}/${packageName}/${tomlVersion}")
+            from file("$project.projectDir/target/bala")
+            into file("$artifactCacheParent/bala/${packageOrg}/${packageName}/${tomlVersion}")
         }
         copy {
             from file("$project.projectDir/target/cache")
@@ -240,10 +247,20 @@ task createArtifactZip(type: Zip) {
     from ballerinaBuild
 }
 
+task createTestableJarZip(type: Zip) {
+    archiveName("${packageOrg}-${packageName}-${project.version}-testable-jars.zip")
+    destinationDir(file("${buildDir}/distributions"))
+    from ("${artifactTestableJar}") {
+        include '**/*-testable.jar'
+    }
+}
+
 publishing {
     publications {
-        mavenJava(MavenPublication) {
+        maven(MavenPublication) {
             artifact source: createArtifactZip, extension: 'zip'
+            artifact source: artifactCodeCoverageReport, classifier: 'jacoco'
+            artifact source: createTestableJarZip, classifier: 'testable-jars', extension: 'zip'
         }
     }
 
@@ -259,6 +276,28 @@ publishing {
     }
 }
 
-build {
-    dependsOn(ballerinaBuild)
-}
+copyStdlibs.dependsOn unpackStdLibs
+
+ballerinaTest.dependsOn ":tcp-native:build"
+ballerinaTest.dependsOn ":tcp-test-utils:build"
+ballerinaTest.dependsOn unpackJballerinaTools
+ballerinaTest.dependsOn unpackStdLibs
+ballerinaTest.dependsOn copyStdlibs
+ballerinaTest.dependsOn updateTomlFile
+ballerinaTest.dependsOn initializeVariables
+ballerinaTest.finalizedBy revertTomlFile
+test.dependsOn ballerinaTest
+
+ballerinaBuild.dependsOn test
+ballerinaBuild.dependsOn ":tcp-native:build"
+ballerinaBuild.dependsOn ":tcp-test-utils:build"
+ballerinaBuild.dependsOn copyToLib
+ballerinaBuild.dependsOn unpackJballerinaTools
+ballerinaBuild.dependsOn unpackStdLibs
+ballerinaBuild.dependsOn copyStdlibs
+ballerinaBuild.dependsOn updateTomlFile
+ballerinaBuild.dependsOn initializeVariables
+ballerinaBuild.finalizedBy revertTomlFile
+build.dependsOn ballerinaBuild
+
+createTestableJarZip.dependsOn ballerinaBuild

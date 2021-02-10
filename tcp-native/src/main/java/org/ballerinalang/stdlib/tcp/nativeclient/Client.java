@@ -61,8 +61,12 @@ public class Client {
         long timeout = config.getIntValue(StringUtils.fromString(Constants.CONFIG_READ_TIMEOUT));
         client.addNativeData(Constants.CONFIG_READ_TIMEOUT, timeout);
 
+        BMap<BString, Object> secureSocket = (BMap<BString, Object>) config.getMapValue(StringUtils
+                .fromString(Constants.SECURE_SOCKET));
+
         try {
-            TcpClient tcpClient = TcpFactory.createTcpClient(localAddress, remoteAddress, balFuture);
+            TcpClient tcpClient = TcpFactory.getInstance().
+                    createTcpClient(localAddress, remoteAddress, balFuture, secureSocket);
             client.addNativeData(Constants.CLIENT, tcpClient);
         } catch (Exception e) {
             balFuture.complete(Utils.createSocketError(e.getMessage()));

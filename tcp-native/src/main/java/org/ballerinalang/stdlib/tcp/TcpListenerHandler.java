@@ -27,7 +27,7 @@ import io.netty.channel.SimpleChannelInboundHandler;
  */
 public class TcpListenerHandler extends SimpleChannelInboundHandler<ByteBuf> {
 
-    private TcpService tcpService;
+    private final TcpService tcpService;
 
     public TcpListenerHandler(TcpService tcpService) {
         this.tcpService = tcpService;

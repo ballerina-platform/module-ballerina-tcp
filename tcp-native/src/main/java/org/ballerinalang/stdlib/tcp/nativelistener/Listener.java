@@ -58,7 +58,7 @@ public class Listener {
         BString localHost = config.getStringValue(StringUtils.fromString(Constants.CONFIG_LOCALHOST));
 
         int localPort = (int) listener.getNativeData(Constants.LOCAL_PORT);
-        InetSocketAddress localAddress = null;
+        InetSocketAddress localAddress;
         if (localHost == null) {
             localAddress = new InetSocketAddress(localPort);
         } else {
@@ -66,9 +66,12 @@ public class Listener {
             localAddress = new InetSocketAddress(hostname, localPort);
         }
 
+        BMap<BString, Object> secureSocket = (BMap<BString, Object>) config.getMapValue(StringUtils
+                .fromString(Constants.SECURE_SOCKET));
         try {
             TcpService tcpService = (TcpService) listener.getNativeData(Constants.SERVICE);
-            TcpListener tcpListener = TcpFactory.createTcpListener(localAddress, balFuture, tcpService);
+            TcpListener tcpListener = TcpFactory.getInstance()
+                    .createTcpListener(localAddress, balFuture, tcpService, secureSocket);
             listener.addNativeData(Constants.LISTENER, tcpListener);
         } catch (Exception e) {
             balFuture.complete(Utils.createSocketError(e.getMessage()));
