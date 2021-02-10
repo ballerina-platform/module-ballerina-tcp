@@ -100,8 +100,6 @@ def originalConfig = ballerinaConfigFile.text
 def originalDependencyConfig = ballerinaDependencyFile.text
 
 task copyStdlibs(type: Copy) {
-    dependsOn(unpackStdLibs)
-
     into distributionPath
     /* Standard Libraries */
     configurations.ballerinaStdLibs.resolvedConfiguration.resolvedArtifacts.each { artifact ->
@@ -160,15 +158,6 @@ task initializeVariables {
 }
 
 task ballerinaTest {
-    dependsOn(":tcp-native:build")
-    dependsOn(":tcp-test-utils:build")
-    dependsOn(unpackJballerinaTools)
-    dependsOn(unpackStdLibs)
-    dependsOn(copyStdlibs)
-    dependsOn(updateTomlFile)
-    dependsOn(initializeVariables)
-    finalizedBy(revertTomlFile)
-
     doLast {
         exec {
             workingDir project.projectDir
@@ -183,16 +172,9 @@ task ballerinaTest {
     }
 }
 
-test {
-    dependsOn(ballerinaTest)
-}
-
 task ballerinaBuild {
     inputs.dir file(project.projectDir)
-    dependsOn(updateTomlFile)
-    dependsOn(initializeVariables)
-    finalizedBy(revertTomlFile)
-
+    
     def testParams = "--skip-tests"
     gradle.taskGraph.whenReady { graph ->
         if (graph.hasTask(":${packageName}-ballerina:build") || graph.hasTask(":${packageName}-ballerina:publish")) {
@@ -294,13 +276,28 @@ publishing {
     }
 }
 
+copyStdlibs.dependsOn unpackStdLibs
+
+ballerinaTest.dependsOn ":tcp-native:build"
+ballerinaTest.dependsOn ":tcp-test-utils:build"
+ballerinaTest.dependsOn unpackJballerinaTools
+ballerinaTest.dependsOn unpackStdLibs
+ballerinaTest.dependsOn copyStdlibs
+ballerinaTest.dependsOn updateTomlFile
+ballerinaTest.dependsOn initializeVariables
+ballerinaTest.finalizedBy revertTomlFile
+test.dependsOn ballerinaTest
+
+ballerinaBuild.dependsOn test
+ballerinaBuild.dependsOn ":tcp-native:build"
+ballerinaBuild.dependsOn ":tcp-test-utils:build"
 ballerinaBuild.dependsOn copyToLib
 ballerinaBuild.dependsOn unpackJballerinaTools
 ballerinaBuild.dependsOn unpackStdLibs
 ballerinaBuild.dependsOn copyStdlibs
-ballerinaBuild.dependsOn ":tcp-native:build"
-ballerinaBuild.dependsOn ":tcp-test-utils:build"
-ballerinaBuild.dependsOn test
+ballerinaBuild.dependsOn updateTomlFile
+ballerinaBuild.dependsOn initializeVariables
+ballerinaBuild.finalizedBy revertTomlFile
 build.dependsOn ballerinaBuild
-createTestableJarZip.dependsOn ballerinaBuild
 
+createTestableJarZip.dependsOn ballerinaBuild
