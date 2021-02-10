@@ -301,6 +301,5 @@ ballerinaBuild.dependsOn ":tcp-native:build"
 ballerinaBuild.dependsOn ":tcp-test-utils:build"
 ballerinaBuild.dependsOn test
 build.dependsOn ballerinaBuild
-
 createTestableJarZip.dependsOn ballerinaBuild
 
