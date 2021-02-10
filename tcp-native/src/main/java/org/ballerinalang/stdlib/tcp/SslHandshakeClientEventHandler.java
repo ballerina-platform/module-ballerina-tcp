@@ -33,6 +33,10 @@ public class SslHandshakeClientEventHandler extends ChannelInboundHandlerAdapter
                 }
                 ctx.pipeline().remove(this);
             } else {
+                if (callback != null) {
+                    callback.complete(Utils.createSocketError(((SslHandshakeCompletionEvent) event).
+                            cause().getMessage()));
+                }
                 ctx.close();
             }
         }
@@ -41,8 +45,5 @@ public class SslHandshakeClientEventHandler extends ChannelInboundHandlerAdapter
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         log.error("Error while SSL handshake: " + cause.getMessage());
-        if (callback != null) {
-            callback.complete(Utils.createSocketError(cause.getMessage()));
-        }
     }
 }
