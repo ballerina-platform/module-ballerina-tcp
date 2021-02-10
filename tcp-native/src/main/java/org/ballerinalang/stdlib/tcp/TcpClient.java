@@ -117,6 +117,7 @@ public class TcpClient {
         if (ciphers != null && ciphers.length > 0) {
             sslHandler.engine().setEnabledCipherSuites(ciphers);
         }
+
         channel.pipeline().addFirst(Constants.SSL_HANDLER, sslHandler);
         channel.pipeline().addLast(Constants.SSL_HANDSHAKE_HANDLER,
                 new SslHandshakeClientEventHandler(tcpClientHandler, callback));

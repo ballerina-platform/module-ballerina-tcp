@@ -107,12 +107,14 @@ public class TcpListener {
         kmf.init(ks, Constants.KEY_STORE_PASSWORD.toCharArray());
         SslContext sslContext = SslContextBuilder.forServer(kmf).build();
         SslHandler sslHandler = sslContext.newHandler(channel.alloc());
+
         if (protocolVersions.length > 0) {
             sslHandler.engine().setEnabledProtocols(protocolVersions);
         }
         if (ciphers != null && ciphers.length > 0) {
             sslHandler.engine().setEnabledCipherSuites(ciphers);
         }
+
         channel.pipeline().addFirst(Constants.SSL_HANDLER, sslHandler);
         channel.pipeline().addLast(Constants.SSL_HANDSHAKE_HANDLER,
                 new SslHandshakeListenerEventHandler(tcpListenerHandler));
@@ -136,7 +138,7 @@ public class TcpListener {
     // Invoke when the listener onBytes return readonly & byte[]
     public static void send(byte[] bytes, Channel channel, TcpService tcpService) {
         if (!tcpService.getIsCallerClosed() && channel.isActive()) {
-            WriteFlowController writeFlowController = new WriteFlowController(Unpooled.wrappedBuffer(bytes),
+            WriteFlowController writeFlowController = new WriteFlowControllerService(Unpooled.wrappedBuffer(bytes),
                     tcpService);
             TcpListenerHandler tcpListenerHandler = (TcpListenerHandler) channel
                     .pipeline().get(Constants.LISTENER_HANDLER);

@@ -9,30 +9,24 @@ import io.netty.channel.ChannelFutureListener;
 import java.util.LinkedList;
 
 /**
- * WriteCallbackService used to write data via channelPipeline.
+ * WriteFlowController used to write data via channelPipeline.
  */
 public class WriteFlowController {
-    private ByteBuf buffer;
+    protected ByteBuf buffer;
     private Future balWriteCallback;
-    private TcpService tcpService;
 
     WriteFlowController(ByteBuf buffer, Future callback) {
         this.balWriteCallback = callback;
         this.buffer = buffer;
     }
 
-    public WriteFlowController(ByteBuf buffer, TcpService tcpService) {
-        this.tcpService = tcpService;
+    public WriteFlowController(ByteBuf buffer) {
         this.buffer = buffer;
     }
 
     public synchronized void writeData(Channel channel, LinkedList<WriteFlowController> writeFlowControllers) {
         channel.writeAndFlush(buffer).addListener((ChannelFutureListener) future -> {
-            if (balWriteCallback != null) {
-                completeCallback(future);
-            } else {
-                callDispatch(future);
-            }
+            completeCallback(future);
         });
         writeFlowControllers.remove(this);
     }
@@ -43,12 +37,6 @@ public class WriteFlowController {
         } else {
             balWriteCallback.complete(Utils
                     .createSocketError("Failed to write data: " + future.cause().getMessage()));
-        }
-    }
-
-    private void callDispatch(ChannelFuture future) {
-        if (!future.isSuccess()) {
-            Dispatcher.invokeOnError(tcpService, "Failed to send data.");
         }
     }
 }
