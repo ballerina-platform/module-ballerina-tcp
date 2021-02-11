@@ -28,6 +28,6 @@ function testListenerEcho() returns  @tainted error? {
     check  socketClient->writeBytes(msgByteArray);
 
     readonly & byte[] receivedData = check socketClient->readBytes();
-    io:println(check getString(receivedData));
+    io:println('string:fromBytes(receivedData));
     check socketClient->close();
 }

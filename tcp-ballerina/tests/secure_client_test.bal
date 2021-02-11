@@ -60,7 +60,7 @@ function testSecureClientEcho() returns @tainted error? {
     check socketClient->writeBytes(msgByteArray);
 
     readonly & byte[] receivedData = check socketClient->readBytes();
-    test:assertEquals(check getString(receivedData), msg, "Found unexpected output");
+    test:assertEquals('string:fromBytes(receivedData), msg, "Found unexpected output");
 
     check socketClient->close();
 }
