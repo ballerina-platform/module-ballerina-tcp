@@ -44,7 +44,7 @@ service class EchoService {
     }
 
     remote function onBytes(readonly & byte[] data) returns (readonly & byte[])|Error? {
-        io:println("Echo: ", getString(data));
+        io:println("Echo: ", 'string:fromBytes(data));
         return data;
     }
 
@@ -74,7 +74,7 @@ service class DiscardService {
 
     remote function onBytes(readonly & byte[] data) returns Error? {
         // read and discard the message
-        io:println("Discard: ", getString(data));
+        io:println("Discard: ", 'string:fromBytes(data));
     }
 
     isolated remote function onError(readonly & Error err) returns Error? {

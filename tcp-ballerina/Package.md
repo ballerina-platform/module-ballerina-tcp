@@ -1,6 +1,6 @@
-## Module Overview
+## Package Overview
 
-This module provides an implementation for sending/receiving messages to/from another application process (local or remote) for both connection-oriented protocols.
+This package provides an implementation for sending/receiving messages to/from another application process (local or remote) for both connection-oriented protocols.
 
 #### Client
 
@@ -59,6 +59,6 @@ service class EchoService {
 }
 ```
 
-For information on the operations, which you can perform with this module, see the below **Functions**. For examples on the usage of the operations, see the following.
+For information on the operations, which you can perform with this package, see the below **Functions**. For examples on the usage of the operations, see the following.
  * [Basic TCP Client Example](https://ballerina.io/learn/by-example/tcp-client.html)
  * [Basic TCP Listener Example](https://ballerina.io/learn/by-example/tcp-listener.html)
