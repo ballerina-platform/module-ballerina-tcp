@@ -255,6 +255,25 @@ task ballerinaPublish {
     }
 }
 
+publishing {
+    publications {
+        maven(MavenPublication) {
+            artifact source: createArtifactZip, extension: 'zip'
+            artifact source: artifactCodeCoverageReport, classifier: 'jacoco'
+        }
+    }
+
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/ballerina-platform/module-ballerina-${packageName}")
+            credentials {
+                username = System.getenv("packageUser")
+                password = System.getenv("packagePAT")
+            }
+        }
+    }
+}
 
 task createArtifactZip(type: Zip) {
     destinationDirectory = file("$buildDir/distributions")
