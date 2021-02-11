@@ -118,7 +118,7 @@ task updateTomlFile {
     doLast {
         def stdlibDependentIoVersion = project.stdlibIoVersion.replace("${snapshotVersion}", "")
         def stdlibDependentLogVersion = project.stdlibLogVersion.replace("${snapshotVersion}", "")
-        def nettyVersion = project.nettyVersion.replace("${snapshotVersion}", "")
+        def nettyVersion = project.nettyVersion
 
         def newConfig = ballerinaConfigFile.text.replace("@project.version@", project.version)
         newConfig = newConfig.replace("@toml.version@", tomlVersion)
@@ -258,6 +258,26 @@ task ballerinaPublish {
 task createArtifactZip(type: Zip) {
     destinationDirectory = file("$buildDir/distributions")
     from ballerinaBuild
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            artifact source: createArtifactZip, extension: 'zip'
+            artifact source: artifactCodeCoverageReport, classifier: 'jacoco'
+        }
+    }
+
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/ballerina-platform/module-ballerina-${packageName}")
+            credentials {
+                username = System.getenv("packageUser")
+                password = System.getenv("packagePAT")
+            }
+        }
+    }
 }
 
 unpackJballerinaTools.dependsOn copyToLib
