@@ -21,7 +21,8 @@ description = 'Ballerina - TCP Ballerina Generator'
 
 def packageName = "tcp"
 def packageOrg = "ballerina"
-def tomlVersion = project.version.replace("-SNAPSHOT", "")
+def snapshotVersion = "-SNAPSHOT"
+def tomlVersion = project.version.replace("${snapshotVersion}", "")
 def ballerinaConfigFile = new File("$project.projectDir/Ballerina.toml")
 def ballerinaDependencyFile = new File("$project.projectDir/Dependencies.toml")
 def artifactBallerinaDocs = file("$project.projectDir/build/docs_parent/")
@@ -113,11 +114,11 @@ task copyStdlibs(type: Copy) {
     }
 }
 
-task updateTomlVerions {
+task updateTomlFile {
     doLast {
-        def stdlibDependentIoVersion = project.stdlibIoVersion.split("-")[0]
-        def stdlibDependentLogVersion = project.stdlibLogVersion.split("-")[0]
-        def nettyVersion = project.nettyVersion.split("-")[0]
+        def stdlibDependentIoVersion = project.stdlibIoVersion.replace("${snapshotVersion}", "")
+        def stdlibDependentLogVersion = project.stdlibLogVersion.replace("${snapshotVersion}", "")
+        def nettyVersion = project.nettyVersion.replace("${snapshotVersion}", "")
 
         def newConfig = ballerinaConfigFile.text.replace("@project.version@", project.version)
         newConfig = newConfig.replace("@toml.version@", tomlVersion)
@@ -263,9 +264,9 @@ task createArtifactZip(type: Zip) {
 unpackJballerinaTools.dependsOn copyToLib
 unpackStdLibs.dependsOn unpackJballerinaTools
 copyStdlibs.dependsOn unpackStdLibs
-updateTomlVerions.dependsOn copyStdlibs
+updateTomlFile.dependsOn copyStdlibs
 
-ballerinaTest.dependsOn updateTomlVerions
+ballerinaTest.dependsOn updateTomlFile
 ballerinaTest.dependsOn initializeVariables
 ballerinaTest.dependsOn ":${packageName}-native:build"
 ballerinaTest.dependsOn ":${packageName}-test-utils:build"
@@ -273,7 +274,7 @@ ballerinaTest.finalizedBy revertTomlFile
 test.dependsOn ballerinaTest
 
 ballerinaBuild.dependsOn test
-ballerinaBuild.dependsOn updateTomlVerions
+ballerinaBuild.dependsOn updateTomlFile
 ballerinaBuild.dependsOn initializeVariables
 ballerinaBuild.dependsOn ":${packageName}-native:build"
 ballerinaBuild.dependsOn ":${packageName}-test-utils:build"
