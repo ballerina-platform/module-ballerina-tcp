@@ -36,15 +36,11 @@ import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.SslHandler;
 import io.netty.handler.timeout.IdleStateHandler;
 
-import java.io.IOException;
+import java.io.File;
 import java.net.InetSocketAddress;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateException;
 import java.util.concurrent.TimeUnit;
 
-import javax.net.ssl.KeyManagerFactory;
-import javax.net.ssl.TrustManagerFactory;
+import javax.net.ssl.SSLException;
 
 /**
  * {@link TcpClient} creates the tcp client and handles all the network operations.
@@ -86,15 +82,14 @@ public class TcpClient {
                             callback.complete(null);
                         }
                     } else {
-                        callback.complete(Utils.createSocketError("Unable to connect with remote host."));
+                        callback.complete(Utils.createSocketError("Unable to connect with remote host: "
+                                + channelFuture.cause().getMessage()));
                     }
                 });
     }
 
     private void setSSLHandler(SocketChannel channel, BMap<BString, Object> secureSocket,
-                               TcpClientHandler tcpClientHandler, Future callback)
-            throws NoSuchAlgorithmException, CertificateException,
-            KeyStoreException, IOException {
+                               TcpClientHandler tcpClientHandler, Future callback) throws SSLException {
         BMap<BString, Object> certificate = (BMap<BString, Object>) secureSocket.getMapValue(StringUtils
                 .fromString(Constants.CERTIFICATE));
         BMap<BString, Object> protocol = (BMap<BString, Object>) secureSocket.getMapValue(StringUtils
@@ -104,10 +99,8 @@ public class TcpClient {
         String[] ciphers = secureSocket.getArrayValue(StringUtils.fromString(Constants.CIPHERS)).getStringArray();
 
         SslContextBuilder sslContextBuilder = SslContextBuilder.forClient();
-        TrustManagerFactory tmf = TrustManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-        tmf.init(certificate == null ? null : SecureSocketUtils.truststore(certificate
+        sslContextBuilder.trustManager(new File(certificate
                 .getStringValue(StringUtils.fromString(Constants.CERTIFICATE_PATH)).getValue()));
-        sslContextBuilder.trustManager(tmf);
         SslContext sslContext = sslContextBuilder.build();
         SslHandler sslHandler = sslContext.newHandler(channel.alloc());
 

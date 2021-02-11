@@ -255,7 +255,6 @@ task ballerinaPublish {
     }
 }
 
-
 task createArtifactZip(type: Zip) {
     destinationDirectory = file("$buildDir/distributions")
     from ballerinaBuild
