@@ -118,7 +118,7 @@ task updateTomlFile {
     doLast {
         def stdlibDependentIoVersion = project.stdlibIoVersion.replace("${snapshotVersion}", "")
         def stdlibDependentLogVersion = project.stdlibLogVersion.replace("${snapshotVersion}", "")
-        def nettyVersion = project.nettyVersion.split("-")[0]
+        def nettyVersion = project.nettyVersion
 
         def newConfig = ballerinaConfigFile.text.replace("@project.version@", project.version)
         newConfig = newConfig.replace("@toml.version@", tomlVersion)
