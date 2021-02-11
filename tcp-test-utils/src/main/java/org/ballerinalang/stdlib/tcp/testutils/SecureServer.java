@@ -10,12 +10,9 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.SslHandler;
-import org.ballerinalang.stdlib.tcp.SecureSocketUtils;
 
-import javax.net.ssl.KeyManagerFactory;
+import java.io.File;
 import java.net.InetSocketAddress;
-import java.security.KeyStore;
-import java.util.Optional;
 
 public class SecureServer implements Runnable {
     private static int PORT = 9002;
@@ -34,12 +31,6 @@ public class SecureServer implements Runnable {
     public void run() {
         group = new NioEventLoopGroup();
         try {
-            // Create ssl context
-            KeyStore ks = SecureSocketUtils.keystore("../tcp-test-utils/etc/cert.pem", "../tcp-test-utils/etc/key.pem");
-            KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-            kmf.init(ks, "secret".toCharArray());
-            SslContext sslContext = SslContextBuilder.forServer(kmf).build();
-
             ServerBootstrap b = new ServerBootstrap();
             b.group(group)
                     .channel(NioServerSocketChannel.class)
@@ -50,6 +41,9 @@ public class SecureServer implements Runnable {
                                 throws Exception {
                             ch.pipeline().addLast(new SecureServerHandler());
                             // Set ssl handler
+                            SslContext sslContext = SslContextBuilder.forServer(
+                                    new File("../tcp-test-utils/etc/cert.pem"),
+                                    new File("../tcp-test-utils/etc/key.pem")).build();
                             SslHandler handler = sslContext.newHandler(ch.alloc());
                             handler.engine().setEnabledProtocols(new String[]{"TLSv1.2" });
                             handler.engine().setEnabledCipherSuites(new String[] {"TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA"});
