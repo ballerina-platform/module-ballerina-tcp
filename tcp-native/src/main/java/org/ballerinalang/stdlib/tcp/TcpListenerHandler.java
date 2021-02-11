@@ -30,7 +30,7 @@ import java.util.LinkedList;
 public class TcpListenerHandler extends SimpleChannelInboundHandler<ByteBuf> {
 
     private final TcpService tcpService;
-    private LinkedList<WriteCallbackService> writeCallbackServices = new LinkedList<>();
+    private LinkedList<WriteFlowController> writeFlowControllers = new LinkedList<>();
 
     public TcpListenerHandler(TcpService tcpService) {
         this.tcpService = tcpService;
@@ -60,18 +60,21 @@ public class TcpListenerHandler extends SimpleChannelInboundHandler<ByteBuf> {
 
     @Override
     public void channelWritabilityChanged(ChannelHandlerContext ctx) throws Exception {
-        if (ctx.channel().isWritable() && writeCallbackServices.size() > 0) {
-            WriteCallbackService writeCallbackService = writeCallbackServices.getFirst();
-            if (writeCallbackService != null) {
-                writeCallbackService.writeData();
-                if (writeCallbackService.isWriteCalledForData()) {
-                    writeCallbackServices.remove(writeCallbackService);
+        if (ctx.channel().isWritable()) {
+            while (writeFlowControllers.size() > 0) {
+                WriteFlowController writeFlowController = writeFlowControllers.getFirst();
+                if (writeFlowController != null) {
+                    writeFlowController.writeData(ctx.channel(), writeFlowControllers);
                 }
             }
         }
     }
 
-    public void addWriteCallback(WriteCallbackService writeCallbackService) {
-        writeCallbackServices.addLast(writeCallbackService);
+    public void addWriteFlowControl(WriteFlowController writeFlowController) {
+        writeFlowControllers.addLast(writeFlowController);
+    }
+
+    public LinkedList<WriteFlowController> getWriteFlowControllers() {
+        return writeFlowControllers;
     }
 }

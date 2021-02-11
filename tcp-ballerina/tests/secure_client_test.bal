@@ -1,5 +1,6 @@
 import ballerina/test;
 import ballerina/jballerina.java;
+import ballerina/io;
 
 @test:BeforeSuite
 function setupServer() {
@@ -8,7 +9,7 @@ function setupServer() {
 
 @test:Config {dependsOn: [testServerAlreadyClosed]}
 function testProtocolVersion() returns @tainted error? {
-    Client socketClient = check new ("localhost", 9002, secureSocket = {
+    Error|Client socketClient = new ("localhost", 9002, secureSocket = {
         certificate: {path: certPath},
         protocol: {
             name: "TLS",
@@ -17,18 +18,17 @@ function testProtocolVersion() returns @tainted error? {
         ciphers: ["TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA"]
     });
 
-    Error? res = socketClient->writeBytes("Hello Ballerina Echo from client".toBytes());
-    if (res is ()) {
-        test:assertFail(msg = "Server only support TLSv1.2 writeBytes should fail.");
+    if (socketClient is Client) {
+        test:assertFail(msg = "Server only support TLSv1.2 initialization should fail.");
+        check socketClient->close();
     }
-
-    check socketClient->close();
+    io:println("SecureClient: ", socketClient);
 }
 
 
 @test:Config {dependsOn: [testProtocolVersion]}
 function testCiphers() returns @tainted error? {
-    Client socketClient = check new ("localhost", 9002, secureSocket = {
+    Error|Client socketClient = new ("localhost", 9002, secureSocket = {
         certificate: {path: certPath},
         protocol: {
             name: "TLS",
@@ -37,12 +37,11 @@ function testCiphers() returns @tainted error? {
         ciphers: ["TLS_RSA_WITH_AES_128_CBC_SHA"] // server only support TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA write should fail
     });
 
-    Error? res = socketClient->writeBytes("Hello Ballerina Echo from client".toBytes());
-    if (res is ()) {
-        test:assertFail(msg = "Server only support TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA cipher writeBytes should fail.");
+    if (socketClient is Client) {
+        test:assertFail(msg = "Server only support TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA cipher initialization should fail.");
+        check socketClient->close();
     }
-    
-    check socketClient->close();
+    io:println("SecureClient: ", socketClient);
 }
 
 @test:Config {dependsOn: [testCiphers]}

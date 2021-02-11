@@ -37,10 +37,10 @@ import io.netty.handler.ssl.SslHandler;
 import io.netty.handler.timeout.IdleStateHandler;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.concurrent.TimeUnit;
 
+import javax.net.ssl.SSLException;
 
 /**
  * {@link TcpClient} creates the tcp client and handles all the network operations.
@@ -60,7 +60,7 @@ public class TcpClient {
                     protected void initChannel(SocketChannel ch) throws Exception {
                         TcpClientHandler tcpClientHandler = new TcpClientHandler();
                         if (secureSocket != null) {
-                            setSSLHandler(ch, secureSocket, tcpClientHandler);
+                            setSSLHandler(ch, secureSocket, tcpClientHandler, callback);
                         } else {
                             ch.pipeline().addLast(Constants.CLIENT_HANDLER, tcpClientHandler);
                         }
@@ -77,7 +77,10 @@ public class TcpClient {
                     if (channelFuture.isSuccess()) {
                         channelFuture.channel().config().setAutoRead(false);
                         channel = channelFuture.channel();
-                        callback.complete(null);
+                        SslHandler sslHandler = (SslHandler) channel.pipeline().get(Constants.SSL_HANDLER);
+                        if (sslHandler == null) {
+                            callback.complete(null);
+                        }
                     } else {
                         callback.complete(Utils.createSocketError("Unable to connect with remote host: "
                                 + channelFuture.cause().getMessage()));
@@ -86,7 +89,7 @@ public class TcpClient {
     }
 
     private void setSSLHandler(SocketChannel channel, BMap<BString, Object> secureSocket,
-                               TcpClientHandler tcpClientHandler) throws IOException {
+                               TcpClientHandler tcpClientHandler, Future callback) throws SSLException {
         BMap<BString, Object> certificate = (BMap<BString, Object>) secureSocket.getMapValue(StringUtils
                 .fromString(Constants.CERTIFICATE));
         BMap<BString, Object> protocol = (BMap<BString, Object>) secureSocket.getMapValue(StringUtils
@@ -99,27 +102,29 @@ public class TcpClient {
         sslContextBuilder.trustManager(new File(certificate
                 .getStringValue(StringUtils.fromString(Constants.CERTIFICATE_PATH)).getValue()));
         SslContext sslContext = sslContextBuilder.build();
-
         SslHandler sslHandler = sslContext.newHandler(channel.alloc());
+
         if (protocolVersions.length > 0) {
             sslHandler.engine().setEnabledProtocols(protocolVersions);
         }
         if (ciphers != null && ciphers.length > 0) {
             sslHandler.engine().setEnabledCipherSuites(ciphers);
         }
+
         channel.pipeline().addFirst(Constants.SSL_HANDLER, sslHandler);
-        channel.pipeline().addLast(Constants.SSL_HANDSHAKE_HANDLER, new SslHandshakeEventHandler(tcpClientHandler));
+        channel.pipeline().addLast(Constants.SSL_HANDSHAKE_HANDLER,
+                new SslHandshakeClientEventHandler(tcpClientHandler, callback));
     }
 
     public void writeData(byte[] bytes, Future callback) {
         if (channel.isActive()) {
-            WriteCallbackService writeCallbackService = new WriteCallbackService(Unpooled.wrappedBuffer(bytes),
-                    callback, channel);
-            writeCallbackService.writeData();
-            if (!writeCallbackService.isWriteCalledForData()) {
-                TcpClientHandler tcpClientHandler = (TcpClientHandler) channel.pipeline().get(Constants.CLIENT_HANDLER);
-                tcpClientHandler.addWriteCallback(writeCallbackService);
+            WriteFlowController writeFlowController = new WriteFlowController(Unpooled.wrappedBuffer(bytes), callback);
+            TcpClientHandler tcpClientHandler = (TcpClientHandler) channel.pipeline().get(Constants.CLIENT_HANDLER);
+            tcpClientHandler.addWriteFlowControl(writeFlowController);
+            if (channel.isWritable()) {
+                writeFlowController.writeData(channel, tcpClientHandler.getWriteFlowControllers());
             }
+
         } else {
             callback.complete(Utils.createSocketError("Socket connection already closed."));
         }

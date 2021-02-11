@@ -102,26 +102,28 @@ public class TcpListener {
                 .build();
 
         SslHandler sslHandler = sslContext.newHandler(channel.alloc());
+
         if (protocolVersions.length > 0) {
             sslHandler.engine().setEnabledProtocols(protocolVersions);
         }
         if (ciphers != null && ciphers.length > 0) {
             sslHandler.engine().setEnabledCipherSuites(ciphers);
         }
+
         channel.pipeline().addFirst(Constants.SSL_HANDLER, sslHandler);
-        channel.pipeline().addLast(Constants.SSL_HANDSHAKE_HANDLER, new SslHandshakeEventHandler(tcpListenerHandler));
+        channel.pipeline().addLast(Constants.SSL_HANDSHAKE_HANDLER,
+                new SslHandshakeListenerEventHandler(tcpListenerHandler));
     }
 
     // Invoke when the caller call writeBytes
     public static void send(byte[] bytes, Channel channel, Future callback, TcpService tcpService) {
         if (!tcpService.getIsCallerClosed() && channel.isActive()) {
-            WriteCallbackService writeCallbackService = new WriteCallbackService(Unpooled.wrappedBuffer(bytes),
-                    callback, channel);
-            writeCallbackService.writeData();
-            if (!writeCallbackService.isWriteCalledForData()) {
-                TcpListenerHandler tcpListenerHandler = (TcpListenerHandler) channel
-                        .pipeline().get(Constants.LISTENER_HANDLER);
-                tcpListenerHandler.addWriteCallback(writeCallbackService);
+            WriteFlowController writeFlowController = new WriteFlowController(Unpooled.wrappedBuffer(bytes), callback);
+            TcpListenerHandler tcpListenerHandler = (TcpListenerHandler) channel.pipeline()
+                    .get(Constants.LISTENER_HANDLER);
+            tcpListenerHandler.addWriteFlowControl(writeFlowController);
+            if (channel.isWritable()) {
+                writeFlowController.writeData(channel, tcpListenerHandler.getWriteFlowControllers());
             }
         } else {
             callback.complete(Utils.createSocketError("Socket connection already closed."));
@@ -131,13 +133,13 @@ public class TcpListener {
     // Invoke when the listener onBytes return readonly & byte[]
     public static void send(byte[] bytes, Channel channel, TcpService tcpService) {
         if (!tcpService.getIsCallerClosed() && channel.isActive()) {
-            WriteCallbackService writeCallbackService = new WriteCallbackService(Unpooled.wrappedBuffer(bytes),
-                    tcpService, channel);
-            writeCallbackService.writeData();
-            if (!writeCallbackService.isWriteCalledForData()) {
-                TcpListenerHandler tcpListenerHandler = (TcpListenerHandler) channel
-                        .pipeline().get(Constants.LISTENER_HANDLER);
-                tcpListenerHandler.addWriteCallback(writeCallbackService);
+            WriteFlowController writeFlowController = new WriteFlowControllerService(Unpooled.wrappedBuffer(bytes),
+                    tcpService);
+            TcpListenerHandler tcpListenerHandler = (TcpListenerHandler) channel
+                    .pipeline().get(Constants.LISTENER_HANDLER);
+            tcpListenerHandler.addWriteFlowControl(writeFlowController);
+            if (channel.isWritable()) {
+                writeFlowController.writeData(channel, tcpListenerHandler.getWriteFlowControllers());
             }
         } else {
             Dispatcher.invokeOnError(tcpService, "Socket connection already closed.");
