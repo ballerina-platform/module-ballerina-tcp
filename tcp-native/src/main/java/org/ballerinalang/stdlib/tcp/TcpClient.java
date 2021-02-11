@@ -46,7 +46,6 @@ import java.util.concurrent.TimeUnit;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.TrustManagerFactory;
 
-
 /**
  * {@link TcpClient} creates the tcp client and handles all the network operations.
  */
@@ -56,8 +55,7 @@ public class TcpClient {
     private final Bootstrap clientBootstrap;
 
     public TcpClient(InetSocketAddress localAddress, InetSocketAddress remoteAddress, EventLoopGroup group,
-                     Future callback, BMap<BString, Object> secureSocket)
-            throws Exception {
+                     Future callback, BMap<BString, Object> secureSocket) {
         clientBootstrap = new Bootstrap();
         clientBootstrap.group(group)
                 .channel(NioSocketChannel.class)
@@ -66,7 +64,7 @@ public class TcpClient {
                     protected void initChannel(SocketChannel ch) throws Exception {
                         TcpClientHandler tcpClientHandler = new TcpClientHandler();
                         if (secureSocket != null) {
-                            setSSLHandler(ch, secureSocket, tcpClientHandler);
+                            setSSLHandler(ch, secureSocket, tcpClientHandler, callback);
                         } else {
                             ch.pipeline().addLast(Constants.CLIENT_HANDLER, tcpClientHandler);
                         }
@@ -78,12 +76,15 @@ public class TcpClient {
                         ctx.close();
                     }
                 })
-                .connect(remoteAddress, localAddress).sync()
+                .connect(remoteAddress, localAddress)
                 .addListener((ChannelFutureListener) channelFuture -> {
                     if (channelFuture.isSuccess()) {
                         channelFuture.channel().config().setAutoRead(false);
                         channel = channelFuture.channel();
-                        callback.complete(null);
+                        SslHandler sslHandler = (SslHandler) channel.pipeline().get(Constants.SSL_HANDLER);
+                        if (sslHandler == null) {
+                            callback.complete(null);
+                        }
                     } else {
                         callback.complete(Utils.createSocketError("Unable to connect with remote host."));
                     }
@@ -91,7 +92,8 @@ public class TcpClient {
     }
 
     private void setSSLHandler(SocketChannel channel, BMap<BString, Object> secureSocket,
-                               TcpClientHandler tcpClientHandler) throws NoSuchAlgorithmException, CertificateException,
+                               TcpClientHandler tcpClientHandler, Future callback)
+            throws NoSuchAlgorithmException, CertificateException,
             KeyStoreException, IOException {
         BMap<BString, Object> certificate = (BMap<BString, Object>) secureSocket.getMapValue(StringUtils
                 .fromString(Constants.CERTIFICATE));
@@ -107,33 +109,34 @@ public class TcpClient {
                 .getStringValue(StringUtils.fromString(Constants.CERTIFICATE_PATH)).getValue()));
         sslContextBuilder.trustManager(tmf);
         SslContext sslContext = sslContextBuilder.build();
-
         SslHandler sslHandler = sslContext.newHandler(channel.alloc());
+
         if (protocolVersions.length > 0) {
             sslHandler.engine().setEnabledProtocols(protocolVersions);
         }
         if (ciphers != null && ciphers.length > 0) {
             sslHandler.engine().setEnabledCipherSuites(ciphers);
         }
+
         channel.pipeline().addFirst(Constants.SSL_HANDLER, sslHandler);
-        channel.pipeline().addLast(Constants.SSL_HANDSHAKE_HANDLER, new SslHandshakeEventHandler(tcpClientHandler));
+        channel.pipeline().addLast(Constants.SSL_HANDSHAKE_HANDLER,
+                new SslHandshakeClientEventHandler(tcpClientHandler, callback));
     }
 
-    public void writeData(byte[] bytes, Future callback) throws InterruptedException {
+    public void writeData(byte[] bytes, Future callback) {
         if (channel.isActive()) {
-            channel.writeAndFlush(Unpooled.wrappedBuffer(bytes)).addListener((ChannelFutureListener) future -> {
-                if (future.isSuccess()) {
-                    callback.complete(null);
-                } else {
-                    callback.complete(Utils.createSocketError("Failed to send data " + future.cause().getMessage()));
-                }
-            });
+            WriteFlowController writeFlowController = new WriteFlowController(Unpooled.wrappedBuffer(bytes), callback);
+            TcpClientHandler tcpClientHandler = (TcpClientHandler) channel.pipeline().get(Constants.CLIENT_HANDLER);
+            tcpClientHandler.addWriteFlowControl(writeFlowController);
+            if (channel.isWritable()) {
+                writeFlowController.writeData(channel, tcpClientHandler.getWriteFlowControllers());
+            }
         } else {
             callback.complete(Utils.createSocketError("Socket connection already closed."));
         }
     }
 
-    public void readData(long readTimeout, Future callback) throws InterruptedException {
+    public void readData(long readTimeout, Future callback) {
         if (channel.isActive()) {
             channel.pipeline().addFirst(Constants.READ_TIMEOUT_HANDLER, new IdleStateHandler(readTimeout, 0, 0,
                     TimeUnit.MILLISECONDS));
@@ -145,12 +148,19 @@ public class TcpClient {
         }
     }
 
-    public void close() throws InterruptedException {
+    public void close(Future callback) {
         // If channel disconnected already then handler value is null
         TcpClientHandler handler = (TcpClientHandler) channel.pipeline().get(Constants.CLIENT_HANDLER);
         if (handler != null) {
             handler.setIsCloseTriggered();
         }
-        channel.close().sync();
+        channel.close().addListener((ChannelFutureListener) future -> {
+            if (future.isSuccess()) {
+                callback.complete(null);
+            } else {
+                callback.complete(Utils.createSocketError("Unable to close the  TCP client. "
+                        + future.cause().getMessage()));
+            }
+        });
     }
 }

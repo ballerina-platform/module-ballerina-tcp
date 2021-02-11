@@ -48,13 +48,13 @@ public class TcpFactory {
         return tcpFactory;
     }
 
-    public TcpClient createTcpClient(InetSocketAddress localAddress, InetSocketAddress remoteAddress,
-                                            Future callback, BMap<BString, Object> secureSocket) throws Exception {
+    public TcpClient createTcpClient(InetSocketAddress localAddress, InetSocketAddress remoteAddress, Future callback,
+                                     BMap<BString, Object> secureSocket) {
         return new TcpClient(localAddress, remoteAddress, getInstance().workerGroup, callback, secureSocket);
     }
 
     public TcpListener createTcpListener(InetSocketAddress localAddress, Future callback, TcpService tcpService,
-                                                BMap<BString, Object> secureSocket) throws Exception {
+                                                BMap<BString, Object> secureSocket) {
         return new TcpListener(localAddress, getInstance().bossGroup, getInstance().workerGroup, callback, tcpService,
                 secureSocket);
     }

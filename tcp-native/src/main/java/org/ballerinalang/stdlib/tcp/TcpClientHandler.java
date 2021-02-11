@@ -24,6 +24,8 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.timeout.IdleStateEvent;
 
+import java.util.LinkedList;
+
 /**
  * {@link TcpClientHandler} is a ChannelInboundHandler implementation for tcp client.
  */
@@ -31,6 +33,7 @@ public class TcpClientHandler extends SimpleChannelInboundHandler<ByteBuf> {
 
     private Future callback;
     private boolean isCloseTriggered = false;
+    private LinkedList<WriteFlowController> writeFlowControllers = new LinkedList<>();
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
@@ -67,12 +70,32 @@ public class TcpClientHandler extends SimpleChannelInboundHandler<ByteBuf> {
         }
     }
 
+    @Override
+    public void channelWritabilityChanged(ChannelHandlerContext ctx) throws Exception {
+        while (writeFlowControllers.size() > 0) {
+            if (ctx.channel().isWritable()) {
+                WriteFlowController writeFlowController = writeFlowControllers.getFirst();
+                if (writeFlowController != null) {
+                    writeFlowController.writeData(ctx.channel(), writeFlowControllers);
+                }
+            }
+        }
+    }
+
     public void setCallback(Future callback) {
         this.callback = callback;
     }
 
     public void setIsCloseTriggered() {
         isCloseTriggered = true;
+    }
+
+    public void addWriteFlowControl(WriteFlowController writeFlowController) {
+        writeFlowControllers.addLast(writeFlowController);
+    }
+
+    public LinkedList<WriteFlowController> getWriteFlowControllers() {
+        return writeFlowControllers;
     }
 }
 

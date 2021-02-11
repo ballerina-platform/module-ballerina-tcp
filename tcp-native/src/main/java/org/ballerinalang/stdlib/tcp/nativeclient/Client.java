@@ -28,7 +28,6 @@ import io.ballerina.runtime.api.values.BString;
 import org.ballerinalang.stdlib.tcp.Constants;
 import org.ballerinalang.stdlib.tcp.TcpClient;
 import org.ballerinalang.stdlib.tcp.TcpFactory;
-import org.ballerinalang.stdlib.tcp.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,7 +49,7 @@ public class Client {
         BString host = config.getStringValue(StringUtils.fromString(Constants.CONFIG_LOCALHOST));
         InetSocketAddress remoteAddress = new InetSocketAddress(remoteHost.getValue(), remotePort);
 
-        InetSocketAddress localAddress = null;
+        InetSocketAddress localAddress;
         if (host == null) {
             // A port number of zero will let the system pick up an ephemeral port in a bind operation.
             localAddress = new InetSocketAddress(0);
@@ -60,17 +59,12 @@ public class Client {
 
         long timeout = config.getIntValue(StringUtils.fromString(Constants.CONFIG_READ_TIMEOUT));
         client.addNativeData(Constants.CONFIG_READ_TIMEOUT, timeout);
+        BMap<BString, Object> secureSocket = (BMap<BString, Object>) config.getMapValue(StringUtils.
+                fromString(Constants.SECURE_SOCKET));
 
-        BMap<BString, Object> secureSocket = (BMap<BString, Object>) config.getMapValue(StringUtils
-                .fromString(Constants.SECURE_SOCKET));
-
-        try {
-            TcpClient tcpClient = TcpFactory.getInstance().
-                    createTcpClient(localAddress, remoteAddress, balFuture, secureSocket);
-            client.addNativeData(Constants.CLIENT, tcpClient);
-        } catch (Exception e) {
-            balFuture.complete(Utils.createSocketError(e.getMessage()));
-        }
+        TcpClient tcpClient = TcpFactory.getInstance().
+                createTcpClient(localAddress, remoteAddress, balFuture, secureSocket);
+        client.addNativeData(Constants.CLIENT, tcpClient);
 
         return null;
     }
@@ -79,12 +73,8 @@ public class Client {
         final Future balFuture = env.markAsync();
 
         long readTimeOut = (long) client.getNativeData(Constants.CONFIG_READ_TIMEOUT);
-        try {
-            TcpClient tcpClient = (TcpClient) client.getNativeData(Constants.CLIENT);
-            tcpClient.readData(readTimeOut, balFuture);
-        } catch (Exception e) {
-            balFuture.complete(Utils.createSocketError(e.getMessage()));
-        }
+        TcpClient tcpClient = (TcpClient) client.getNativeData(Constants.CLIENT);
+        tcpClient.readData(readTimeOut, balFuture);
 
         return null;
     }
@@ -93,12 +83,8 @@ public class Client {
         final Future balFuture = env.markAsync();
 
         long readTimeOut = (long) client.getNativeData(Constants.CONFIG_READ_TIMEOUT);
-        try {
-            TcpClient tcpClient = (TcpClient) client.getNativeData(Constants.CLIENT);
-            tcpClient.readData(readTimeOut, balFuture);
-        } catch (InterruptedException e) {
-            balFuture.complete(Utils.createSocketError("Error while receiving data."));
-        }
+        TcpClient tcpClient = (TcpClient) client.getNativeData(Constants.CLIENT);
+        tcpClient.readData(readTimeOut, balFuture);
 
         return null;
     }
@@ -108,25 +94,17 @@ public class Client {
 
         byte[] byteContent = content.getBytes();
         TcpClient tcpClient = (TcpClient) client.getNativeData(Constants.CLIENT);
-        try {
-            tcpClient.writeData(byteContent, balFuture);
-        } catch (InterruptedException e) {
-            balFuture.complete(Utils.createSocketError(e.getMessage()));
-        }
+        tcpClient.writeData(byteContent, balFuture);
 
         return null;
     }
 
-    public static Object close(BObject client) {
-        try {
-            TcpClient tcpClient = (TcpClient) client.getNativeData(Constants.CLIENT);
-            tcpClient.close();
-        } catch (InterruptedException e) {
-            log.error("Unable to close the TCP client.", e);
-            return Utils.createSocketError("Unable to close the  TCP client. " + e.getMessage());
-        }
+    public static Object close(Environment env, BObject client) {
+        final Future balFuture = env.markAsync();
+
+        TcpClient tcpClient = (TcpClient) client.getNativeData(Constants.CLIENT);
+        tcpClient.close(balFuture);
 
         return null;
     }
-
 }
