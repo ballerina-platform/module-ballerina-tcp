@@ -124,7 +124,6 @@ public class TcpClient {
             if (channel.isWritable()) {
                 writeFlowController.writeData(channel, tcpClientHandler.getWriteFlowControllers());
             }
-
         } else {
             callback.complete(Utils.createSocketError("Socket connection already closed."));
         }
