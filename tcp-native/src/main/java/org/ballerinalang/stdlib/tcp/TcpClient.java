@@ -77,8 +77,7 @@ public class TcpClient {
                     if (channelFuture.isSuccess()) {
                         channelFuture.channel().config().setAutoRead(false);
                         channel = channelFuture.channel();
-                        SslHandler sslHandler = (SslHandler) channel.pipeline().get(Constants.SSL_HANDLER);
-                        if (sslHandler == null) {
+                        if (secureSocket == null) {
                             callback.complete(null);
                         }
                     } else {
