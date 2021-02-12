@@ -32,7 +32,7 @@ function testClientEcho() returns  @tainted error? {
     check  socketClient->writeBytes(msgByteArray);
 
     readonly & byte[] receivedData = check socketClient->readBytes();
-    test:assertEquals(check getString(receivedData), msg, "Found unexpected output");
+    test:assertEquals('string:fromBytes(receivedData), msg, "Found unexpected output");
 
     check socketClient->close();
 }
@@ -69,17 +69,10 @@ function testServerAlreadyClosed() returns  @tainted error? {
         test:assertFail(msg = "Test for server already disconnected failed");
         io:println(res.length());
     }
-    // print expected timeout error
+    // print expected error
     io:println(res);
 
     check socketClient->close();
-}
-
-function getString(readonly & byte[] content) returns @tainted string|io:Error {
-    io:ReadableByteChannel byteChannel = check io:createReadableChannel(content);
-    io:ReadableCharacterChannel characterChannel = new io:ReadableCharacterChannel(byteChannel, "UTF-8");
-
-    return check characterChannel.read(content.length());
 }
 
 @test:AfterSuite {}

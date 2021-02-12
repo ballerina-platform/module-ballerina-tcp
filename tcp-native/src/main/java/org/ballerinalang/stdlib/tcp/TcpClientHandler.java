@@ -24,6 +24,8 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.timeout.IdleStateEvent;
 
+import java.util.LinkedList;
+
 /**
  * {@link TcpClientHandler} is a ChannelInboundHandler implementation for tcp client.
  */
@@ -31,6 +33,7 @@ public class TcpClientHandler extends SimpleChannelInboundHandler<ByteBuf> {
 
     private Future callback;
     private boolean isCloseTriggered = false;
+    private LinkedList<WriteFlowController> writeFlowControllers = new LinkedList<>();
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
@@ -43,22 +46,40 @@ public class TcpClientHandler extends SimpleChannelInboundHandler<ByteBuf> {
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, ByteBuf msg) throws Exception {
         ctx.channel().pipeline().remove(Constants.READ_TIMEOUT_HANDLER);
-        callback.complete(Utils.returnReadOnlyBytes(msg));
+        if (callback != null) {
+            callback.complete(Utils.returnReadOnlyBytes(msg));
+        }
     }
 
     @Override
-    public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
-        if (evt instanceof IdleStateEvent) {
+    public void userEventTriggered(ChannelHandlerContext ctx, Object event) throws Exception {
+        if (event instanceof IdleStateEvent) {
             // return timeout error
             ctx.channel().pipeline().remove(Constants.READ_TIMEOUT_HANDLER);
-            callback.complete(Utils.createSocketError("Read timed out"));
+            if (callback != null) {
+                callback.complete(Utils.createSocketError("Read timed out"));
+            }
         }
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         ctx.channel().pipeline().remove(Constants.READ_TIMEOUT_HANDLER);
-        callback.complete(Utils.createSocketError(cause.getMessage()));
+        if (callback != null) {
+            callback.complete(Utils.createSocketError(cause.getMessage()));
+        }
+    }
+
+    @Override
+    public void channelWritabilityChanged(ChannelHandlerContext ctx) throws Exception {
+        while (writeFlowControllers.size() > 0) {
+            if (ctx.channel().isWritable()) {
+                WriteFlowController writeFlowController = writeFlowControllers.getFirst();
+                if (writeFlowController != null) {
+                    writeFlowController.writeData(ctx.channel(), writeFlowControllers);
+                }
+            }
+        }
     }
 
     public void setCallback(Future callback) {
@@ -67,6 +88,14 @@ public class TcpClientHandler extends SimpleChannelInboundHandler<ByteBuf> {
 
     public void setIsCloseTriggered() {
         isCloseTriggered = true;
+    }
+
+    public void addWriteFlowControl(WriteFlowController writeFlowController) {
+        writeFlowControllers.addLast(writeFlowController);
+    }
+
+    public LinkedList<WriteFlowController> getWriteFlowControllers() {
+        return writeFlowControllers;
     }
 }
 

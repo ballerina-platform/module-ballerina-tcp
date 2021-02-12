@@ -41,7 +41,7 @@ public class Dispatcher {
 
     private static void invokeOnBytes(TcpService tcpService, ByteBuf buffer, Channel channel) {
         try {
-            Object[] params = getOnBytesSignature(buffer, channel);
+            Object[] params = getOnBytesSignature(buffer);
 
             tcpService.getRuntime().invokeMethodAsync(tcpService.getConnectionService(), Constants.ON_BYTES, null, null,
                     new TcpCallback(tcpService, false, channel), params);
@@ -55,7 +55,7 @@ public class Dispatcher {
             MethodType methodType = Arrays.stream(tcpService.getConnectionService().getType().getMethods())
                     .filter(m -> m.getName().equals(Constants.ON_CLOSE)).findFirst().orElse(null);
             if (methodType != null) {
-                Object params[] = getOnErrorSignature(message);
+                Object[] params = getOnErrorSignature(message);
                 tcpService.getRuntime().invokeMethodAsync(tcpService.getConnectionService(), Constants.ON_ERROR,
                         null, null, new TcpCallback(tcpService), params);
             }
@@ -64,7 +64,7 @@ public class Dispatcher {
         }
     }
 
-    private static Object[] getOnBytesSignature(ByteBuf buffer, Channel channel) {
+    private static Object[] getOnBytesSignature(ByteBuf buffer) {
         byte[] byteContent = new byte[buffer.readableBytes()];
         buffer.readBytes(byteContent);
         BArray bytes = ValueCreator.createArrayValue(byteContent);
@@ -96,6 +96,7 @@ public class Dispatcher {
                 case Constants.ON_BYTES:
                     Dispatcher.invokeOnBytes(tcpService, buffer, channel);
                     break;
+                default:break;
             }
         }
     }

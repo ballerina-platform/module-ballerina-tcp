@@ -22,12 +22,15 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 
+import java.util.LinkedList;
+
 /**
  * {@link TcpListenerHandler} is a ChannelInboundHandler implementation for tcp listener.
  */
 public class TcpListenerHandler extends SimpleChannelInboundHandler<ByteBuf> {
 
-    private TcpService tcpService;
+    private final TcpService tcpService;
+    private LinkedList<WriteFlowController> writeFlowControllers = new LinkedList<>();
 
     public TcpListenerHandler(TcpService tcpService) {
         this.tcpService = tcpService;
@@ -53,5 +56,25 @@ public class TcpListenerHandler extends SimpleChannelInboundHandler<ByteBuf> {
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         Dispatcher.invokeOnError(tcpService, cause.getMessage());
+    }
+
+    @Override
+    public void channelWritabilityChanged(ChannelHandlerContext ctx) throws Exception {
+        while (writeFlowControllers.size() > 0) {
+            if (ctx.channel().isWritable()) {
+                WriteFlowController writeFlowController = writeFlowControllers.getFirst();
+                if (writeFlowController != null) {
+                    writeFlowController.writeData(ctx.channel(), writeFlowControllers);
+                }
+            }
+        }
+    }
+
+    public void addWriteFlowControl(WriteFlowController writeFlowController) {
+        writeFlowControllers.addLast(writeFlowController);
+    }
+
+    public LinkedList<WriteFlowController> getWriteFlowControllers() {
+        return writeFlowControllers;
     }
 }

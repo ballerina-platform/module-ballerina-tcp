@@ -58,7 +58,7 @@ public class Listener {
         BString localHost = config.getStringValue(StringUtils.fromString(Constants.CONFIG_LOCALHOST));
 
         int localPort = (int) listener.getNativeData(Constants.LOCAL_PORT);
-        InetSocketAddress localAddress = null;
+        InetSocketAddress localAddress;
         if (localHost == null) {
             localAddress = new InetSocketAddress(localPort);
         } else {
@@ -66,13 +66,13 @@ public class Listener {
             localAddress = new InetSocketAddress(hostname, localPort);
         }
 
-        try {
-            TcpService tcpService = (TcpService) listener.getNativeData(Constants.SERVICE);
-            TcpListener tcpListener = TcpFactory.createTcpListener(localAddress, balFuture, tcpService);
-            listener.addNativeData(Constants.LISTENER, tcpListener);
-        } catch (Exception e) {
-            balFuture.complete(Utils.createSocketError(e.getMessage()));
-        }
+        BMap<BString, Object> secureSocket = (BMap<BString, Object>) config.getMapValue(StringUtils
+                .fromString(Constants.SECURE_SOCKET));
+
+        TcpService tcpService = (TcpService) listener.getNativeData(Constants.SERVICE);
+        TcpListener tcpListener = TcpFactory.getInstance()
+                .createTcpListener(localAddress, balFuture, tcpService, secureSocket);
+        listener.addNativeData(Constants.LISTENER, tcpListener);
 
         return null;
     }
@@ -90,15 +90,12 @@ public class Listener {
 
     public static Object gracefulStop(Environment env, BObject listener) {
         Future balFuture = env.markAsync();
-        try {
-            TcpListener tcpListener = (TcpListener) listener.getNativeData(Constants.LISTENER);
-            if (tcpListener != null) {
-                tcpListener.close(balFuture);
-            } else {
-                balFuture.complete(Utils.createSocketError("Unable to initialize the tcp listener."));
-            }
-        } catch (InterruptedException e) {
-            balFuture.complete(Utils.createSocketError("Failed to gracefully shutdown the Listener."));
+
+        TcpListener tcpListener = (TcpListener) listener.getNativeData(Constants.LISTENER);
+        if (tcpListener != null) {
+            tcpListener.close(balFuture);
+        } else {
+            balFuture.complete(Utils.createSocketError("Unable to initialize the tcp listener."));
         }
 
         return null;

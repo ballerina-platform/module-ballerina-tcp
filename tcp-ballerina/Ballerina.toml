@@ -45,3 +45,9 @@ artifactId = "netty-resolver"
 version = "@netty.version@"
 path = "./build/libs/netty-resolver-@netty.version@.jar"
 groupId = "io.netty"
+
+[[platform.java11.dependency]]
+artifactId = "netty-resolver"
+version = "@netty.version@"
+path = "./build/libs/netty-codec-@netty.version@.jar"
+groupId = "io.netty"

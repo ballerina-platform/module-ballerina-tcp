@@ -19,6 +19,8 @@
 package org.ballerinalang.stdlib.tcp;
 
 import io.ballerina.runtime.api.Future;
+import io.ballerina.runtime.api.values.BMap;
+import io.ballerina.runtime.api.values.BString;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 
@@ -29,9 +31,9 @@ import java.net.InetSocketAddress;
  */
 public class TcpFactory {
 
-    private static TcpFactory tcpFactory;
-    private EventLoopGroup bossGroup;
-    private EventLoopGroup workerGroup;
+    private static volatile TcpFactory tcpFactory;
+    private final EventLoopGroup bossGroup;
+    private final EventLoopGroup workerGroup;
 
     private TcpFactory() {
         int totalNumberOfThreads = (Runtime.getRuntime().availableProcessors() * 2);
@@ -39,20 +41,21 @@ public class TcpFactory {
         workerGroup = new NioEventLoopGroup(totalNumberOfThreads - totalNumberOfThreads / 4);
     }
 
-    private static TcpFactory getInstance() {
+    public static TcpFactory getInstance() {
         if (tcpFactory == null) {
             tcpFactory = new TcpFactory();
         }
         return tcpFactory;
     }
 
-    public static TcpClient createTcpClient(InetSocketAddress localAddress, InetSocketAddress remoteAddress,
-                                            Future callback) throws Exception {
-        return new TcpClient(localAddress, remoteAddress, getInstance().workerGroup, callback);
+    public TcpClient createTcpClient(InetSocketAddress localAddress, InetSocketAddress remoteAddress, Future callback,
+                                     BMap<BString, Object> secureSocket) {
+        return new TcpClient(localAddress, remoteAddress, getInstance().workerGroup, callback, secureSocket);
     }
 
-    public static TcpListener createTcpListener(InetSocketAddress localAddress, Future callback,
-                                                TcpService tcpService) throws Exception {
-        return new TcpListener(localAddress, getInstance().bossGroup, getInstance().workerGroup, callback, tcpService);
+    public TcpListener createTcpListener(InetSocketAddress localAddress, Future callback, TcpService tcpService,
+                                                BMap<BString, Object> secureSocket) {
+        return new TcpListener(localAddress, getInstance().bossGroup, getInstance().workerGroup, callback, tcpService,
+                secureSocket);
     }
 }
