@@ -7,7 +7,7 @@ function setupServer() {
     var result = startSecureServer();
 }
 
-@test:Config {dependsOn: [testServerAlreadyClosed]}
+@test:Config {dependsOn: [testServerAlreadyClosed], enable: false}
 function testProtocolVersion() returns @tainted error? {
     Error|Client socketClient = new ("localhost", 9002, secureSocket = {
         certificate: {path: certPath},
@@ -26,7 +26,7 @@ function testProtocolVersion() returns @tainted error? {
 }
 
 
-@test:Config {dependsOn: [testProtocolVersion]}
+@test:Config {dependsOn: [testProtocolVersion], enable: false}
 function testCiphers() returns @tainted error? {
     Error|Client socketClient = new ("localhost", 9002, secureSocket = {
         certificate: {path: certPath},
@@ -44,7 +44,7 @@ function testCiphers() returns @tainted error? {
     io:println("SecureClient: ", socketClient);
 }
 
-@test:Config {dependsOn: [testCiphers]}
+@test:Config {dependsOn: [testCiphers], enable: false}
 function testSecureClientEcho() returns @tainted error? {
     Client socketClient = check new ("localhost", 9002, secureSocket = {
         certificate: {path: certPath},
@@ -59,8 +59,8 @@ function testSecureClientEcho() returns @tainted error? {
     byte[] msgByteArray = msg.toBytes();
     check socketClient->writeBytes(msgByteArray);
 
-    readonly & byte[] receivedData = check socketClient->readBytes();
-    test:assertEquals('string:fromBytes(receivedData), msg, "Found unexpected output");
+   readonly & byte[] receivedData = check socketClient->readBytes();
+   test:assertEquals('string:fromBytes(receivedData), msg, "Found unexpected output");
 
     check socketClient->close();
 }
