@@ -65,6 +65,7 @@ public class SslHandshakeClientEventHandler extends ChannelInboundHandlerAdapter
         log.error("Error while SSL handshake: " + cause.getMessage());
         if (cause instanceof DecoderException) {
             balClientInitCallback.complete(Utils.createSocketError(cause.getMessage()));
+            ctx.close();
         }
     }
 }
