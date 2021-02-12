@@ -21,6 +21,7 @@ package org.ballerinalang.stdlib.tcp;
 import io.ballerina.runtime.api.Future;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.handler.codec.DecoderException;
 import io.netty.handler.flow.FlowControlHandler;
 import io.netty.handler.ssl.SslCloseCompletionEvent;
 import io.netty.handler.ssl.SslHandshakeCompletionEvent;
@@ -62,5 +63,8 @@ public class SslHandshakeClientEventHandler extends ChannelInboundHandlerAdapter
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         log.error("Error while SSL handshake: " + cause.getMessage());
+        if (cause instanceof DecoderException) {
+            balClientInitCallback.complete(Utils.createSocketError(cause.getMessage()));
+        }
     }
 }
