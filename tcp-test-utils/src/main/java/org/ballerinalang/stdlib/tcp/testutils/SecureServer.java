@@ -45,6 +45,7 @@ public class SecureServer implements Runnable {
                             SslHandler handler = sslContext.newHandler(ch.alloc());
                             handler.engine().setEnabledProtocols(new String[]{"TLSv1.2"});
                             handler.engine().setEnabledCipherSuites(new String[]{"TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA"});
+                            handler.setHandshakeTimeoutMillis(20_000); // set the handshake timeout value to 20sec
                             ch.pipeline().addFirst(handler);
                             ch.pipeline().addLast(new SslHandshakeEventHandler());
                         }
