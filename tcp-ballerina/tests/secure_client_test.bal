@@ -54,7 +54,7 @@ function testSecureClientEcho() returns @tainted error? {
         ciphers: ["TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA"]
     });
 
-    string msg = "Hello Ballerina Echo from secure client";
+    string msg = "Hello Ballerina Echo from secure client xxx";
     byte[] msgByteArray = msg.toBytes();
     check socketClient->writeBytes(msgByteArray);
 
