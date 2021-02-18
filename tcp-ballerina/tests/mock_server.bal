@@ -106,7 +106,7 @@ service on new Listener(PORT4, secureSocket = {
     privateKey: {path: keyPath},
     protocol: {
         name: "TLS",
-        versions: ["TLSv1.2", "TLSv1.1"]
+        versions: ["TLSv1.2"]
     },
     ciphers: ["TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA"]
 }) {

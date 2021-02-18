@@ -31,7 +31,7 @@ function testCiphers() returns @tainted error? {
         certificate: {path: certPath},
         protocol: {
             name: "TLS",
-            versions: ["TLSv1.2", "TLSv1.1"]
+            versions: ["TLSv1.2"]
         },
         ciphers: ["TLS_RSA_WITH_AES_128_CBC_SHA"] // server only support TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA write should fail
     });
@@ -49,7 +49,7 @@ function testSecureClientEcho() returns @tainted error? {
         certificate: {path: certPath},
         protocol: {
             name: "TLS",
-            versions: ["TLSv1.2", "TLSv1.1"]
+            versions: ["TLSv1.2"]
         },
         ciphers: ["TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA"]
     });
