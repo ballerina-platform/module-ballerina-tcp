@@ -77,8 +77,7 @@ public class TcpClient {
                     if (channelFuture.isSuccess()) {
                         channelFuture.channel().config().setAutoRead(false);
                         channel = channelFuture.channel();
-                        SslHandler sslHandler = (SslHandler) channel.pipeline().get(Constants.SSL_HANDLER);
-                        if (sslHandler == null) {
+                        if (secureSocket == null) {
                             callback.complete(null);
                         }
                     } else {
@@ -103,7 +102,7 @@ public class TcpClient {
                 .getStringValue(StringUtils.fromString(Constants.CERTIFICATE_PATH)).getValue()));
         SslContext sslContext = sslContextBuilder.build();
         SslHandler sslHandler = sslContext.newHandler(channel.alloc());
-
+        sslHandler.setHandshakeTimeoutMillis(20_000); // set handshake time out value to 20sec
         if (protocolVersions.length > 0) {
             sslHandler.engine().setEnabledProtocols(protocolVersions);
         }

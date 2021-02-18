@@ -25,7 +25,6 @@ function testProtocolVersion() returns @tainted error? {
     io:println("SecureClient: ", socketClient);
 }
 
-
 @test:Config {dependsOn: [testProtocolVersion], enable: false}
 function testCiphers() returns @tainted error? {
     Error|Client socketClient = new ("localhost", 9002, secureSocket = {
@@ -44,7 +43,7 @@ function testCiphers() returns @tainted error? {
     io:println("SecureClient: ", socketClient);
 }
 
-@test:Config {dependsOn: [testCiphers], enable: false}
+@test:Config {dependsOn: [testServerAlreadyClosed], enable: true}
 function testSecureClientEcho() returns @tainted error? {
     Client socketClient = check new ("localhost", 9002, secureSocket = {
         certificate: {path: certPath},
