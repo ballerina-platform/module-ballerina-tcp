@@ -85,9 +85,9 @@ def moduleVersion = project.version.replace("-SNAPSHOT", "")
 
 release {
     failOnPublishNeeded = false
+    failOnSnapshotDependencies = true
 
     buildTasks = ['build']
-    failOnSnapshotDependencies = true
     versionPropertyFile = 'gradle.properties'
     tagTemplate = 'v$version'
 
