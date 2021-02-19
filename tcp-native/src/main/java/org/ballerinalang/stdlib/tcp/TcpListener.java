@@ -26,7 +26,6 @@ import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
-import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
@@ -54,6 +53,11 @@ public class TcpListener {
         this.bossGroup = bossGroup;
         this.workerGroup = workerGroup;
         listenerBootstrap = new ServerBootstrap();
+
+        if (secureSocket != null && !SecureSocketUtils.isValidateCertAndKey(secureSocket, callback)) {
+            return;
+        }
+
         listenerBootstrap.group(this.bossGroup, this.workerGroup)
                 .channel(NioServerSocketChannel.class)
                 .childHandler(new ChannelInitializer<SocketChannel>() {
@@ -65,12 +69,6 @@ public class TcpListener {
                         } else {
                             ch.pipeline().addLast(Constants.LISTENER_HANDLER, tcpListenerHandler);
                         }
-                    }
-
-                    @Override
-                    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-                        callback.complete(Utils.createSocketError(cause.getMessage()));
-                        ctx.close();
                     }
                 })
                 .bind(localAddress)

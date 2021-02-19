@@ -18,6 +18,11 @@
 
 package org.ballerinalang.stdlib.tcp;
 
+import io.ballerina.runtime.api.Future;
+import io.ballerina.runtime.api.utils.StringUtils;
+import io.ballerina.runtime.api.values.BMap;
+import io.ballerina.runtime.api.values.BString;
+
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -180,5 +185,23 @@ public class SecureSocketUtils {
         }
 
         return certificates;
+    }
+
+    public static boolean isValidateCertAndKey(BMap<BString, Object> secureSocket, Future callback) {
+        BMap<BString, Object> certificate = (BMap<BString, Object>) secureSocket.getMapValue(StringUtils
+                .fromString(Constants.CERTIFICATE));
+        BMap<BString, Object> privateKey = (BMap<BString, Object>) secureSocket.getMapValue(StringUtils
+                .fromString(Constants.PRIVATE_KEY));
+
+        try {
+            SecureSocketUtils.readCertificateChain(new File(certificate.getStringValue(StringUtils
+                    .fromString(Constants.CERTIFICATE_PATH)).getValue()));
+            SecureSocketUtils.readPrivateKey(new File(privateKey.getStringValue(StringUtils
+                    .fromString(Constants.PRIVATE_KEY_PATH)).getValue()), Optional.empty());
+        } catch (IOException | GeneralSecurityException e) {
+            callback.complete(Utils.createSocketError(e.getMessage()));
+            return false;
+        }
+        return true;
     }
 }
