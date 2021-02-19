@@ -26,21 +26,26 @@ import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
-import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.ssl.SslContext;
-import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.SslHandler;
 import io.netty.handler.timeout.IdleStateHandler;
 
-import java.io.File;
+import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
 import java.util.concurrent.TimeUnit;
 
-import javax.net.ssl.SSLException;
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLEngine;
+import javax.net.ssl.SSLParameters;
+import javax.net.ssl.TrustManagerFactory;
 
 /**
  * {@link TcpClient} creates the tcp client and handles all the network operations.
@@ -65,12 +70,6 @@ public class TcpClient {
                             ch.pipeline().addLast(Constants.CLIENT_HANDLER, tcpClientHandler);
                         }
                     }
-
-                    @Override
-                    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-                        callback.complete(Utils.createSocketError(cause.getMessage()));
-                        ctx.close();
-                    }
                 })
                 .connect(remoteAddress, localAddress)
                 .addListener((ChannelFutureListener) channelFuture -> {
@@ -88,7 +87,7 @@ public class TcpClient {
     }
 
     private void setSSLHandler(SocketChannel channel, BMap<BString, Object> secureSocket,
-                               TcpClientHandler tcpClientHandler, Future callback) throws SSLException {
+                               TcpClientHandler tcpClientHandler, Future callback) {
         BMap<BString, Object> certificate = (BMap<BString, Object>) secureSocket.getMapValue(StringUtils
                 .fromString(Constants.CERTIFICATE));
         BMap<BString, Object> protocol = (BMap<BString, Object>) secureSocket.getMapValue(StringUtils
@@ -97,20 +96,35 @@ public class TcpClient {
                 fromString(Constants.PROTOCOL_VERSIONS)).getStringArray();
         String[] ciphers = secureSocket.getArrayValue(StringUtils.fromString(Constants.CIPHERS)).getStringArray();
 
-        SslContextBuilder sslContextBuilder = SslContextBuilder.forClient();
-        sslContextBuilder.trustManager(new File(certificate
-                .getStringValue(StringUtils.fromString(Constants.CERTIFICATE_PATH)).getValue()));
-        SslContext sslContext = sslContextBuilder.build();
-        SslHandler sslHandler = sslContext.newHandler(channel.alloc());
-        sslHandler.setHandshakeTimeoutMillis(20_000); // set handshake time out value to 20sec
-        if (protocolVersions.length > 0) {
-            sslHandler.engine().setEnabledProtocols(protocolVersions);
-        }
-        if (ciphers != null && ciphers.length > 0) {
-            sslHandler.engine().setEnabledCipherSuites(ciphers);
+        SSLEngine sslEngine;
+        try {
+            SSLContext sslContext = protocol != null ? SSLContext.getInstance(protocol.getStringValue(StringUtils
+                    .fromString(Constants.NAME)).getValue())
+                    : SSLContext.getDefault();
+            TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(KeyManagerFactory
+                    .getDefaultAlgorithm());
+            trustManagerFactory.init(SecureSocketUtils.truststore(certificate.getStringValue(StringUtils
+                    .fromString(Constants.CERTIFICATE_PATH)).getValue()));
+            sslContext.init(null, trustManagerFactory.getTrustManagers(), null);
+            sslEngine = sslContext.createSSLEngine();
+        } catch (NoSuchAlgorithmException | CertificateException | KeyStoreException | IOException
+                | KeyManagementException e) {
+            callback.complete(Utils.createSocketError(e.getMessage()));
+            return;
         }
 
-        channel.pipeline().addFirst(Constants.SSL_HANDLER, sslHandler);
+        sslEngine.setUseClientMode(true);
+
+        SSLParameters sslParameters = new SSLParameters();
+        if (protocolVersions.length > 0) {
+            sslParameters.setProtocols(protocolVersions);
+        }
+        if (ciphers != null && ciphers.length > 0) {
+            sslParameters.setCipherSuites(ciphers);
+        }
+        sslEngine.setSSLParameters(sslParameters);
+
+        channel.pipeline().addFirst(Constants.SSL_HANDLER, new SslHandler(sslEngine));
         channel.pipeline().addLast(Constants.SSL_HANDSHAKE_HANDLER,
                 new SslHandshakeClientEventHandler(tcpClientHandler, callback));
     }

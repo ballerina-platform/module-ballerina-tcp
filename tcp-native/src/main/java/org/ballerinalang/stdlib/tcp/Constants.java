@@ -68,6 +68,7 @@ public class Constants {
     public static final String PRIVATE_KEY = "privateKey";
     public static final String PRIVATE_KEY_PATH = "path";
     public static final String KEY_STORE_PASSWORD = "secret";
+    public static final String NAME = "name";
 
     private Constants() {}
 
