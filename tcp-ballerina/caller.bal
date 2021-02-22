@@ -37,7 +37,7 @@ public client class Caller {
   # + data - The data need to be sent to the remote host
   # + return - () or else a `tcp:Error` if the given data can't be sent
   isolated remote function writeBytes(byte[] data) returns Error? {
-    return externSendBytes(self, data);
+    return externWriteBytesCaller(self, data);
   }
 
   # Close the remote connection.
@@ -49,12 +49,12 @@ public client class Caller {
   }
 }
 
-isolated function externSendBytes(Caller caller, byte[] data) returns Error? = @java:Method {
-    'class: "org.ballerinalang.stdlib.tcp.nativelistener.Caller",
-    name: "sendBytes"
+isolated function externWriteBytesCaller(Caller caller, byte[] data) returns Error? = @java:Method {
+    name: "externWriteBytes",
+    'class: "org.ballerinalang.stdlib.tcp.nativelistener.Caller"
 } external;
 
 isolated function externCloseCaller(Caller caller) returns Error? = @java:Method {
-    'class: "org.ballerinalang.stdlib.tcp.nativelistener.Caller",
-    name: "close"
+    name: "externClose",
+    'class: "org.ballerinalang.stdlib.tcp.nativelistener.Caller"
 } external;

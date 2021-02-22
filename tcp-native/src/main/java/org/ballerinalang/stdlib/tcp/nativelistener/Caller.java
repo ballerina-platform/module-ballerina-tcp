@@ -34,7 +34,7 @@ import org.ballerinalang.stdlib.tcp.Utils;
  */
 public class Caller {
 
-    public static Object sendBytes(Environment env, BObject caller, BArray data) {
+    public static Object externWriteBytes(Environment env, BObject caller, BArray data) {
         final Future callback = env.markAsync();
         byte[] byteContent = data.getBytes();
         Channel channel = (Channel) caller.getNativeData(Constants.CHANNEL);
@@ -43,7 +43,7 @@ public class Caller {
         return null;
     }
 
-    public static Object close(Environment env, BObject caller) {
+    public static Object externClose(Environment env, BObject caller) {
         final Future callback = env.markAsync();
 
         Channel channel = (Channel) caller.getNativeData(Constants.CHANNEL);

@@ -40,18 +40,18 @@ import java.net.InetSocketAddress;
 public class Listener {
     private static final Logger log = LoggerFactory.getLogger(Listener.class);
 
-    public static Object init(BObject listener, int localPort, BMap<BString, Object> config) {
+    public static Object externInit(BObject listener, int localPort, BMap<BString, Object> config) {
         listener.addNativeData(Constants.LISTENER_CONFIG, config);
         listener.addNativeData(Constants.LOCAL_PORT, localPort);
         return null;
     }
 
-    public static Object register(Environment env, BObject listener, BObject service) {
+    public static Object externAttach(Environment env, BObject listener, BObject service) {
         listener.addNativeData(Constants.SERVICE, new TcpService(env.getRuntime(), service));
         return null;
     }
 
-    public static Object start(Environment env, BObject listener) {
+    public static Object externStart(Environment env, BObject listener) {
         Future balFuture = env.markAsync();
 
         BMap<BString, Object> config = (BMap<BString, Object>) listener.getNativeData(Constants.LISTENER_CONFIG);
@@ -77,7 +77,7 @@ public class Listener {
         return null;
     }
 
-    public static Object detach(BObject listener) {
+    public static Object externDetach(BObject listener) {
         TcpService service = (TcpService) listener.getNativeData(Constants.SERVICE);
         if (service == null) {
             log.info("service is not attached to the listener");
@@ -88,7 +88,7 @@ public class Listener {
         return null;
     }
 
-    public static Object gracefulStop(Environment env, BObject listener) {
+    public static Object externGracefulStop(Environment env, BObject listener) {
         Future balFuture = env.markAsync();
 
         TcpListener tcpListener = (TcpListener) listener.getNativeData(Constants.LISTENER);
