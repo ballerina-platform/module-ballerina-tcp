@@ -54,7 +54,7 @@ public class TcpListener {
         this.workerGroup = workerGroup;
         listenerBootstrap = new ServerBootstrap();
 
-        if (secureSocket != null && !SecureSocketUtils.isValidateCertAndKey(secureSocket, callback)) {
+        if (secureSocket != null && !SecureSocketUtils.isValidCertAndKey(secureSocket, callback)) {
             return;
         }
 

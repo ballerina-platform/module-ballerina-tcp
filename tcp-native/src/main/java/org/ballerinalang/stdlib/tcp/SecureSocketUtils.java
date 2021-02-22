@@ -187,7 +187,7 @@ public class SecureSocketUtils {
         return certificates;
     }
 
-    public static boolean isValidateCertAndKey(BMap<BString, Object> secureSocket, Future callback) {
+    public static boolean isValidCertAndKey(BMap<BString, Object> secureSocket, Future callback) {
         BMap<BString, Object> certificate = (BMap<BString, Object>) secureSocket.getMapValue(StringUtils
                 .fromString(Constants.CERTIFICATE));
         BMap<BString, Object> privateKey = (BMap<BString, Object>) secureSocket.getMapValue(StringUtils
