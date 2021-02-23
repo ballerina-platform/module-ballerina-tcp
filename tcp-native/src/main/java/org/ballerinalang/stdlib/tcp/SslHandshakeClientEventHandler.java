@@ -53,6 +53,7 @@ public class SslHandshakeClientEventHandler extends ChannelInboundHandlerAdapter
             } else {
                 balClientInitCallback.complete(Utils.createSocketError(((SslHandshakeCompletionEvent) event).
                         cause().getMessage()));
+                balClientInitCallback = null;
                 ctx.close();
             }
         } else if (!(event instanceof SslCloseCompletionEvent)) {
@@ -63,7 +64,7 @@ public class SslHandshakeClientEventHandler extends ChannelInboundHandlerAdapter
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         log.error("Error while SSL handshake: " + cause.getMessage());
-        if (cause instanceof DecoderException) {
+        if (cause instanceof DecoderException && balClientInitCallback != null) {
             balClientInitCallback.complete(Utils.createSocketError(cause.getMessage()));
             ctx.close();
         }
