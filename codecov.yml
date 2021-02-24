@@ -1,6 +1,6 @@
 fixes:
   - "ballerina/tcp/::tcp-ballerina/"
 
-# ignore:
-#   - "**/test"
+ignore:
+  - "**/test"
 
