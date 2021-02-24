@@ -7,7 +7,7 @@ function setupServer() {
     var result = startSecureServer();
 }
 
-@test:Config {dependsOn: [testServerAlreadyClosed], enable: true}
+@test:Config {dependsOn: [testListenerEcho], enable: true}
 function testProtocolVersion() returns @tainted error? {
     Error|Client socketClient = new ("localhost", 9002, secureSocket = {
         certificate: {path: certPath},
@@ -24,7 +24,6 @@ function testProtocolVersion() returns @tainted error? {
     }
     io:println("SecureClient: ", socketClient);
 }
-
 
 @test:Config {dependsOn: [testProtocolVersion], enable: true}
 function testCiphers() returns @tainted error? {

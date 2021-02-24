@@ -26,13 +26,11 @@ import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
-import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.ssl.SslContext;
-import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.SslHandler;
 import io.netty.handler.timeout.IdleStateHandler;
 
@@ -48,11 +46,10 @@ import javax.net.ssl.SSLException;
 public class TcpClient {
 
     private Channel channel;
-    private final Bootstrap clientBootstrap;
 
     public TcpClient(InetSocketAddress localAddress, InetSocketAddress remoteAddress, EventLoopGroup group,
                      Future callback, BMap<BString, Object> secureSocket) {
-        clientBootstrap = new Bootstrap();
+        Bootstrap clientBootstrap = new Bootstrap();
         clientBootstrap.group(group)
                 .channel(NioSocketChannel.class)
                 .handler(new ChannelInitializer<SocketChannel>() {
@@ -65,19 +62,13 @@ public class TcpClient {
                             ch.pipeline().addLast(Constants.CLIENT_HANDLER, tcpClientHandler);
                         }
                     }
-
-                    @Override
-                    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-                        callback.complete(Utils.createSocketError(cause.getMessage()));
-                        ctx.close();
-                    }
                 })
                 .connect(remoteAddress, localAddress)
                 .addListener((ChannelFutureListener) channelFuture -> {
                     if (channelFuture.isSuccess()) {
-                        channelFuture.channel().config().setAutoRead(false);
                         channel = channelFuture.channel();
                         if (secureSocket == null) {
+                            channelFuture.channel().config().setAutoRead(false);
                             callback.complete(null);
                         }
                     } else {
@@ -97,18 +88,20 @@ public class TcpClient {
                 fromString(Constants.PROTOCOL_VERSIONS)).getStringArray();
         String[] ciphers = secureSocket.getArrayValue(StringUtils.fromString(Constants.CIPHERS)).getStringArray();
 
-        SslContextBuilder sslContextBuilder = SslContextBuilder.forClient();
-        sslContextBuilder.trustManager(new File(certificate
+        SSLConfig sslConfig = new SSLConfig();
+        sslConfig.setClientTrustCertificates(new File(certificate
                 .getStringValue(StringUtils.fromString(Constants.CERTIFICATE_PATH)).getValue()));
-        SslContext sslContext = sslContextBuilder.build();
-        SslHandler sslHandler = sslContext.newHandler(channel.alloc());
 
         if (protocolVersions.length > 0) {
-            sslHandler.engine().setEnabledProtocols(protocolVersions);
+            sslConfig.setEnableProtocols(protocolVersions);
         }
         if (ciphers != null && ciphers.length > 0) {
-            sslHandler.engine().setEnabledCipherSuites(ciphers);
+            sslConfig.setCipherSuites(ciphers);
         }
+
+        SSLHandlerFactory sslHandlerFactory = new SSLHandlerFactory(sslConfig);
+        SslContext sslContext = sslHandlerFactory.createContextForClient();
+        SslHandler sslHandler = sslContext.newHandler(channel.alloc());
 
         channel.pipeline().addFirst(Constants.SSL_HANDLER, sslHandler);
         channel.pipeline().addLast(Constants.SSL_HANDSHAKE_HANDLER,
