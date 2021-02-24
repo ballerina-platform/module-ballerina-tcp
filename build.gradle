@@ -101,25 +101,12 @@ task build {
     dependsOn('tcp-ballerina:build')
 }
 
-def classFilesArray = []
-
-task copyClassFilePaths {
+task codeCoverageReport(type: JacocoReport) {
+    dependsOn('tcp-native:copyJavaClassFiles')
     dependsOn('tcp-ballerina:extractBallerinaClassFiles')
 
-    subprojects.forEach { subproject -> 
-        fileTree("${subproject.buildDir}/classes").matching {
-            exclude '**/test/*'
-            exclude '**/module-info.class'
-            include '**/*.class'
-        }.each { file -> classFilesArray.push(file) }
-    }
-}
-
-task codeCoverageReport(type: JacocoReport) {
-    dependsOn(copyClassFilePaths)
-
     executionData fileTree(project.rootDir.absolutePath).include("**/target/cache/tests_cache/coverage/ballerina.exec")
-    additionalClassDirs files(classFilesArray)
+    additionalClassDirs files("${buildDir}/classes")
 
     subprojects.each {
         sourceSets it.sourceSets.main

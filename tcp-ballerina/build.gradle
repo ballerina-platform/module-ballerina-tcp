@@ -299,7 +299,7 @@ task extractBallerinaClassFiles(type: Copy) {
             exclude '**/tests/*'
             include '**/*.class'
         }
-        into "${project.projectDir}/build/classes"
+        into "${project.rootDir.absolutePath}/build/classes"
     }
 }
 
