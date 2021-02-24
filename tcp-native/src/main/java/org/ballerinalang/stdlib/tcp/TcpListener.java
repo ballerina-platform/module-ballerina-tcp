@@ -29,10 +29,10 @@ import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.EventLoopGroup;
-import io.netty.channel.socket.ServerSocketChannel;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.ssl.SslContext;
+import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.SslHandler;
 
 import java.io.File;
@@ -48,7 +48,6 @@ public class TcpListener {
     private final EventLoopGroup bossGroup;
     private final EventLoopGroup workerGroup;
     private final ServerBootstrap listenerBootstrap;
-    private SslContext sslContext;
 
     public TcpListener(InetSocketAddress localAddress, EventLoopGroup bossGroup, EventLoopGroup workerGroup,
                        Future callback, TcpService tcpService, BMap<BString, Object> secureSocket) {
@@ -57,11 +56,14 @@ public class TcpListener {
         listenerBootstrap = new ServerBootstrap();
         listenerBootstrap.group(this.bossGroup, this.workerGroup)
                 .channel(NioServerSocketChannel.class)
-                .handler(new ChannelInitializer<ServerSocketChannel>() {
+                .childHandler(new ChannelInitializer<SocketChannel>() {
                     @Override
-                    protected void initChannel(ServerSocketChannel channel) throws Exception {
+                    protected void initChannel(SocketChannel ch) throws Exception {
+                        TcpListenerHandler tcpListenerHandler = new TcpListenerHandler(tcpService);
                         if (secureSocket != null) {
-                            sslContext = getSslContext(secureSocket);
+                            setSSLHandler(ch, secureSocket, tcpListenerHandler);
+                        } else {
+                            ch.pipeline().addLast(Constants.LISTENER_HANDLER, tcpListenerHandler);
                         }
                     }
 
@@ -69,17 +71,6 @@ public class TcpListener {
                     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
                         callback.complete(Utils.createSocketError(cause.getMessage()));
                         ctx.close();
-                    }
-                })
-                .childHandler(new ChannelInitializer<SocketChannel>() {
-                    @Override
-                    protected void initChannel(SocketChannel channel) throws Exception {
-                        TcpListenerHandler tcpListenerHandler = new TcpListenerHandler(tcpService);
-                        if (secureSocket != null) {
-                            setSslHandler(channel, sslContext, tcpListenerHandler);
-                        } else {
-                            channel.pipeline().addLast(Constants.LISTENER_HANDLER, tcpListenerHandler);
-                        }
                     }
                 })
                 .bind(localAddress)
@@ -93,7 +84,8 @@ public class TcpListener {
                 });
     }
 
-    private SslContext getSslContext(BMap<BString, Object> secureSocket) throws IOException {
+    private void setSSLHandler(SocketChannel channel, BMap<BString, Object> secureSocket,
+                               TcpListenerHandler tcpListenerHandler) throws IOException {
         BMap<BString, Object> certificate = (BMap<BString, Object>) secureSocket.getMapValue(StringUtils
                 .fromString(Constants.CERTIFICATE));
         BMap<BString, Object> privateKey = (BMap<BString, Object>) secureSocket.getMapValue(StringUtils
@@ -104,25 +96,19 @@ public class TcpListener {
                 fromString(Constants.PROTOCOL_VERSIONS)).getStringArray();
         String[] ciphers = secureSocket.getArrayValue(StringUtils.fromString(Constants.CIPHERS)).getStringArray();
 
-        SSLConfig sslConfig = new SSLConfig();
-        sslConfig.setServerCertificates(new File(certificate.getStringValue(StringUtils
-                .fromString(Constants.CERTIFICATE_PATH)).getValue()));
-        sslConfig.setServerKeyFile(new File(privateKey.getStringValue(StringUtils
-                .fromString(Constants.PRIVATE_KEY_PATH)).getValue()));
+        SslContext sslContext = SslContextBuilder.forServer(
+                new File(certificate.getStringValue(StringUtils.fromString(Constants.CERTIFICATE_PATH)).getValue()),
+                new File(privateKey.getStringValue(StringUtils.fromString(Constants.PRIVATE_KEY_PATH)).getValue()))
+                .build();
+
+        SslHandler sslHandler = sslContext.newHandler(channel.alloc());
 
         if (protocolVersions.length > 0) {
-            sslConfig.setEnableProtocols(protocolVersions);
+            sslHandler.engine().setEnabledProtocols(protocolVersions);
         }
         if (ciphers != null && ciphers.length > 0) {
-            sslConfig.setCipherSuites(ciphers);
+            sslHandler.engine().setEnabledCipherSuites(ciphers);
         }
-
-        SSLHandlerFactory sslHandlerFactory = new SSLHandlerFactory(sslConfig);
-        return sslHandlerFactory.createContextForServer();
-    }
-
-    private void setSslHandler(Channel channel, SslContext sslContext, TcpListenerHandler tcpListenerHandler) {
-        SslHandler sslHandler = sslContext.newHandler(channel.alloc());
 
         channel.pipeline().addFirst(Constants.SSL_HANDLER, sslHandler);
         channel.pipeline().addLast(Constants.SSL_HANDSHAKE_HANDLER,

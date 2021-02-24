@@ -32,6 +32,7 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.ssl.SslContext;
+import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.SslHandler;
 import io.netty.handler.timeout.IdleStateHandler;
 
@@ -76,7 +77,8 @@ public class TcpClient {
                     if (channelFuture.isSuccess()) {
                         channelFuture.channel().config().setAutoRead(false);
                         channel = channelFuture.channel();
-                        if (secureSocket == null) {
+                        SslHandler sslHandler = (SslHandler) channel.pipeline().get(Constants.SSL_HANDLER);
+                        if (sslHandler == null) {
                             callback.complete(null);
                         }
                     } else {
@@ -96,20 +98,18 @@ public class TcpClient {
                 fromString(Constants.PROTOCOL_VERSIONS)).getStringArray();
         String[] ciphers = secureSocket.getArrayValue(StringUtils.fromString(Constants.CIPHERS)).getStringArray();
 
-        SSLConfig sslConfig = new SSLConfig();
-        sslConfig.setClientTrustCertificates(new File(certificate
+        SslContextBuilder sslContextBuilder = SslContextBuilder.forClient();
+        sslContextBuilder.trustManager(new File(certificate
                 .getStringValue(StringUtils.fromString(Constants.CERTIFICATE_PATH)).getValue()));
+        SslContext sslContext = sslContextBuilder.build();
+        SslHandler sslHandler = sslContext.newHandler(channel.alloc());
 
         if (protocolVersions.length > 0) {
-            sslConfig.setEnableProtocols(protocolVersions);
+            sslHandler.engine().setEnabledProtocols(protocolVersions);
         }
         if (ciphers != null && ciphers.length > 0) {
-            sslConfig.setCipherSuites(ciphers);
+            sslHandler.engine().setEnabledCipherSuites(ciphers);
         }
-
-        SSLHandlerFactory sslHandlerFactory = new SSLHandlerFactory(sslConfig);
-        SslContext sslContext = sslHandlerFactory.createContextForClient();
-        SslHandler sslHandler = sslContext.newHandler(channel.alloc());
 
         channel.pipeline().addFirst(Constants.SSL_HANDLER, sslHandler);
         channel.pipeline().addLast(Constants.SSL_HANDSHAKE_HANDLER,
