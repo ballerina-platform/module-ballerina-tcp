@@ -50,12 +50,12 @@ public class TcpFactory {
 
     public TcpClient createTcpClient(InetSocketAddress localAddress, InetSocketAddress remoteAddress, Future callback,
                                      BMap<BString, Object> secureSocket) {
-        return new TcpClient(localAddress, remoteAddress, workerGroup, callback, secureSocket);
+        return new TcpClient(localAddress, remoteAddress, getInstance().workerGroup, callback, secureSocket);
     }
 
     public TcpListener createTcpListener(InetSocketAddress localAddress, Future callback, TcpService tcpService,
                                                 BMap<BString, Object> secureSocket) {
-        return new TcpListener(localAddress, bossGroup, workerGroup, callback, tcpService,
+        return new TcpListener(localAddress, getInstance().bossGroup, getInstance().workerGroup, callback, tcpService,
                 secureSocket);
     }
 }
