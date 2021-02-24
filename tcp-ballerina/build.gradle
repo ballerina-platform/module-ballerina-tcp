@@ -158,8 +158,12 @@ task initializeVariables {
         balJavaDebugParam = "BAL_JAVA_DEBUG=${project.findProperty("balJavaDebug")}"
     }
     gradle.taskGraph.whenReady { graph ->
-        if (graph.hasTask(":${packageName}-ballerina:build") || graph.hasTask(":${packageName}-ballerina:publish"))  {
+        if (graph.hasTask(":${packageName}-ballerina:build") ||
+                graph.hasTask(":${packageName}-ballerina:publish") ||
+                graph.hasTask(":${packageName}-ballerina:publishToMavenLocal")) {
             ballerinaTest.enabled = false
+        } else {
+            ballerinaTest.enabled = true
         }
 
         if (graph.hasTask(":${packageName}-ballerina:test")) {
@@ -239,6 +243,9 @@ task ballerinaBuild {
 
 task ballerinaPublish {
     doLast {
+        if (project.version.endsWith('-SNAPSHOT')) {
+            return
+        }
         if (ballerinaCentralAccessToken != null) {
             println("Publishing to the ballerina central..")
             exec {
@@ -250,7 +257,8 @@ task ballerinaPublish {
                     commandLine 'sh', '-c', "$distributionBinPath/bal push"
                 }
             }
-
+        } else {
+            throw new InvalidUserDataException("Central Access Token is Not Present")
         }
     }
 }
@@ -300,5 +308,9 @@ ballerinaBuild.dependsOn ":${packageName}-test-utils:build"
 ballerinaBuild.finalizedBy revertTomlFile
 build.dependsOn ballerinaBuild
 
+ballerinaPublish.dependsOn ":${packageName}-native:build"
 ballerinaPublish.dependsOn ballerinaBuild
+ballerinaPublish.dependsOn updateTomlFile
+ballerinaPublish.dependsOn initializeVariables
+ballerinaPublish.finalizedBy revertTomlFile
 publish.dependsOn ballerinaPublish
