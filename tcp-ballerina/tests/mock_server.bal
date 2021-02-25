@@ -16,8 +16,8 @@
 
 import ballerina/io;
 
-configurable string keyPath = ?;
-configurable string certPath = ?;
+string certPath = "tests/etc/cert.pem";
+string keyPath = "tests/etc/key.pem";
 
 const int PORT1 = 8809;
 const int PORT2 = 8023;

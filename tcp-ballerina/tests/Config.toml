@@ -1,3 +1,0 @@
-[tcp]
-certPath = "tests/etc/cert.pem"
-keyPath = "tests/etc/key.pem"

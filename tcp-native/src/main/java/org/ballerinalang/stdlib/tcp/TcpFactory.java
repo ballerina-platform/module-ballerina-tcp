@@ -36,9 +36,9 @@ public class TcpFactory {
     private final EventLoopGroup workerGroup;
 
     private TcpFactory() {
-        int totalNumberOfThreads = (Runtime.getRuntime().availableProcessors() * 2);
-        bossGroup = new NioEventLoopGroup(totalNumberOfThreads / 4);
-        workerGroup = new NioEventLoopGroup(totalNumberOfThreads - totalNumberOfThreads / 4);
+        int totalNumberOfProcessors = Runtime.getRuntime().availableProcessors();
+        bossGroup = new NioEventLoopGroup(totalNumberOfProcessors);
+        workerGroup = new NioEventLoopGroup(totalNumberOfProcessors * 2);
     }
 
     public static TcpFactory getInstance() {
@@ -50,12 +50,12 @@ public class TcpFactory {
 
     public TcpClient createTcpClient(InetSocketAddress localAddress, InetSocketAddress remoteAddress, Future callback,
                                      BMap<BString, Object> secureSocket) {
-        return new TcpClient(localAddress, remoteAddress, getInstance().workerGroup, callback, secureSocket);
+        return new TcpClient(localAddress, remoteAddress, workerGroup, callback, secureSocket);
     }
 
     public TcpListener createTcpListener(InetSocketAddress localAddress, Future callback, TcpService tcpService,
-                                                BMap<BString, Object> secureSocket) {
-        return new TcpListener(localAddress, getInstance().bossGroup, getInstance().workerGroup, callback, tcpService,
+                                         BMap<BString, Object> secureSocket) {
+        return new TcpListener(localAddress, bossGroup, workerGroup, callback, tcpService,
                 secureSocket);
     }
 }
