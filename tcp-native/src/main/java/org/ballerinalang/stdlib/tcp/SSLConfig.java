@@ -14,7 +14,6 @@
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
  *  under the License.
- *
  */
 package org.ballerinalang.stdlib.tcp;
 
@@ -27,7 +26,6 @@ import java.util.Arrays;
 /**
  * A class that encapsulates SSLContext configuration.
  */
-
 public class SSLConfig {
 
     private static final Logger log = LoggerFactory.getLogger(SSLConfig.class);
