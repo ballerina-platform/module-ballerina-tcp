@@ -1,9 +1,6 @@
 fixes:
   - "ballerina/tcp/*/::tcp-ballerina/"
 
-codecov:
-  require_ci_to_pass: no
-
 ignore:
   - "tcp-test-utils"
   - "tcp-ballerina/tests"
