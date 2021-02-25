@@ -30,7 +30,7 @@ public client class Client {
     # + remotePort - The port number of the remmote host
     # + config - Connection oriented client related configuration
     public isolated function init(string remoteHost, int remotePort, *ClientConfig config) returns Error? {
-        return initNewClient(self, remoteHost, remotePort, config);
+        return externInit(self, remoteHost, remotePort, config);
     }
 
     # Sends the given data to the connected remote host.
@@ -83,28 +83,23 @@ public type ClientConfig record {|
     SecureSocket secureSocket?;
 |};
 
-isolated function initNewClient(Client clientObj, string remoteHost, int remotePort, ClientConfig config) 
+isolated function externInit(Client clientObj, string remoteHost, int remotePort, ClientConfig config) 
 returns Error? = @java:Method {
-    name: "init",
+    name: "externInit",
     'class: "org.ballerinalang.stdlib.tcp.nativeclient.Client"
 } external;
 
 isolated function externWriteBytes(Client clientObj, byte[] content) returns Error? = @java:Method {
-    name: "writeBytes",
+    name: "externWriteBytes",
     'class: "org.ballerinalang.stdlib.tcp.nativeclient.Client"
 } external;
 
 isolated function externReadBytes(Client clientObj) returns (readonly & byte[])|Error = @java:Method {
-    name: "readBytes",
-    'class: "org.ballerinalang.stdlib.tcp.nativeclient.Client"
-} external;
-
-isolated function externReadBlocksAsStream(Client clientObj) returns stream<byte[]>|Error = @java:Method {
-    name: "readBlocksAsStream",
+    name: "externReadBytes",
     'class: "org.ballerinalang.stdlib.tcp.nativeclient.Client"
 } external;
 
 isolated function externClose(Client clientObj) returns Error? = @java:Method {
-    name: "close",
+    name: "externClose",
     'class: "org.ballerinalang.stdlib.tcp.nativeclient.Client"
 } external;

@@ -28,7 +28,7 @@ public class Listener {
     # + localPort - The port number of the remote service
     # + config - Configurations related to the `tcp:Listener`
     public isolated function init(int localPort, *ListenerConfig config) returns error? {
-        return initListener(self, localPort, config);
+        return externInitListener(self, localPort, config);
     }
 
     # Binds a service to the `tcp:Listener`.
@@ -86,27 +86,27 @@ public type ListenerConfig record {|
    ListenerSecureSocket secureSocket?; 
 |};
 
-isolated function initListener(Listener listenerObj, int localPort, ListenerConfig config) returns error? = @java:Method {
+isolated function externInitListener(Listener listenerObj, int localPort, ListenerConfig config) returns error? = @java:Method {
     'class: "org.ballerinalang.stdlib.tcp.nativelistener.Listener",
-    name: "init"
+    name: "externInit"
 } external;
 
 isolated function externAttach(Listener listenerObj, service object {} s) returns error? = @java:Method {
     'class: "org.ballerinalang.stdlib.tcp.nativelistener.Listener",
-    name: "register"
+    name: "externAttach"
 } external;
 
 isolated function externStart(Listener listenerObj) returns error? = @java:Method {
     'class: "org.ballerinalang.stdlib.tcp.nativelistener.Listener",
-    name: "start"
+    name: "externStart"
 } external;
 
 isolated function externGracefulStop(Listener listenerObj) returns error? = @java:Method {
     'class: "org.ballerinalang.stdlib.tcp.nativelistener.Listener",
-    name: "gracefulStop"
+    name: "externGracefulStop"
 } external;
 
 isolated function externDetach(Listener listenerObj) returns error? = @java:Method {
     'class: "org.ballerinalang.stdlib.tcp.nativelistener.Listener",
-    name: "detach"
+    name: "externDetach"
 } external;

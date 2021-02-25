@@ -42,8 +42,8 @@ public class Client {
 
     private static final Logger log = LoggerFactory.getLogger(Client.class);
 
-    public static Object init(Environment env, BObject client, BString remoteHost, int remotePort,
-                              BMap<BString, Object> config) {
+    public static Object externInit(Environment env, BObject client, BString remoteHost, int remotePort,
+                                    BMap<BString, Object> config) {
         final Future balFuture = env.markAsync();
 
         BString host = config.getStringValue(StringUtils.fromString(Constants.CONFIG_LOCALHOST));
@@ -69,7 +69,7 @@ public class Client {
         return null;
     }
 
-    public static Object readBytes(Environment env, BObject client) {
+    public static Object externReadBytes(Environment env, BObject client) {
         final Future balFuture = env.markAsync();
 
         long readTimeOut = (long) client.getNativeData(Constants.CONFIG_READ_TIMEOUT);
@@ -79,17 +79,7 @@ public class Client {
         return null;
     }
 
-    public static Object readBlocksAsStream(Environment env, BObject client) {
-        final Future balFuture = env.markAsync();
-
-        long readTimeOut = (long) client.getNativeData(Constants.CONFIG_READ_TIMEOUT);
-        TcpClient tcpClient = (TcpClient) client.getNativeData(Constants.CLIENT);
-        tcpClient.readData(readTimeOut, balFuture);
-
-        return null;
-    }
-
-    public static Object writeBytes(Environment env, BObject client, BArray content) {
+    public static Object externWriteBytes(Environment env, BObject client, BArray content) {
         final Future balFuture = env.markAsync();
 
         byte[] byteContent = content.getBytes();
@@ -99,7 +89,7 @@ public class Client {
         return null;
     }
 
-    public static Object close(Environment env, BObject client) {
+    public static Object externClose(Environment env, BObject client) {
         final Future balFuture = env.markAsync();
 
         TcpClient tcpClient = (TcpClient) client.getNativeData(Constants.CLIENT);
