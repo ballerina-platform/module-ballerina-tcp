@@ -32,20 +32,15 @@ service on echoServer {
 
     isolated remote function onConnect(Client caller) returns ConnectionService {
         io:println("Client connected to echoServer: ", caller.remotePort);
-        return new EchoService(caller);
+        return new EchoService();
     }
 }
 
 service class EchoService {
-    Client caller;
 
-    public isolated function init(Client c) {
-        self.caller = c;
-    }
-
-    remote function onBytes(readonly & byte[] data) returns (readonly & byte[])|Error? {
+    remote function onBytes(Client caller, readonly & byte[] data) returns (readonly & byte[])|Error? {
         io:println("Echo: ", 'string:fromBytes(data));
-        check self.caller->writeBytes(data);
+        check caller->writeBytes(data);
     }
 
     isolated remote function onError(readonly & Error err) returns Error? {
@@ -61,16 +56,11 @@ service on discardServer {
 
     isolated remote function onConnect(Client caller) returns ConnectionService {
         io:println("Client connected to discardServer: ", caller.remotePort);
-        return new DiscardService(caller);
+        return new DiscardService();
     }
 }
 
 service class DiscardService {
-    Client caller;
-
-    public isolated function init(Client c) {
-        self.caller = c;
-    }
 
     remote function onBytes(readonly & byte[] data) returns Error? {
         // read and discard the message
@@ -89,16 +79,11 @@ service on closeServer {
     isolated remote function onConnect(Client caller) returns ConnectionService|Error {
         io:println("Client connected to closeServer: ", caller.remotePort);
         check caller->close();
-        return new EchoService(caller);
+        return new EchoService();
     }
 }
 
 service class closeService {
-    Client caller;
-
-    public isolated function init(Client c) {
-        self.caller = c;
-    }
 }
 
 service on new Listener(PORT4, secureSocket = {
@@ -113,6 +98,6 @@ service on new Listener(PORT4, secureSocket = {
 
     isolated remote function onConnect(Client caller) returns ConnectionService {
         io:println("Client connected to secureEchoServer: ", caller.remotePort);
-        return new EchoService(caller);
+        return new EchoService();
     }
 }

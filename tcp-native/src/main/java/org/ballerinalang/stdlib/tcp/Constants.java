@@ -67,6 +67,7 @@ public class Constants {
     public static final String PRIVATE_KEY = "privateKey";
     public static final String PRIVATE_KEY_PATH = "path";
     public static final String HTTPS_SCHEME = "http";
+    public static final String READ_ONLY_BYTE_ARRAY = "(byte[] & readonly)";
 
     private Constants() {}
 
