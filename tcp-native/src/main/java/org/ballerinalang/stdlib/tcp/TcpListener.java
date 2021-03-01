@@ -129,7 +129,7 @@ public class TcpListener {
                 new SslHandshakeListenerEventHandler(tcpListenerHandler));
     }
 
-    // Invoke when the caller call writeBytes
+    // Invoke when the client call writeBytes
     public static void send(byte[] bytes, Channel channel, Future callback, TcpService tcpService) {
         if (!tcpService.getIsCallerClosed() && channel.isActive()) {
             WriteFlowController writeFlowController = new WriteFlowController(Unpooled.wrappedBuffer(bytes), callback);

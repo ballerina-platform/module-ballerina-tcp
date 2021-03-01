@@ -78,13 +78,15 @@ public class Dispatcher {
     private static BObject createClient(Channel channel, TcpService tcpService) {
         InetSocketAddress remoteAddress = (InetSocketAddress) channel.remoteAddress();
         InetSocketAddress localAddress = (InetSocketAddress) channel.localAddress();
-        final BObject caller = ValueCreator.createObjectValue(Utils.getTcpPackage(), Constants.CALLER);
-        caller.set(StringUtils.fromString(Constants.CALLER_REMOTE_PORT), remoteAddress.getPort());
-        caller.set(StringUtils.fromString(Constants.CALLER_REMOTE_HOST),
+        final BObject caller = ValueCreator.createObjectValue(Utils.getTcpPackage(), Constants.CLIENT,
+                StringUtils.fromString(""), -1, null);
+        caller.set(StringUtils.fromString(Constants.CLIENT_REMOTE_PORT), remoteAddress.getPort());
+        caller.set(StringUtils.fromString(Constants.CLIENT_REMOTE_HOST),
                 StringUtils.fromString(remoteAddress.getHostName()));
-        caller.set(StringUtils.fromString(Constants.CALLER_LOCAL_PORT), localAddress.getPort());
-        caller.set(StringUtils.fromString(Constants.CALLER_LOCAL_HOST),
+        caller.set(StringUtils.fromString(Constants.CLIENT_LOCAL_PORT), localAddress.getPort());
+        caller.set(StringUtils.fromString(Constants.CLIENT_LOCAL_HOST),
                 StringUtils.fromString(localAddress.getHostName()));
+        caller.set(StringUtils.fromString(Constants.CLIENT_IS_INIT_BY_SERVICE), true);
         caller.addNativeData(Constants.CHANNEL, channel);
         caller.addNativeData(Constants.SERVICE, tcpService);
         return caller;
@@ -96,7 +98,8 @@ public class Dispatcher {
                 case Constants.ON_BYTES:
                     Dispatcher.invokeOnBytes(tcpService, buffer, channel);
                     break;
-                default:break;
+                default:
+                    break;
             }
         }
     }

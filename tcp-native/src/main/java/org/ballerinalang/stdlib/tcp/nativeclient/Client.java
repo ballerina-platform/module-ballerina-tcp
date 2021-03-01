@@ -25,9 +25,14 @@ import io.ballerina.runtime.api.values.BArray;
 import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BObject;
 import io.ballerina.runtime.api.values.BString;
+import io.netty.channel.Channel;
 import org.ballerinalang.stdlib.tcp.Constants;
+import org.ballerinalang.stdlib.tcp.Dispatcher;
 import org.ballerinalang.stdlib.tcp.TcpClient;
 import org.ballerinalang.stdlib.tcp.TcpFactory;
+import org.ballerinalang.stdlib.tcp.TcpListener;
+import org.ballerinalang.stdlib.tcp.TcpService;
+import org.ballerinalang.stdlib.tcp.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,7 +68,7 @@ public class Client {
                 fromString(Constants.SECURE_SOCKET));
 
         TcpClient tcpClient = TcpFactory.getInstance().
-                createTcpClient(localAddress, remoteAddress, balFuture, secureSocket);
+                createTcpClient(localAddress, remoteAddress, balFuture, secureSocket, client);
         client.addNativeData(Constants.CLIENT, tcpClient);
 
         return null;
@@ -81,10 +86,19 @@ public class Client {
 
     public static Object externWriteBytes(Environment env, BObject client, BArray content) {
         final Future balFuture = env.markAsync();
-
         byte[] byteContent = content.getBytes();
+
         TcpClient tcpClient = (TcpClient) client.getNativeData(Constants.CLIENT);
-        tcpClient.writeData(byteContent, balFuture);
+
+        // if client have channel as native data then it's used inside the listener
+        if (tcpClient != null) {
+            tcpClient.writeData(byteContent, balFuture);
+        } else {
+            BObject caller = client;
+            Channel channel = (Channel) caller.getNativeData(Constants.CHANNEL);
+            TcpService tcpService = (TcpService) caller.getNativeData(Constants.SERVICE);
+            TcpListener.send(byteContent, channel, balFuture, tcpService);
+        }
 
         return null;
     }
@@ -93,8 +107,23 @@ public class Client {
         final Future balFuture = env.markAsync();
 
         TcpClient tcpClient = (TcpClient) client.getNativeData(Constants.CLIENT);
-        tcpClient.close(balFuture);
 
+
+        // if client have channel as native data then it's used inside the listener
+        if (tcpClient != null) {
+            tcpClient.close(balFuture);
+        } else {
+            BObject caller = client;
+            Channel channel = (Channel) caller.getNativeData(Constants.CHANNEL);
+            TcpService tcpService = (TcpService) caller.getNativeData(Constants.SERVICE);
+            tcpService.setIsCallerClosed(true);
+            try {
+                TcpListener.close(channel, balFuture);
+                Dispatcher.invokeOnClose(tcpService);
+            } catch (Exception e) {
+                balFuture.complete(Utils.createSocketError(e.getMessage()));
+            }
+        }
         return null;
     }
 }

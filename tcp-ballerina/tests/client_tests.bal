@@ -33,6 +33,7 @@ function testClientEcho() returns  @tainted error? {
 
     readonly & byte[] receivedData = check socketClient->readBytes();
     test:assertEquals('string:fromBytes(receivedData), msg, "Found unexpected output");
+    io:println(string:fromBytes(receivedData));
 
     check socketClient->close();
 }

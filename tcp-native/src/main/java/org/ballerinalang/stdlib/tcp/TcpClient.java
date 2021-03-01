@@ -21,6 +21,7 @@ package org.ballerinalang.stdlib.tcp;
 import io.ballerina.runtime.api.Future;
 import io.ballerina.runtime.api.utils.StringUtils;
 import io.ballerina.runtime.api.values.BMap;
+import io.ballerina.runtime.api.values.BObject;
 import io.ballerina.runtime.api.values.BString;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.Unpooled;
@@ -48,7 +49,7 @@ public class TcpClient {
     private Channel channel;
 
     public TcpClient(InetSocketAddress localAddress, InetSocketAddress remoteAddress, EventLoopGroup group,
-                     Future callback, BMap<BString, Object> secureSocket) {
+                     Future callback, BMap<BString, Object> secureSocket, BObject client) {
         Bootstrap clientBootstrap = new Bootstrap();
         clientBootstrap.group(group)
                 .channel(NioSocketChannel.class)
@@ -67,6 +68,13 @@ public class TcpClient {
                 .addListener((ChannelFutureListener) channelFuture -> {
                     if (channelFuture.isSuccess()) {
                         channel = channelFuture.channel();
+
+                        // set ballerina public localHost, localPort fields
+                        InetSocketAddress resolvedLocalAddress = (InetSocketAddress) channel.localAddress();
+                        client.set(StringUtils.fromString(Constants.CLIENT_LOCAL_PORT), resolvedLocalAddress.getPort());
+                        client.set(StringUtils.fromString(Constants.CLIENT_LOCAL_HOST),
+                                StringUtils.fromString(resolvedLocalAddress.getHostName()));
+
                         if (secureSocket == null) {
                             channelFuture.channel().config().setAutoRead(false);
                             callback.complete(null);

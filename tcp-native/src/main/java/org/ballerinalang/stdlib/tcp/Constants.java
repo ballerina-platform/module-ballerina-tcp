@@ -42,20 +42,20 @@ public class Constants {
     public static final String ON_CONNECT = "onConnect";
     public static final String ON_CLOSE = "onClose";
 
-    // Constants related to tcp caller
-    public static final String CALLER = "Caller";
-    public static final String CALLER_REMOTE_PORT = "remotePort";
-    public static final String CALLER_REMOTE_HOST = "remoteHost";
+    // Constants related to tcp client
+    public static final String CLIENT = "Client";
+    public static final String CLIENT_REMOTE_PORT = "remotePort";
+    public static final String CLIENT_REMOTE_HOST = "remoteHost";
     public static final String CHANNEL = "channel";
-    public static final String CALLER_LOCAL_PORT = "localPort";
-    public static final String CALLER_LOCAL_HOST = "localHost";
+    public static final String CLIENT_LOCAL_PORT = "localPort";
+    public static final String CLIENT_LOCAL_HOST = "localHost";
+    public static final String CLIENT_IS_INIT_BY_SERVICE = "isInitializedByService";
 
     // Constants used for adding native data
     public static final String LISTENER = "listener";
     public static final String LISTENER_CONFIG = "listenerConfig";
     public static final String LOCAL_PORT = "localPort";
     public static final String SERVICE = "Service";
-    public static final String CLIENT = "Client";
 
     // Constants related to secureSocket configuration
     public static final String SECURE_SOCKET = "secureSocket";

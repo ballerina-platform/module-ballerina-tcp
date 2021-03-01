@@ -18,7 +18,17 @@ import ballerina/jballerina.java;
 
 # Initializes the TCP connection client based on the 
 # provided configurations.
+# + remoteHost - The hostname or the IP address of the remote host
+# + remotePort - The port number of the remote host
+# + localHost - The hostname which the binded
+# + localPort - The port number which the socket is binded
 public client class Client {
+
+    public string remoteHost;
+    public int remotePort;
+    public string localHost = "";
+    public int localPort = -1;
+    private boolean isInitializedByService;
 
     # Initializes the TCP client based on the 
     # provided configurations.
@@ -30,6 +40,12 @@ public client class Client {
     # + remotePort - The port number of the remmote host
     # + config - Connection oriented client related configuration
     public isolated function init(string remoteHost, int remotePort, *ClientConfig config) returns Error? {
+        self.remoteHost = remoteHost;
+        self.remotePort = remotePort;
+        self.isInitializedByService = false;
+        if (remoteHost == "" && remotePort == -1) {
+            return (); // if initialized by listener
+        }
         return externInit(self, remoteHost, remotePort, config);
     }
 
@@ -54,6 +70,9 @@ public client class Client {
     # + return - The `readonly & byte[]`, or else a `tcp:Error` if the data
     #            can't be read from the remote host
     remote function readBytes() returns (readonly & byte[])|Error {
+        if (self.isInitializedByService) {
+            panic error GenericError("Can not call readBytes() within onBytes()");
+        }
         return externReadBytes(self);
     }
 

@@ -30,22 +30,22 @@ listener Listener closeServer = check new Listener(PORT3);
 
 service on echoServer {
 
-    isolated remote function onConnect(Caller caller) returns ConnectionService {
+    isolated remote function onConnect(Client caller) returns ConnectionService {
         io:println("Client connected to echoServer: ", caller.remotePort);
         return new EchoService(caller);
     }
 }
 
 service class EchoService {
-    Caller caller;
+    Client caller;
 
-    public isolated function init(Caller c) {
+    public isolated function init(Client c) {
         self.caller = c;
     }
 
     remote function onBytes(readonly & byte[] data) returns (readonly & byte[])|Error? {
         io:println("Echo: ", 'string:fromBytes(data));
-        return data;
+        check self.caller->writeBytes(data);
     }
 
     isolated remote function onError(readonly & Error err) returns Error? {
@@ -59,16 +59,16 @@ service class EchoService {
 
 service on discardServer {
 
-    isolated remote function onConnect(Caller caller) returns ConnectionService {
+    isolated remote function onConnect(Client caller) returns ConnectionService {
         io:println("Client connected to discardServer: ", caller.remotePort);
         return new DiscardService(caller);
     }
 }
 
 service class DiscardService {
-    Caller caller;
+    Client caller;
 
-    public isolated function init(Caller c) {
+    public isolated function init(Client c) {
         self.caller = c;
     }
 
@@ -86,7 +86,7 @@ service class DiscardService {
 }
 
 service on closeServer {
-    isolated remote function onConnect(Caller caller) returns ConnectionService|Error {
+    isolated remote function onConnect(Client caller) returns ConnectionService|Error {
         io:println("Client connected to closeServer: ", caller.remotePort);
         check caller->close();
         return new EchoService(caller);
@@ -94,9 +94,9 @@ service on closeServer {
 }
 
 service class closeService {
-    Caller caller;
+    Client caller;
 
-    public isolated function init(Caller c) {
+    public isolated function init(Client c) {
         self.caller = c;
     }
 }
@@ -111,7 +111,7 @@ service on new Listener(PORT4, secureSocket = {
     ciphers: ["TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA"]
 }) {
 
-    isolated remote function onConnect(Caller caller) returns ConnectionService {
+    isolated remote function onConnect(Client caller) returns ConnectionService {
         io:println("Client connected to secureEchoServer: ", caller.remotePort);
         return new EchoService(caller);
     }
