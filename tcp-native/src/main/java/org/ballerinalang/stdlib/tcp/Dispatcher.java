@@ -20,8 +20,8 @@ package org.ballerinalang.stdlib.tcp;
 
 import io.ballerina.runtime.api.creators.ValueCreator;
 import io.ballerina.runtime.api.types.MethodType;
+import io.ballerina.runtime.api.types.Type;
 import io.ballerina.runtime.api.utils.StringUtils;
-import io.ballerina.runtime.api.values.BArray;
 import io.ballerina.runtime.api.values.BError;
 import io.ballerina.runtime.api.values.BObject;
 import io.netty.buffer.ByteBuf;
@@ -39,10 +39,9 @@ public class Dispatcher {
 
     private static final Logger log = LoggerFactory.getLogger(Dispatcher.class);
 
-    private static void invokeOnBytes(TcpService tcpService, ByteBuf buffer, Channel channel) {
+    private static void invokeOnBytes(TcpService tcpService, ByteBuf buffer, Channel channel, Type[] parameterTypes) {
         try {
-            Object[] params = getOnBytesSignature(buffer);
-
+            Object[] params = getOnBytesSignature(buffer, channel, tcpService, parameterTypes);
             tcpService.getRuntime().invokeMethodAsync(tcpService.getConnectionService(), Constants.ON_BYTES, null, null,
                     new TcpCallback(tcpService, false, channel), params);
         } catch (BError e) {
@@ -64,11 +63,28 @@ public class Dispatcher {
         }
     }
 
-    private static Object[] getOnBytesSignature(ByteBuf buffer) {
+    private static Object[] getOnBytesSignature(ByteBuf buffer, Channel channel, TcpService tcpService,
+                                                Type[] parameterTypes) {
         byte[] byteContent = new byte[buffer.readableBytes()];
         buffer.readBytes(byteContent);
-        BArray bytes = ValueCreator.createArrayValue(byteContent);
-        return new Object[]{bytes, true};
+        Object[] bValues = new Object[parameterTypes.length * 2];
+        int index = 0;
+        for (Type param : parameterTypes) {
+            String typeName = param.getName();
+            switch (typeName) {
+                case Constants.READ_ONLY_BYTE_ARRAY:
+                    bValues[index++] = ValueCreator.createArrayValue(byteContent);
+                    bValues[index++] = true;
+                    break;
+                case Constants.CALLER:
+                    bValues[index++] = createClient(channel, tcpService);
+                    bValues[index++] = true;
+                    break;
+                default:
+                    break;
+            }
+        }
+        return bValues;
     }
 
     private static Object[] getOnErrorSignature(String message) {
@@ -94,9 +110,10 @@ public class Dispatcher {
         for (MethodType method : tcpService.getConnectionService().getType().getMethods()) {
             switch (method.getName()) {
                 case Constants.ON_BYTES:
-                    Dispatcher.invokeOnBytes(tcpService, buffer, channel);
+                    Dispatcher.invokeOnBytes(tcpService, buffer, channel, method.getType().getParameterTypes());
                     break;
-                default:break;
+                default:
+                    break;
             }
         }
     }
