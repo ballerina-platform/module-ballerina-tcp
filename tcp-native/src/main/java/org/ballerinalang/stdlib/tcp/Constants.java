@@ -25,7 +25,7 @@ public class Constants {
 
     // Constants related to client config
     public static final String CONFIG_LOCALHOST = "localHost";
-    public static final String CONFIG_READ_TIMEOUT = "timeoutInMillis";
+    public static final String CONFIG_READ_TIMEOUT = "timeout";
 
     // constant listener handler names
     public static final String LISTENER_HANDLER = "listenerHandler";

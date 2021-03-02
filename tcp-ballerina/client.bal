@@ -73,13 +73,13 @@ public client class Client {
 # Configurations for the connection oriented tcp client.
 # 
 # + localHost - Local binding of the interface.
-# + timeoutInMillis - The socket reading timeout value to be used 
-#                     in milliseconds. If this is not set,the default value
-#                     of 300000 milliseconds (5 minutes) will be used.
+# + timeout - The socket reading timeout value to be used 
+#             in seconds. If this is not set,the default value
+#             of 300 seconds (5 minutes) will be used.
 # + secureSocket - secureSocket configuratoin.
 public type ClientConfig record {|
     string localHost?;
-    int timeoutInMillis = 300000;
+    decimal timeout = 300;
     SecureSocket secureSocket?;
 |};
 
