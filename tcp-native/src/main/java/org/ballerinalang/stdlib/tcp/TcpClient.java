@@ -121,10 +121,11 @@ public class TcpClient {
         }
     }
 
-    public void readData(long readTimeout, Future callback) {
+    public void readData(double readTimeoutInSec, Future callback) {
+        long readTimeoutInNano = (long) (readTimeoutInSec * 1_000_000_000);
         if (channel.isActive()) {
-            channel.pipeline().addFirst(Constants.READ_TIMEOUT_HANDLER, new IdleStateHandler(readTimeout, 0, 0,
-                    TimeUnit.MILLISECONDS));
+            channel.pipeline().addFirst(Constants.READ_TIMEOUT_HANDLER, new IdleStateHandler(readTimeoutInNano, 0, 0,
+                    TimeUnit.NANOSECONDS));
             TcpClientHandler handler = (TcpClientHandler) channel.pipeline().get(Constants.CLIENT_HANDLER);
             handler.setCallback(callback);
             channel.read();
