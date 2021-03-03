@@ -38,9 +38,9 @@ service on echoServer {
 
 service class EchoService {
 
-    remote function onBytes(Caller caller, readonly & byte[] data) returns (readonly & byte[])|Error? {
+    remote function onBytes(Caller caller, readonly & byte[] data) returns Error?{
         io:println("Echo: ", 'string:fromBytes(data));
-        check caller->writeBytes(data);
+        check  caller->writeBytes(data);
     }
 
     isolated remote function onError(readonly & Error err) returns Error? {
