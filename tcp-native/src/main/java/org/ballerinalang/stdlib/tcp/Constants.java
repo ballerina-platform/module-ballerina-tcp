@@ -36,11 +36,13 @@ public class Constants {
     public static final String FLOW_CONTROL_HANDLER = "flowControlHandler";
 
 
-    // Remote method names
+    // Remote method names and method param types
     public static final String ON_BYTES = "onBytes";
     public static final String ON_ERROR = "onError";
     public static final String ON_CONNECT = "onConnect";
     public static final String ON_CLOSE = "onClose";
+    public static final String READ_ONLY_BYTE_ARRAY = "(byte[] & readonly)";
+
 
     // Constants related to tcp caller
     public static final String CALLER = "Caller";
