@@ -23,6 +23,7 @@ const int PORT1 = 8809;
 const int PORT2 = 8023;
 const int PORT3 = 8639;
 const int PORT4 = 8641;
+const int PORT5 = 8642;
 
 listener Listener echoServer = check new Listener(PORT1);
 listener Listener discardServer = check new Listener(PORT2);
@@ -38,9 +39,9 @@ service on echoServer {
 
 service class EchoService {
 
-    remote function onBytes(Caller caller, readonly & byte[] data) returns Error?{
+    remote function onBytes(Caller caller, readonly & byte[] data) returns Error? {
         io:println("Echo: ", 'string:fromBytes(data));
-        check  caller->writeBytes(data);
+        check caller->writeBytes(data);
     }
 
     isolated remote function onError(readonly & Error err) returns Error? {
@@ -84,7 +85,6 @@ service on closeServer {
 }
 
 service class CloseService {
-
 }
 
 service on new Listener(PORT4, secureSocket = {
@@ -95,10 +95,42 @@ service on new Listener(PORT4, secureSocket = {
         versions: ["TLSv1.2", "TLSv1.1"]
     },
     ciphers: ["TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA"]
-}) {
+}, localHost = "localhost") {
 
     isolated remote function onConnect(Caller caller) returns ConnectionService {
         io:println("Client connected to secureEchoServer: ", caller.remotePort);
-        return new EchoService();
+        return new SecureEchoService();
+    }
+}
+
+service class SecureEchoService {
+
+    remote function onBytes(readonly & byte[] data) returns readonly & byte[] {
+        io:println("Echo: ", 'string:fromBytes(data));
+        return data;
+    }
+
+    isolated remote function onError(readonly & Error err) returns Error? {
+        io:println(err.message());
+    }
+}
+
+const int BIG_DATA_SIZE = 8000001;
+
+service on new Listener(PORT5) {
+
+    isolated remote function onConnect(Caller caller) returns ConnectionService {
+        io:println("Client connected to secureEchoServer: ", caller.remotePort);
+        return new BigDataService();
+    }
+}
+
+service class BigDataService {
+
+    remote function onBytes(Caller caller, readonly & byte[] data) returns Error? {
+        io:println("Received: ", 'string:fromBytes(data));
+        byte[] response = [];
+        response[BIG_DATA_SIZE - 1] = 97;
+        check caller->writeBytes(response);
     }
 }

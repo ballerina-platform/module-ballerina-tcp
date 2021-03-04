@@ -24,12 +24,12 @@ function setup() {
 }
 
 @test:Config {}
-function testClientEcho() returns  @tainted error? {
+function testClientEcho() returns @tainted error? {
     Client socketClient = check new ("localhost", 3000);
 
     string msg = "Hello Ballerina Echo from client";
     byte[] msgByteArray = msg.toBytes();
-    check  socketClient->writeBytes(msgByteArray);
+    check socketClient->writeBytes(msgByteArray);
 
     readonly & byte[] receivedData = check socketClient->readBytes();
     test:assertEquals('string:fromBytes(receivedData), msg, "Found unexpected output");
@@ -37,15 +37,24 @@ function testClientEcho() returns  @tainted error? {
     check socketClient->close();
 }
 
-@test:Config {
-    dependsOn: [testClientEcho]
+@test:Config {dependsOn: [testClientEcho]}
+function testInvalidNeworkInterface() returns @tainted error? {
+    Client|Error? socketClient = new ("localhost", 3000, localHost = "invalid");
+
+    if (socketClient is Error) {
+        io:println(socketClient);
+    } else {
+        test:assertFail(msg = "Invalid network interface name provided, initializing client should result in an error");
+    }
 }
-function testClientReadTimeout() returns  @tainted error? {
+
+@test:Config {dependsOn: [testInvalidNeworkInterface]}
+function testClientReadTimeout() returns @tainted error? {
     Client socketClient = check new ("localhost", PORT2, timeoutInMillis = 100);
 
     string msg = "Do not reply";
     byte[] msgByteArray = msg.toBytes();
-    check  socketClient->writeBytes(msgByteArray);
+    check socketClient->writeBytes(msgByteArray);
 
     Error|(readonly & byte[]) res = socketClient->readBytes();
     if (res is (readonly & byte[])) {
@@ -58,10 +67,8 @@ function testClientReadTimeout() returns  @tainted error? {
     check socketClient->close();
 }
 
-@test:Config {
-    dependsOn: [testClientReadTimeout]
-}
-function testServerAlreadyClosed() returns  @tainted error? {
+@test:Config {dependsOn: [testClientReadTimeout]}
+function testServerAlreadyClosed() returns @tainted error? {
     Client socketClient = check new ("localhost", PORT3, timeoutInMillis = 100);
 
     Error|(readonly & byte[]) res = socketClient->readBytes();

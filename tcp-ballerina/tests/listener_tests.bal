@@ -17,17 +17,35 @@
 import ballerina/test;
 import ballerina/io;
 
-@test:Config {
-    dependsOn: [testServerAlreadyClosed]
-}
-function testListenerEcho() returns  @tainted error? {
+@test:Config {dependsOn: [testServerAlreadyClosed]}
+function testListenerEcho() returns @tainted error? {
     Client socketClient = check new ("localhost", PORT1);
 
     string msg = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam sit amet egestas neque.";
     byte[] msgByteArray = msg.toBytes();
-    check  socketClient->writeBytes(msgByteArray);
+    check socketClient->writeBytes(msgByteArray);
 
     readonly & byte[] receivedData = check socketClient->readBytes();
     io:println('string:fromBytes(receivedData));
+    check socketClient->close();
+}
+
+@test:Config {dependsOn: [testServerAlreadyClosed]}
+function testListenerSendingBigData() returns @tainted error? {
+    Client socketClient = check new ("localhost", PORT5);
+
+    string msg = "send the data";
+    byte[] msgByteArray = msg.toBytes();
+    check socketClient->writeBytes(msgByteArray);
+    int totalSize = 0;
+
+    readonly & byte[] response;
+    while (totalSize < BIG_DATA_SIZE) {
+        response = check socketClient->readBytes();
+        totalSize += response.length();
+    }
+    io:println("last byte of bigData: ", response[response.length() - 1]);
+    test:assertEquals(response[response.length() - 1], 97, "Found unexpected output");
+
     check socketClient->close();
 }
