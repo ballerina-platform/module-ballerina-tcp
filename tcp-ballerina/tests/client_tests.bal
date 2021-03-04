@@ -48,6 +48,7 @@ function testInvalidNeworkInterface() returns @tainted error? {
     }
 }
 
+@test:Config {dependsOn: [testInvalidNeworkInterface]}
 function testClientReadTimeout() returns  @tainted error? {
     Client socketClient = check new ("localhost", PORT2, timeout = 0.1);
 
