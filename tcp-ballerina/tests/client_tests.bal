@@ -48,9 +48,8 @@ function testInvalidNeworkInterface() returns @tainted error? {
     }
 }
 
-@test:Config {dependsOn: [testInvalidNeworkInterface]}
-function testClientReadTimeout() returns @tainted error? {
-    Client socketClient = check new ("localhost", PORT2, timeoutInMillis = 100);
+function testClientReadTimeout() returns  @tainted error? {
+    Client socketClient = check new ("localhost", PORT2, timeout = 0.1);
 
     string msg = "Do not reply";
     byte[] msgByteArray = msg.toBytes();
@@ -68,8 +67,8 @@ function testClientReadTimeout() returns @tainted error? {
 }
 
 @test:Config {dependsOn: [testClientReadTimeout]}
-function testServerAlreadyClosed() returns @tainted error? {
-    Client socketClient = check new ("localhost", PORT3, timeoutInMillis = 100);
+function testServerAlreadyClosed() returns  @tainted error? {
+    Client socketClient = check new ("localhost", PORT3, timeout = 0.1);
 
     Error|(readonly & byte[]) res = socketClient->readBytes();
     if (res is (readonly & byte[])) {
