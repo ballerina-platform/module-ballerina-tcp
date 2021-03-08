@@ -77,14 +77,10 @@ service class DiscardService {
 }
 
 service on closeServer {
-    isolated remote function onConnect(Caller caller) returns ConnectionService|Error {
+    isolated remote function onConnect(Caller caller) returns Error? {
         io:println("Client connected to closeServer: ", caller.remotePort);
         check caller->close();
-        return new CloseService();
     }
-}
-
-service class CloseService {
 }
 
 service on new Listener(PORT4, secureSocket = {

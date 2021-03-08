@@ -55,3 +55,22 @@ function testSecureListenerWithClient() returns @tainted error? {
 
     check socketClient->close();
 }
+
+
+@test:Config {dependsOn: [testSecureListenerWithClient]}
+function testSecureListenerWithUnsuportedClientProtocol() returns @tainted error? {
+    Error|Client socketClient = new ("localhost", PORT4, secureSocket = {
+        certificate: {path: certPath},
+        protocol: {
+            name: "SSL",
+            versions: ["SSLv3"]
+        },
+        ciphers: ["TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA"]
+    });
+
+    if (socketClient is Client) {
+        test:assertFail("Client initialization should fail, server doesn't support SSL protocol");
+    } else {
+        io:println(socketClient.message());
+    }
+}
