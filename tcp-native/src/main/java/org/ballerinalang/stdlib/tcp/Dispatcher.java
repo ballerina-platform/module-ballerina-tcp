@@ -50,6 +50,9 @@ public class Dispatcher {
     }
 
     public static void invokeOnError(TcpService tcpService, String message) {
+        if (tcpService.getConnectionService() == null) {
+            return;
+        }
         try {
             MethodType methodType = Arrays.stream(tcpService.getConnectionService().getType().getMethods())
                     .filter(m -> m.getName().equals(Constants.ON_CLOSE)).findFirst().orElse(null);
@@ -134,6 +137,9 @@ public class Dispatcher {
     }
 
     public static void invokeOnClose(TcpService tcpService) {
+        if (tcpService.getConnectionService() == null) {
+            return;
+        }
         try {
             MethodType methodType = Arrays.stream(tcpService.getConnectionService().getType().getMethods())
                     .filter(m -> m.getName().equals(Constants.ON_CLOSE)).findFirst().orElse(null);
