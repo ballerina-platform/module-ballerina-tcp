@@ -24,10 +24,12 @@ const int PORT2 = 8023;
 const int PORT3 = 8639;
 const int PORT4 = 8641;
 const int PORT5 = 8642;
+const int PORT6 = 8643;
 
 listener Listener echoServer = check new Listener(PORT1);
 listener Listener discardServer = check new Listener(PORT2);
 listener Listener closeServer = check new Listener(PORT3);
+listener Listener helloServer = check new Listener(PORT6);
 
 service on echoServer {
 
@@ -128,5 +130,27 @@ service class BigDataService {
         byte[] response = [];
         response[BIG_DATA_SIZE - 1] = 97;
         check caller->writeBytes(response);
+    }
+}
+
+service class HelloService {
+
+    remote function onBytes(Caller caller, readonly & byte[] data) returns Error? {
+        check caller->writeBytes("Hello".toBytes());
+    }
+}
+
+service class HiService {
+
+    remote function onBytes(Caller caller, readonly & byte[] data) returns Error? {
+        check caller->writeBytes("Hi".toBytes());
+    }
+}
+
+service on helloServer {
+
+    isolated remote function onConnect(Caller caller) returns ConnectionService {
+        io:println("Client connected to HelloServer: ", caller.remotePort);
+        return new HelloService();
     }
 }
