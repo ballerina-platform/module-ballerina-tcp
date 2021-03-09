@@ -71,7 +71,8 @@ public class TcpClient {
                 .addListener((ChannelFutureListener) channelFuture -> {
                     if (channelFuture.isSuccess()) {
                         channel = channelFuture.channel();
-                        if (secureSocket == null) {
+                        if (secureSocket == null
+                                || !secureSocket.getBooleanValue(Constants.SECURESOCKET_CONFIG_ENABLE_SSL)) {
                             channelFuture.channel().config().setAutoRead(false);
                             callback.complete(null);
                         }
