@@ -80,6 +80,32 @@ function testSecureClientEcho() returns @tainted error? {
     check socketClient->close();
 }
 
+@test:Config {dependsOn: [testSecureClientEcho], enable: true}
+function testSecureClientWithTruststore() returns @tainted error? {
+    Client socketClient = check new ("localhost", PORT7, secureSocket = {
+        cert: {
+            path: truststore,
+            password:"ballerina"
+        },
+        protocol: {
+            name: TLS,
+            versions: ["TLSv1.2", "TLSv1.1"]
+        },
+        ciphers: ["TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA"],
+        sessionTimeout: 600,
+        handshakeTimeout: 10
+    });
+
+    string msg = "Hello Ballerina Echo from secure client";
+    byte[] msgByteArray = msg.toBytes();
+    check socketClient->writeBytes(msgByteArray);
+
+   readonly & byte[] receivedData = check socketClient->readBytes();
+   test:assertEquals('string:fromBytes(receivedData), msg, "Found unexpected output");
+
+    check socketClient->close();
+}
+
 @test:AfterSuite {}
 function stopServer() {
     var result = stopSecureServer();
