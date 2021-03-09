@@ -80,7 +80,7 @@ public client class Client {
 public type ClientConfig record {|
     string localHost?;
     decimal timeout = 300;
-    SecureSocket secureSocket?;
+    ClientSecureSocket secureSocket?;
 |};
 
 isolated function externInit(Client clientObj, string remoteHost, int remotePort, ClientConfig config) 

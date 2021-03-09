@@ -19,7 +19,6 @@
 package org.ballerinalang.stdlib.tcp;
 
 import io.ballerina.runtime.api.Future;
-import io.ballerina.runtime.api.utils.StringUtils;
 import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BString;
 import io.netty.bootstrap.ServerBootstrap;
@@ -35,9 +34,8 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslHandler;
 
-import java.io.File;
-import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.util.concurrent.TimeUnit;
 
 /**
  * {@link TcpListener} creates the tcp client and handles all the network operations.
@@ -76,7 +74,7 @@ public class TcpListener {
                     protected void initChannel(SocketChannel channel) throws Exception {
                         TcpListenerHandler tcpListenerHandler = new TcpListenerHandler(tcpService);
                         if (secureSocket != null) {
-                            setSslHandler(channel, sslContext, tcpListenerHandler);
+                            setSslHandler(channel, sslContext, tcpListenerHandler, secureSocket);
                         } else {
                             channel.pipeline().addLast(Constants.LISTENER_HANDLER, tcpListenerHandler);
                         }
@@ -93,37 +91,18 @@ public class TcpListener {
                 });
     }
 
-    private SslContext getSslContext(BMap<BString, Object> secureSocket) throws IOException {
-        BMap<BString, Object> certificate = (BMap<BString, Object>) secureSocket.getMapValue(StringUtils
-                .fromString(Constants.CERTIFICATE));
-        BMap<BString, Object> privateKey = (BMap<BString, Object>) secureSocket.getMapValue(StringUtils
-                .fromString(Constants.PRIVATE_KEY));
-        BMap<BString, Object> protocol = (BMap<BString, Object>) secureSocket.getMapValue(StringUtils
-                .fromString(Constants.PROTOCOL));
-        String[] protocolVersions = protocol == null ? new String[]{} : protocol.getArrayValue(StringUtils.
-                fromString(Constants.PROTOCOL_VERSIONS)).getStringArray();
-        String[] ciphers = secureSocket.getArrayValue(StringUtils.fromString(Constants.CIPHERS)).getStringArray();
-
-        SSLConfig sslConfig = new SSLConfig();
-        sslConfig.setServerCertificates(new File(certificate.getStringValue(StringUtils
-                .fromString(Constants.CERTIFICATE_PATH)).getValue()));
-        sslConfig.setServerKeyFile(new File(privateKey.getStringValue(StringUtils
-                .fromString(Constants.PRIVATE_KEY_PATH)).getValue()));
-
-        if (protocolVersions.length > 0) {
-            sslConfig.setEnableProtocols(protocolVersions);
-        }
-        if (ciphers != null && ciphers.length > 0) {
-            sslConfig.setCipherSuites(ciphers);
-        }
+    private SslContext getSslContext(BMap<BString, Object> secureSocket) throws Exception {
+        SSLConfig sslConfig = Utils.setSslConfig(secureSocket, new SSLConfig(), true);
 
         SSLHandlerFactory sslHandlerFactory = new SSLHandlerFactory(sslConfig);
         return sslHandlerFactory.createContextForServer();
     }
 
-    private void setSslHandler(Channel channel, SslContext sslContext, TcpListenerHandler tcpListenerHandler) {
+    private void setSslHandler(Channel channel, SslContext sslContext, TcpListenerHandler tcpListenerHandler,
+                               BMap<BString, Object> secureSocket) {
         SslHandler sslHandler = sslContext.newHandler(channel.alloc());
-
+        sslHandler.setHandshakeTimeout(Utils.getLongValueOrDefault(secureSocket,
+                Constants.SECURESOCKET_CONFIG_HANDSHAKE_TIMEOUT), TimeUnit.SECONDS);
         channel.pipeline().addFirst(Constants.SSL_HANDLER, sslHandler);
         channel.pipeline().addLast(Constants.SSL_HANDSHAKE_HANDLER,
                 new SslHandshakeListenerEventHandler(tcpListenerHandler));

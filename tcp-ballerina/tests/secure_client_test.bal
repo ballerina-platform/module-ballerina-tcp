@@ -26,9 +26,9 @@ function setupServer() {
 @test:Config {dependsOn: [testListenerEcho], enable: true}
 function testProtocolVersion() returns @tainted error? {
     Error|Client socketClient = new ("localhost", 9002, secureSocket = {
-        certificate: {path: certPath},
+        cert: certPath,
         protocol: {
-            name: "TLS",
+            name: TLS,
             versions: ["TLSv1.1"] // server only support TLSv1.2 but client only support TLSv1.1 write should fail
         },
         ciphers: ["TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA"]
@@ -44,9 +44,9 @@ function testProtocolVersion() returns @tainted error? {
 @test:Config {dependsOn: [testProtocolVersion], enable: true}
 function testCiphers() returns @tainted error? {
     Error|Client socketClient = new ("localhost", 9002, secureSocket = {
-        certificate: {path: certPath},
+        cert: certPath,
         protocol: {
-            name: "TLS",
+            name: TLS,
             versions: ["TLSv1.2", "TLSv1.1"]
         },
         ciphers: ["TLS_RSA_WITH_AES_128_CBC_SHA"] // server only support TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA write should fail
@@ -62,9 +62,9 @@ function testCiphers() returns @tainted error? {
 @test:Config {dependsOn: [testCiphers], enable: true}
 function testSecureClientEcho() returns @tainted error? {
     Client socketClient = check new ("localhost", 9002, secureSocket = {
-        certificate: {path: certPath},
+        cert: certPath,
         protocol: {
-            name: "TLS",
+            name: TLS,
             versions: ["TLSv1.2", "TLSv1.1"]
         },
         ciphers: ["TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA"]
@@ -78,6 +78,57 @@ function testSecureClientEcho() returns @tainted error? {
    test:assertEquals('string:fromBytes(receivedData), msg, "Found unexpected output");
 
     check socketClient->close();
+}
+
+@test:Config {dependsOn: [testSecureClientEcho], enable: true}
+function testSecureClientWithTruststore() returns @tainted error? {
+    Client socketClient = check new ("localhost", PORT7, secureSocket = {
+        cert: {
+            path: truststore,
+            password:"ballerina"
+        },
+        protocol: {
+            name: TLS,
+            versions: ["TLSv1.2", "TLSv1.1"]
+        },
+        ciphers: ["TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA"],
+        sessionTimeout: 600,
+        handshakeTimeout: 10
+    });
+
+    string msg = "Hello Ballerina Echo from secure client";
+    byte[] msgByteArray = msg.toBytes();
+    check socketClient->writeBytes(msgByteArray);
+
+   readonly & byte[] receivedData = check socketClient->readBytes();
+   test:assertEquals('string:fromBytes(receivedData), msg, "Found unexpected output");
+
+    check socketClient->close();
+}
+
+@test:Config {dependsOn: [testSecureClientEcho], enable: true}
+function testSecureSocketConfigEnableFalse() returns @tainted error? {
+    Client socketClient = check new ("localhost", PORT1, secureSocket = {
+        enable: false,
+        cert: {
+            path: truststore,
+            password:"ballerina"
+        },
+        protocol: {
+            name: TLS,
+            versions: ["TLSv1.2", "TLSv1.1"]
+        },
+        ciphers: ["TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA"]
+    });
+
+    string msg = "Hello ballerina from client";
+    byte[] msgByteArray = msg.toBytes();
+    check socketClient->writeBytes(msgByteArray);
+
+   readonly & byte[] receivedData = check socketClient->readBytes();
+   test:assertEquals('string:fromBytes(receivedData), msg, "Found unexpected output");
+
+   check socketClient->close();
 }
 
 @test:AfterSuite {}

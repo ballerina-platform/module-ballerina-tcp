@@ -18,6 +18,9 @@
 
 package org.ballerinalang.stdlib.tcp;
 
+import io.ballerina.runtime.api.utils.StringUtils;
+import io.ballerina.runtime.api.values.BString;
+
 /**
  * Constant variable for tcp related operations.
  */
@@ -60,14 +63,24 @@ public class Constants {
     public static final String CLIENT = "Client";
 
     // Constants related to secureSocket configuration
-    public static final String SECURE_SOCKET = "secureSocket";
-    public static final String CERTIFICATE = "certificate";
-    public static final String CERTIFICATE_PATH = "path";
-    public static final String PROTOCOL_VERSIONS = "versions";
-    public static final String PROTOCOL = "protocol";
-    public static final String CIPHERS = "ciphers";
-    public static final String PRIVATE_KEY = "privateKey";
-    public static final String PRIVATE_KEY_PATH = "path";
+    public static final String PKCS_STORE_TYPE = "PKCS12";
+    public static final BString SECURE_SOCKET = StringUtils.fromString("secureSocket");
+    public static final BString SECURESOCKET_CONFIG_ENABLE_SSL = StringUtils.fromString("enable");
+    public static final BString SECURESOCKET_CONFIG_CERT = StringUtils.fromString("cert");
+    public static final BString SECURESOCKET_CONFIG_TRUSTSTORE_FILE_PATH = StringUtils.fromString("path");
+    public static final BString SECURESOCKET_CONFIG_TRUSTSTORE_PASSWORD = StringUtils.fromString("password");
+    public static final BString SECURESOCKET_CONFIG_KEY = StringUtils.fromString("key");
+    public static final BString SECURESOCKET_CONFIG_CERTKEY_CERT_FILE = StringUtils.fromString("certFile");
+    public static final BString SECURESOCKET_CONFIG_CERTKEY_KEY_FILE = StringUtils.fromString("keyFile");
+    public static final BString SECURESOCKET_CONFIG_CERTKEY_KEY_PASSWORD = StringUtils.fromString("keyPassword");
+    public static final BString SECURESOCKET_CONFIG_KEYSTORE_FILE_PATH = StringUtils.fromString("path");
+    public static final BString SECURESOCKET_CONFIG_KEYSTORE_PASSWORD = StringUtils.fromString("password");
+    public static final BString SECURESOCKET_CONFIG_PROTOCOL = StringUtils.fromString("protocol");
+    public static final BString SECURESOCKET_CONFIG_PROTOCOL_NAME = StringUtils.fromString("name");
+    public static final BString SECURESOCKET_CONFIG_PROTOCOL_VERSIONS = StringUtils.fromString("versions");
+    public static final BString SECURESOCKET_CONFIG_CIPHERS = StringUtils.fromString("ciphers");
+    public static final BString SECURESOCKET_CONFIG_HANDSHAKE_TIMEOUT = StringUtils.fromString("handshakeTimeout");
+    public static final BString SECURESOCKET_CONFIG_SESSION_TIMEOUT = StringUtils.fromString("sessionTimeout");
     public static final String HTTPS_SCHEME = "http";
 
     private Constants() {}

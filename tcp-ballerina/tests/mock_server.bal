@@ -13,11 +13,12 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-
 import ballerina/io;
 
 string certPath = "tests/etc/cert.pem";
 string keyPath = "tests/etc/key.pem";
+string keystore = "tests/etc/ballerinaKeystore.p12";
+string truststore = "tests/etc/ballerinaTruststore.p12";
 
 const int PORT1 = 8809;
 const int PORT2 = 8023;
@@ -25,6 +26,7 @@ const int PORT3 = 8639;
 const int PORT4 = 8641;
 const int PORT5 = 8642;
 const int PORT6 = 8643;
+const int PORT7 = 8645;
 
 listener Listener echoServer = check new Listener(PORT1);
 listener Listener discardServer = check new Listener(PORT2);
@@ -86,13 +88,16 @@ service on closeServer {
 }
 
 service on new Listener(PORT4, secureSocket = {
-    certificate: {path: certPath},
-    privateKey: {path: keyPath},
+    key: {
+        certFile: certPath,
+        keyFile: keyPath
+    },
     protocol: {
-        name: "TLS",
+        name: TLS,
         versions: ["TLSv1.2", "TLSv1.1"]
     },
-    ciphers: ["TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA"]
+    ciphers: ["TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA"],
+    handshakeTimeout: 10
 }, localHost = "localhost") {
 
     isolated remote function onConnect(Caller caller) returns ConnectionService {
@@ -152,5 +157,26 @@ service on helloServer {
     isolated remote function onConnect(Caller caller) returns ConnectionService {
         io:println("Client connected to HelloServer: ", caller.remotePort);
         return new HelloService();
+    }
+}
+
+// mock secure server with keystore
+service on new Listener(PORT7, secureSocket = {
+    key: {
+        path: keystore,
+        password: "ballerina"
+    },
+    protocol: {
+        name: TLS,
+        versions: ["TLSv1.2", "TLSv1.1"]
+    },
+    ciphers: ["TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA"],
+    handshakeTimeout: 10,
+    sessionTimeout: 600
+}, localHost = "localhost") {
+
+    isolated remote function onConnect(Caller caller) returns ConnectionService {
+        io:println("Client connected to secureEchoServer: ", caller.remotePort);
+        return new SecureEchoService();
     }
 }

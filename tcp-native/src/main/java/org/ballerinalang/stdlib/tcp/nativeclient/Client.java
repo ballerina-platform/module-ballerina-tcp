@@ -60,8 +60,7 @@ public class Client {
 
         double timeout = ((BDecimal) config.get(StringUtils.fromString(Constants.CONFIG_READ_TIMEOUT))).floatValue();
         client.addNativeData(Constants.CONFIG_READ_TIMEOUT, timeout);
-        BMap<BString, Object> secureSocket = (BMap<BString, Object>) config.getMapValue(StringUtils.
-                fromString(Constants.SECURE_SOCKET));
+        BMap<BString, Object> secureSocket = (BMap<BString, Object>) config.getMapValue(Constants.SECURE_SOCKET);
 
         TcpClient tcpClient = TcpFactory.getInstance().
                 createTcpClient(localAddress, remoteAddress, balFuture, secureSocket);

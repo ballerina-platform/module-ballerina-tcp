@@ -66,8 +66,7 @@ public class Listener {
             localAddress = new InetSocketAddress(hostname, localPort);
         }
 
-        BMap<BString, Object> secureSocket = (BMap<BString, Object>) config.getMapValue(StringUtils
-                .fromString(Constants.SECURE_SOCKET));
+        BMap<BString, Object> secureSocket = (BMap<BString, Object>) config.getMapValue(Constants.SECURE_SOCKET);
 
         TcpService tcpService = (TcpService) listener.getNativeData(Constants.SERVICE);
         TcpListener tcpListener = TcpFactory.getInstance()
