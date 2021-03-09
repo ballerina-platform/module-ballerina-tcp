@@ -20,9 +20,9 @@ import ballerina/io;
 @test:Config {dependsOn: [testSecureClientEcho], enable: true}
 function testSecureListenerWithSecureClient() returns @tainted error? {
     Client socketClient = check new ("localhost", PORT4, secureSocket = {
-        certificate: {path: certPath},
+        cert: certPath,
         protocol: {
-            name: "TLS",
+            name: TLS,
             versions: ["TLSv1.2", "TLSv1.1"]
         },
         ciphers: ["TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA"]
@@ -60,9 +60,9 @@ function testSecureListenerWithClient() returns @tainted error? {
 @test:Config {dependsOn: [testSecureListenerWithClient]}
 function testSecureListenerWithUnsuportedClientProtocol() returns @tainted error? {
     Error|Client socketClient = new ("localhost", PORT4, secureSocket = {
-        certificate: {path: certPath},
+        cert: certPath,
         protocol: {
-            name: "SSL",
+            name: SSL,
             versions: ["SSLv3"]
         },
         ciphers: ["TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA"]

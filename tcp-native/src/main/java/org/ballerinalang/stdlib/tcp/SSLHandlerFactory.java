@@ -309,9 +309,15 @@ public class SSLHandlerFactory {
         sslEngine.setSSLParameters(sslParams);
     }
 
-    public SslContext createContextForClient() throws SSLException {
+    public SslContext createContextForClient() throws IOException, NoSuchAlgorithmException, KeyStoreException {
         SslProvider provider = SslProvider.JDK;
-        SslContextBuilder sslContextBuilder = clientContextBuilderWithCerts(provider);
+        SslContextBuilder sslContextBuilder;
+        if (sslConfig.getClientTrustCertificates() != null) {
+            sslContextBuilder = clientContextBuilderWithCerts(provider);
+        } else {
+            initializeTrustManagerFactory();
+            sslContextBuilder = clientContextBuilderWithKs(provider);
+        }
         setCiphers(sslContextBuilder, Arrays.asList(this.sslConfig.getCipherSuites()));
         setSslProtocol(sslContextBuilder);
         SslContext sslContext = sslContextBuilder.build();
@@ -322,9 +328,22 @@ public class SSLHandlerFactory {
         return sslContext;
     }
 
-    public SslContext createContextForServer() throws SSLException {
+    private void initializeTrustManagerFactory() throws IOException, NoSuchAlgorithmException, KeyStoreException {
+        KeyStore tks = getKeyStore(sslConfig.getTrustStore(), sslConfig.getTrustStorePass());
+        tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+        tmf.init(tks);
+    }
+
+    public SslContext createContextForServer() throws IOException, NoSuchAlgorithmException, UnrecoverableKeyException,
+            KeyStoreException {
         SslProvider provider = SslProvider.JDK;
-        SslContextBuilder sslContextBuilder = serverContextBuilderWithCerts(provider);
+        SslContextBuilder sslContextBuilder;
+        if (sslConfig.getServerCertificates() != null) {
+            sslContextBuilder = serverContextBuilderWithCerts(provider);
+        } else {
+            initializeKeyManagerFactory();
+            sslContextBuilder = serverContextBuilderWithKs(provider);
+        }
         setCiphers(sslContextBuilder, Arrays.asList(this.sslConfig.getCipherSuites()));
         setSslProtocol(sslContextBuilder);
         SslContext sslContext = sslContextBuilder.build();
@@ -333,5 +352,15 @@ public class SSLHandlerFactory {
             sslContext.sessionContext().setSessionTimeout(sessionTimeout);
         }
         return sslContext;
+    }
+
+    private void initializeKeyManagerFactory() throws IOException, NoSuchAlgorithmException, KeyStoreException,
+            UnrecoverableKeyException {
+        KeyStore ks = getKeyStore(sslConfig.getKeyStore(), sslConfig.getKeyStorePass());
+        // Set up key manager factory to use our key store
+        kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+        kmf.init(ks, sslConfig.getCertPass() != null ?
+                sslConfig.getCertPass().toCharArray() :
+                sslConfig.getKeyStorePass().toCharArray());
     }
 }

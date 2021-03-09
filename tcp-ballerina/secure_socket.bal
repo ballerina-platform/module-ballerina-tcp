@@ -14,44 +14,61 @@
 // specific language governing permissions and limitations
 // under the License.
 
+import ballerina/crypto;
+
 # Secure Socket configuration for TCP Client.
 #
-# + certificate - Server certificate
-# + protocol - SSL or TLS protocol
-# + ciphers - Ciper used
-public type SecureSocket record {|
-    Certificate certificate;
-    Protocol? protocol = ();
-    string[] ciphers = [];
+# + enable - Enable SSL validation
+# + cert - Configurations associated with `crypto:TrustStore` or single certificate file that the client trusts
+# + protocol - SSL/TLS protocol related options
+# + ciphers - List of ciphers to be used
+#             eg: TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256, TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA
+# + handshakeTimeout - SSL handshake time out
+# + sessionTimeout - SSL session time out
+public type ClientSecureSocket record {|
+    boolean enable = true;
+    crypto:TrustStore|string cert?;
+    record {|
+        Protocol name;
+        string[] versions = [];
+    |} protocol?;
+    string[] ciphers?;
+    decimal handshakeTimeout?;
+    decimal sessionTimeout?;
 |};
 
 # Secure Socket configuration for TCP Listener.
 #
-# + privateKey - Server private key
+# + key - Configurations associated with `crypto:KeyStore` or combination of certificate and (PKCS8) private key of the server
+# + protocol - SSL/TLS protocol related options
+# + ciphers - List of ciphers to be used
+#             eg: TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256, TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA
+# + handshakeTimeout - SSL handshake time out
+# + sessionTimeout - SSL session time out
 public type ListenerSecureSocket record {|
-    *SecureSocket;
-    PrivateKey privateKey;
+    crypto:KeyStore|CertKey key;
+    record {|
+        Protocol name;
+        string[] versions = [];
+    |} protocol?;
+    string[] ciphers = [];
+    decimal handshakeTimeout?;
+    decimal sessionTimeout?;
 |};
 
-# Certificate configuration.
+# Represents combination of certificate, private key and private key password if encrypted.
 #
-# + path - Certificate file location
-public type Certificate record {|
-    string path;
+# + certFile - A file containing the certificate
+# + keyFile - A file containing the private key in PKCS8 format
+# + keyPassword - Password of the private key if it is encrypted
+public type CertKey record {|
+   string certFile;
+   string keyFile;
+   string keyPassword?;
 |};
 
-# Private key configuration.
-#
-# + path - private key file location
-public type PrivateKey record {|
-    string path;
-|};
-
-# Transport security protocol.
-#
-# + name - Protocol name
-# + versions - Protocol versions
-public type Protocol record {|
-    string name;
-    string[] versions;
-|};
+# Represents protocol options.
+public enum Protocol {
+   SSL,
+   TLS
+}

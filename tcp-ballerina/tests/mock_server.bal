@@ -86,13 +86,13 @@ service on closeServer {
 }
 
 service on new Listener(PORT4, secureSocket = {
-    certificate: {path: certPath},
-    privateKey: {path: keyPath},
+    key: {certFile: certPath, keyFile: keyPath},
     protocol: {
-        name: "TLS",
+        name: TLS,
         versions: ["TLSv1.2", "TLSv1.1"]
     },
-    ciphers: ["TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA"]
+    ciphers: ["TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA"],
+    handshakeTimeout: 10
 }, localHost = "localhost") {
 
     isolated remote function onConnect(Caller caller) returns ConnectionService {
