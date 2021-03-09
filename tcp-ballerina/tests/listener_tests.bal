@@ -49,3 +49,33 @@ function testListenerSendingBigData() returns @tainted error? {
 
     check socketClient->close();
 }
+
+@test:Config {dependsOn: [testSecureListenerWithUnsuportedClientProtocol]}
+function testListenerDetach() returns @tainted error? {
+    Client socketClient = check new ("localhost", PORT6);
+
+    check socketClient->writeBytes("What service is this?".toBytes());
+
+    readonly & byte[] receivedData = check socketClient->readBytes();
+    test:assertEquals(string:fromBytes(receivedData), "Hello", "Unexpected response");
+    check socketClient->close();
+
+    check helloServer.gracefulStop();
+    check helloServer.detach(service object {}); // detach helloService from helloServer
+
+    var obj = service object {
+        isolated remote function onConnect(Caller caller) returns ConnectionService {
+            io:println("Client connected to HiServer: ", caller.remotePort);
+            return new HiService();
+        }
+    };
+    check helloServer.attach(obj); // attach hiService to helloServer
+    check helloServer.start();
+
+    socketClient = check new ("localhost", PORT6);
+
+    check socketClient->writeBytes("What service is this?".toBytes());
+
+    receivedData = check socketClient->readBytes();
+    test:assertEquals(string:fromBytes(receivedData), "Hi", "Unexpected response"); 
+}
