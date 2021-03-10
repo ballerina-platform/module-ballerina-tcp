@@ -36,6 +36,7 @@ import io.netty.handler.timeout.IdleStateHandler;
 
 import java.net.InetSocketAddress;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * {@link TcpClient} creates the tcp client and handles all the network operations.
@@ -46,6 +47,7 @@ public class TcpClient {
 
     public TcpClient(InetSocketAddress localAddress, InetSocketAddress remoteAddress, EventLoopGroup group,
                      Future callback, BMap<BString, Object> secureSocket) {
+        AtomicBoolean isCallbackCompleted = new AtomicBoolean(false);
         Bootstrap clientBootstrap = new Bootstrap();
         clientBootstrap.group(group)
                 .channel(NioSocketChannel.class)
@@ -64,6 +66,7 @@ public class TcpClient {
                     @Override
                     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
                         callback.complete(Utils.createSocketError(cause.getMessage()));
+                        isCallbackCompleted.set(true);
                         ctx.close();
                     }
                 })
@@ -77,8 +80,10 @@ public class TcpClient {
                             callback.complete(null);
                         }
                     } else {
-                        callback.complete(Utils.createSocketError("Unable to connect with remote host: "
-                                + channelFuture.cause().getMessage()));
+                        if (!isCallbackCompleted.get()) {
+                            callback.complete(Utils.createSocketError("Unable to connect with remote host: "
+                                    + channelFuture.cause().getMessage()));
+                        }
                     }
                 });
     }

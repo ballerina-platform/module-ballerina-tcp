@@ -36,6 +36,7 @@ import io.netty.handler.ssl.SslHandler;
 
 import java.net.InetSocketAddress;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * {@link TcpListener} creates the tcp client and handles all the network operations.
@@ -51,6 +52,7 @@ public class TcpListener {
                        Future callback, TcpService tcpService, BMap<BString, Object> secureSocket) {
         this.bossGroup = bossGroup;
         this.workerGroup = workerGroup;
+        AtomicBoolean isCallbackCompleted = new AtomicBoolean(false);
         ServerBootstrap listenerBootstrap = new ServerBootstrap();
 
         listenerBootstrap.group(this.bossGroup, this.workerGroup)
@@ -66,6 +68,7 @@ public class TcpListener {
                     @Override
                     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
                         callback.complete(Utils.createSocketError(cause.getMessage()));
+                        isCallbackCompleted.set(true);
                         ctx.close();
                     }
                 })
@@ -86,7 +89,9 @@ public class TcpListener {
                         channel = channelFuture.channel();
                         callback.complete(null);
                     } else {
-                        callback.complete(Utils.createSocketError("Error initializing the server."));
+                        if (!isCallbackCompleted.get()) {
+                            callback.complete(Utils.createSocketError("Error initializing the server."));
+                        }
                     }
                 });
     }
