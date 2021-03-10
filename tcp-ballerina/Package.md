@@ -54,7 +54,7 @@ service class EchoService {
     }
 
     remote function onError(readonly & tcp:Error err) returns tcp:Error? {
-        log:printError("An error occurred", err = err);
+        log:printError("An error occurred", 'error = err);
     }
 
     remote function onClose() returns tcp:Error? {
