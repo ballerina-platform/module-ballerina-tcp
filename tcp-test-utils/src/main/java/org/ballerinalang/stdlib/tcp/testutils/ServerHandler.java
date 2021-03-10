@@ -14,4 +14,9 @@ public class ServerHandler extends SimpleChannelInboundHandler<ByteBuf> {
             ctx.channel().writeAndFlush(buf);
         }
     }
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        System.out.println("Test server : " + cause.getMessage());
+    }
 }
