@@ -131,6 +131,27 @@ function testSecureSocketConfigEnableFalse() returns @tainted error? {
    check socketClient->close();
 }
 
+@test:Config {dependsOn: [testSecureSocketConfigEnableFalse], enable: true}
+isolated function testSecureClientWithInvalidCertPath() returns @tainted error? {
+    Error|Client socketClient = new ("localhost", 9002, secureSocket = {
+        cert: {
+            path: "invalid",
+            password:"ballerina"
+        },
+        protocol: {
+            name: TLS,
+            versions: ["TLSv1.2", "TLSv1.1"]
+        },
+        ciphers: ["TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA"]
+    });
+    
+    if (socketClient is Client) {
+        test:assertFail(msg = "Invalid trustore path provided initialization should fail.");
+    } else {
+        io:println(socketClient.message());
+    }
+}
+
 @test:AfterSuite {}
 function stopServer() {
     var result = stopSecureServer();
