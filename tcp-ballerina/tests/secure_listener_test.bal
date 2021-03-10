@@ -74,3 +74,27 @@ function testSecureListenerWithUnsuportedClientProtocol() returns @tainted error
         io:println(socketClient.message());
     }
 }
+
+@test:Config {dependsOn: [testSecureListenerWithUnsuportedClientProtocol]}
+isolated function testListenerWithInvalidCertFilePath() returns error? {
+    Listener server = check new Listener(9999, secureSocket = {
+        key: {
+            certFile: "invalid",
+            keyFile: "invalid"
+        },
+        protocol: {
+            name: TLS,
+            versions: ["TLSv1.2", "TLSv1.1"]
+        },
+        ciphers: ["TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA"]
+    });
+
+    check server.attach(new HiService());
+    error? res = server.start();
+
+    if (res is ()) {
+        test:assertFail("Starting the listener should throw error since the provided key values are invalid");
+    } else {
+        io:print(res.message());
+    }
+}
