@@ -29,7 +29,7 @@ public client class Client {
     # + remoteHost - The hostname or the IP address of the remote host
     # + remotePort - The port number of the remmote host
     # + config - Connection oriented client related configuration
-    public isolated function init(string remoteHost, int remotePort, *ClientConfig config) returns Error? {
+    public isolated function init(string remoteHost, int remotePort, *ClientConfiguration config) returns Error? {
         return externInit(self, remoteHost, remotePort, config);
     }
 
@@ -77,13 +77,13 @@ public client class Client {
 #             in seconds. If this is not set,the default value
 #             of 300 seconds (5 minutes) will be used.
 # + secureSocket - secureSocket configuratoin.
-public type ClientConfig record {|
+public type ClientConfiguration record {|
     string localHost?;
     decimal timeout = 300;
     ClientSecureSocket secureSocket?;
 |};
 
-isolated function externInit(Client clientObj, string remoteHost, int remotePort, ClientConfig config) 
+isolated function externInit(Client clientObj, string remoteHost, int remotePort, ClientConfiguration config) 
 returns Error? = @java:Method {
     name: "externInit",
     'class: "org.ballerinalang.stdlib.tcp.nativeclient.Client"
