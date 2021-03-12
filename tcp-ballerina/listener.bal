@@ -27,7 +27,7 @@ public class Listener {
     # ```
     # + localPort - The port number of the remote service
     # + config - Configurations related to the `tcp:Listener`
-    public isolated function init(int localPort, *ListenerConfig config) returns error? {
+    public isolated function init(int localPort, *ListenerConfiguration config) returns error? {
         return externInitListener(self, localPort, config);
     }
 
@@ -81,12 +81,12 @@ public class Listener {
     }
 }
 
-public type ListenerConfig record {|
+public type ListenerConfiguration record {|
    string localHost?;
    ListenerSecureSocket secureSocket?; 
 |};
 
-isolated function externInitListener(Listener listenerObj, int localPort, ListenerConfig config) returns error? = @java:Method {
+isolated function externInitListener(Listener listenerObj, int localPort, ListenerConfiguration config) returns error? = @java:Method {
     'class: "org.ballerinalang.stdlib.tcp.nativelistener.Listener",
     name: "externInit"
 } external;
