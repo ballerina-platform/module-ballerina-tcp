@@ -49,7 +49,7 @@ service class EchoService {
         check caller->writeBytes(data);
     }
 
-    isolated remote function onError(readonly & Error err) returns Error? {
+    isolated remote function onError(Error err) returns Error? {
         io:println(err.message());
     }
 
@@ -73,7 +73,7 @@ service class DiscardService {
         io:println("Discard: ", 'string:fromBytes(data));
     }
 
-    isolated remote function onError(readonly & Error err) returns Error? {
+    isolated remote function onError(Error err) returns Error? {
         io:println(err.message());
     }
 
@@ -114,7 +114,7 @@ service class SecureEchoService {
         return data;
     }
 
-    isolated remote function onError(readonly & Error err) returns Error? {
+    isolated remote function onError(Error err) returns Error? {
         io:println(err.message());
     }
 }

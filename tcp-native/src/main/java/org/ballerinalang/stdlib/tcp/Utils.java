@@ -32,7 +32,7 @@ import io.netty.buffer.ByteBuf;
 
 import java.io.File;
 
-import static org.ballerinalang.stdlib.tcp.Constants.ErrorType.GenericError;
+import static org.ballerinalang.stdlib.tcp.Constants.ErrorType.Error;
 
 /**
  * Represents the util functions of Socket operations.
@@ -49,26 +49,8 @@ public class Utils {
     private Utils() {
     }
 
-    /**
-     * Create Generic tcp error with given error message.
-     *
-     * @param errMsg the error message
-     * @return BError instance which contains the error details
-     */
-    public static BError createSocketError(String errMsg) {
-        return ErrorCreator.createDistinctError(GenericError.errorType(), getTcpPackage(),
-                StringUtils.fromString(errMsg));
-    }
-
-    /**
-     * Create tcp error with given error type and message.
-     *
-     * @param type   the error type which cause for this error
-     * @param errMsg the error message
-     * @return BError instance which contains the error details
-     */
-    public static BError createSocketError(Constants.ErrorType type, String errMsg) {
-        return ErrorCreator.createDistinctError(type.errorType(), getTcpPackage(), StringUtils.fromString(errMsg));
+    public static BError createTcpError(String errMsg) {
+        return ErrorCreator.createError(getTcpPackage(), Error.errorType(), StringUtils.fromString(errMsg), null, null);
     }
 
     public static BArray returnReadOnlyBytes(ByteBuf buf) {

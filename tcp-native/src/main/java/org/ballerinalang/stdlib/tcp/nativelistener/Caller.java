@@ -53,7 +53,7 @@ public class Caller {
             TcpListener.close(channel, callback);
             Dispatcher.invokeOnClose(tcpService);
         } catch (Exception e) {
-            callback.complete(Utils.createSocketError(e.getMessage()));
+            callback.complete(Utils.createTcpError(e.getMessage()));
         }
         return null;
     }

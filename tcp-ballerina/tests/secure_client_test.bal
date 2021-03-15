@@ -157,12 +157,12 @@ function stopServer() {
     var result = stopSecureServer();
 }
 
-public function startSecureServer() returns Error? = @java:Method {
+public function startSecureServer() returns error? = @java:Method {
     name: "startSecureServer",
     'class: "org.ballerinalang.stdlib.tcp.testutils.TestUtils"
 } external;
 
-public function stopSecureServer() returns Error? = @java:Method {
+public function stopSecureServer() returns error? = @java:Method {
     name: "stopSecureServer",
     'class: "org.ballerinalang.stdlib.tcp.testutils.TestUtils"
 } external;

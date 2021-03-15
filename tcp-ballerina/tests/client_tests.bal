@@ -87,12 +87,12 @@ function stopAll() {
     var result = stopEchoServer();
 }
 
-public function startEchoServer() returns Error? = @java:Method {
+public function startEchoServer() returns error? = @java:Method {
     name: "startEchoServer",
     'class: "org.ballerinalang.stdlib.tcp.testutils.TestUtils"
 } external;
 
-public function stopEchoServer() returns Error? = @java:Method {
+public function stopEchoServer() returns error? = @java:Method {
     name: "stopEchoServer",
     'class: "org.ballerinalang.stdlib.tcp.testutils.TestUtils"
 } external;

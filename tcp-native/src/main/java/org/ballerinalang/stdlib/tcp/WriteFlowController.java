@@ -54,7 +54,7 @@ public class WriteFlowController {
             balWriteCallback.complete(null);
         } else {
             balWriteCallback.complete(Utils
-                    .createSocketError("Failed to write data: " + future.cause().getMessage()));
+                    .createTcpError("Failed to write data: " + future.cause().getMessage()));
         }
     }
 }
