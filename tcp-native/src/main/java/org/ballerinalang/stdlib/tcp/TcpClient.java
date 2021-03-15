@@ -65,7 +65,7 @@ public class TcpClient {
 
                     @Override
                     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-                        callback.complete(Utils.createSocketError(cause.getMessage()));
+                        callback.complete(Utils.createTcpError(cause.getMessage()));
                         isCallbackCompleted.set(true);
                         ctx.close();
                     }
@@ -81,7 +81,7 @@ public class TcpClient {
                         }
                     } else {
                         if (!isCallbackCompleted.get()) {
-                            callback.complete(Utils.createSocketError("Unable to connect with remote host: "
+                            callback.complete(Utils.createTcpError("Unable to connect with remote host: "
                                     + channelFuture.cause().getMessage()));
                         }
                     }
@@ -110,7 +110,7 @@ public class TcpClient {
                 writeFlowController.writeData(channel, tcpClientHandler.getWriteFlowControllers());
             }
         } else {
-            callback.complete(Utils.createSocketError("Socket connection already closed."));
+            callback.complete(Utils.createTcpError("Socket connection already closed."));
         }
     }
 
@@ -123,7 +123,7 @@ public class TcpClient {
             handler.setCallback(callback);
             channel.read();
         } else {
-            callback.complete(Utils.createSocketError("Socket connection already closed."));
+            callback.complete(Utils.createTcpError("Socket connection already closed."));
         }
     }
 
@@ -137,7 +137,7 @@ public class TcpClient {
             if (future.isSuccess()) {
                 callback.complete(null);
             } else {
-                callback.complete(Utils.createSocketError("Unable to close the  TCP client. "
+                callback.complete(Utils.createTcpError("Unable to close the  TCP client. "
                         + future.cause().getMessage()));
             }
         });

@@ -38,7 +38,7 @@ public class TcpClientHandler extends SimpleChannelInboundHandler<ByteBuf> {
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         if (!isCloseTriggered && callback != null) {
-            callback.complete(Utils.createSocketError("Connection closed by the server."));
+            callback.complete(Utils.createTcpError("Connection closed by the server."));
         }
         ctx.channel().close();
     }
@@ -57,7 +57,7 @@ public class TcpClientHandler extends SimpleChannelInboundHandler<ByteBuf> {
             // return timeout error
             ctx.channel().pipeline().remove(Constants.READ_TIMEOUT_HANDLER);
             if (callback != null) {
-                callback.complete(Utils.createSocketError("Read timed out"));
+                callback.complete(Utils.createTcpError("Read timed out"));
             }
         }
     }
@@ -66,7 +66,7 @@ public class TcpClientHandler extends SimpleChannelInboundHandler<ByteBuf> {
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         ctx.channel().pipeline().remove(Constants.READ_TIMEOUT_HANDLER);
         if (callback != null) {
-            callback.complete(Utils.createSocketError(cause.getMessage()));
+            callback.complete(Utils.createTcpError(cause.getMessage()));
         }
     }
 

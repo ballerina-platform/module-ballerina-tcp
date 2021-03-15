@@ -67,7 +67,7 @@ public class TcpListener {
 
                     @Override
                     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-                        callback.complete(Utils.createSocketError(cause.getMessage()));
+                        callback.complete(Utils.createTcpError(cause.getMessage()));
                         isCallbackCompleted.set(true);
                         ctx.close();
                     }
@@ -90,7 +90,7 @@ public class TcpListener {
                         callback.complete(null);
                     } else {
                         if (!isCallbackCompleted.get()) {
-                            callback.complete(Utils.createSocketError("Error initializing the server."));
+                            callback.complete(Utils.createTcpError("Error initializing the server."));
                         }
                     }
                 });
@@ -124,7 +124,7 @@ public class TcpListener {
                 writeFlowController.writeData(channel, tcpListenerHandler.getWriteFlowControllers());
             }
         } else {
-            callback.complete(Utils.createSocketError("Socket connection already closed."));
+            callback.complete(Utils.createTcpError("Socket connection already closed."));
         }
     }
 
@@ -161,7 +161,7 @@ public class TcpListener {
                 if (future.isSuccess()) {
                     callback.complete(null);
                 } else {
-                    callback.complete(Utils.createSocketError("Failed to close the client connection"));
+                    callback.complete(Utils.createTcpError("Failed to close the client connection"));
                 }
             });
         }
@@ -173,7 +173,7 @@ public class TcpListener {
             if (future.isSuccess()) {
                 callback.complete(null);
             } else {
-                callback.complete(Utils.createSocketError("Failed to gracefully shutdown the Listener."));
+                callback.complete(Utils.createTcpError("Failed to gracefully shutdown the Listener."));
             }
         });
     }

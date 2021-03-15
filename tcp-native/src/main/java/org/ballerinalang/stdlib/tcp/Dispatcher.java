@@ -91,7 +91,7 @@ public class Dispatcher {
     }
 
     private static Object[] getOnErrorSignature(String message) {
-        return new Object[]{Utils.createSocketError(message), true};
+        return new Object[]{Utils.createTcpError(message), true};
     }
 
     private static BObject createClient(Channel channel, TcpService tcpService) {

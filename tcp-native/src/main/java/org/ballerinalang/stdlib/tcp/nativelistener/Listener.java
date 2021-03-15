@@ -94,7 +94,7 @@ public class Listener {
         if (tcpListener != null) {
             tcpListener.close(balFuture);
         } else {
-            balFuture.complete(Utils.createSocketError("Unable to initialize the tcp listener."));
+            balFuture.complete(Utils.createTcpError("Unable to initialize the tcp listener."));
         }
 
         return null;
