@@ -46,7 +46,6 @@ public class SSLConfig {
     private boolean wantClientAuth;
     private String[] serverNames;
     private String[] sniMatchers;
-    private boolean validateCertEnabled;
     private int cacheSize = 50;
     private int cacheValidityPeriod = 15;
     private boolean ocspStaplingEnabled = false;
@@ -130,22 +129,8 @@ public class SSLConfig {
         return wantClientAuth;
     }
 
-    public void setWantClientAuth(boolean wantClientAuth) {
-        if (log.isDebugEnabled()) {
-            log.debug("Set WantClientAuth {}", wantClientAuth);
-        }
-        this.wantClientAuth = wantClientAuth;
-    }
-
     public boolean isNeedClientAuth() {
         return needClientAuth;
-    }
-
-    public void setNeedClientAuth(boolean needClientAuth) {
-        if (log.isDebugEnabled()) {
-            log.debug("Set NeedClientAuth {}", needClientAuth);
-        }
-        this.needClientAuth = needClientAuth;
     }
 
     public void setSSLProtocol(String sslProtocol) {
@@ -153,10 +138,6 @@ public class SSLConfig {
             log.debug("Set SSLProtocol {}", sslProtocol);
         }
         this.sslProtocol = sslProtocol;
-    }
-
-    public String getSSLProtocol() {
-        return sslProtocol;
     }
 
     public String getTLSStoreType() {
@@ -167,26 +148,8 @@ public class SSLConfig {
         this.tlsStoreType = tlsStoreType;
     }
 
-    public boolean isEnableSessionCreation() {
-        return enableSessionCreation;
-    }
-
-    public void setEnableSessionCreation(boolean enableSessionCreation) {
-        if (log.isDebugEnabled()) {
-            log.debug("Enable Session Creation {}", enableSessionCreation);
-        }
-        this.enableSessionCreation = enableSessionCreation;
-    }
-
     public String[] getEnableProtocols() {
         return enableProtocols == null ? null : enableProtocols.clone();
-    }
-
-    public void setEnableProtocols(String enableProtocols) {
-        if (log.isDebugEnabled()) {
-            log.debug("Set enable protocols {}", enableProtocols);
-        }
-        this.enableProtocols = enableProtocols.replaceAll("\\s+", "").split(SEPARATOR);
     }
 
     public void setEnableProtocols(String[] enableProtocols) {
@@ -223,46 +186,6 @@ public class SSLConfig {
         this.keyStorePass = keyStorePass;
     }
 
-    public boolean isValidateCertEnabled() {
-        return validateCertEnabled;
-    }
-
-    public void setValidateCertEnabled(boolean validateCertEnabled) {
-        this.validateCertEnabled = validateCertEnabled;
-    }
-
-    public int getCacheSize() {
-        return cacheSize;
-    }
-
-    public void setCacheSize(int cacheSize) {
-        this.cacheSize = cacheSize;
-    }
-
-    public int getCacheValidityPeriod() {
-        return cacheValidityPeriod;
-    }
-
-    public void setCacheValidityPeriod(int cacheValidityPeriod) {
-        this.cacheValidityPeriod = cacheValidityPeriod;
-    }
-
-    public boolean isOcspStaplingEnabled() {
-        return ocspStaplingEnabled;
-    }
-
-    public void setOcspStaplingEnabled(boolean ocspStaplingEnabled) {
-        this.ocspStaplingEnabled = ocspStaplingEnabled;
-    }
-
-    public boolean isHostNameVerificationEnabled() {
-        return hostNameVerificationEnabled;
-    }
-
-    public void setHostNameVerificationEnabled(boolean hostNameVerificationEnabled) {
-        this.hostNameVerificationEnabled = hostNameVerificationEnabled;
-    }
-
     public File getServerKeyFile() {
         return serverKeyFile;
     }
@@ -295,18 +218,6 @@ public class SSLConfig {
         this.serverCertificates = serverCertificates;
     }
 
-    public void setClientKeyFile(File clientKeyFile) {
-        this.clientKeyFile = clientKeyFile;
-    }
-
-    public void setClientCertificates(File clientCertificates) {
-        this.clientCertificates = clientCertificates;
-    }
-
-    public void setServerTrustCertificates(File serverTrustCertificates) {
-        this.serverTrustCertificates = serverTrustCertificates;
-    }
-
     public void setClientTrustCertificates(File clientTrustCertificates) {
         this.clientTrustCertificates = clientTrustCertificates;
     }
@@ -323,10 +234,6 @@ public class SSLConfig {
         return clientKeyPassword;
     }
 
-    public void setClientKeyPassword(String clientKeyPassword) {
-        this.clientKeyPassword = clientKeyPassword;
-    }
-
     public int getSessionTimeOut() {
         return sessionTimeOut;
     }
@@ -341,21 +248,5 @@ public class SSLConfig {
 
     public void setHandshakeTimeOut(long handshakeTimeOut) {
         this.handshakeTimeOut = handshakeTimeOut;
-    }
-
-    public boolean isDisableSsl() {
-        return disableSsl;
-    }
-
-    public void disableSsl() {
-        this.disableSsl = true;
-    }
-
-    public boolean useJavaDefaults() {
-        return useJavaDefaults;
-    }
-
-    public void setUseJavaDefaults() {
-        this.useJavaDefaults = true;
     }
 }
