@@ -60,10 +60,16 @@ function testListenerDetach() returns @tainted error? {
     test:assertEquals(string:fromBytes(receivedData), "Hello", "Unexpected response");
     check socketClient->close();
 
-    check helloServer.gracefulStop();
-    check helloServer.detach(service object {}); // detach helloService from helloServer
+    Service dummyService = service object {
+        isolated remote function onConnect(Caller caller)  {
 
-    var obj = service object {
+        }
+    };
+
+    check helloServer.gracefulStop();
+    check helloServer.detach(dummyService); // detach helloService from helloServer
+
+    Service obj = service object {
         isolated remote function onConnect(Caller caller) returns ConnectionService {
             io:println("Client connected to HiServer: ", caller.remotePort);
             return new HiService();
