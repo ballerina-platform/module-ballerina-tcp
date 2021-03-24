@@ -40,7 +40,7 @@ public class Listener {
     # + name - Name of the service
     # + return - `()` or else a `tcp:Error` upon failure to register
     #             the listener
-    public isolated function attach(service object {} s, () name = ()) returns error? {
+    public isolated function attach(Service s, () name = ()) returns error? {
         return externAttach(self, s);
     }
 
@@ -76,7 +76,7 @@ public class Listener {
     #
     # + s - Type descriptor of the service
     # + return - `()` or else a `tcp:Error` upon failure to detach the service
-    public isolated function detach(service object {} s) returns error? {
+    public isolated function detach(Service s) returns error? {
         return externDetach(self);
     }
 }
