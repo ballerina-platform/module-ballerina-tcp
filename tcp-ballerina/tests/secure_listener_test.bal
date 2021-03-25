@@ -89,7 +89,13 @@ isolated function testListenerWithInvalidCertFilePath() returns error? {
         ciphers: ["TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA"]
     });
 
-    check server.attach(new HiService());
+    Service obj = service object {
+        isolated remote function onConnect(Caller caller) returns ConnectionService {
+            io:println("Client connected to HiServer: ", caller.remotePort);
+            return new HiService();
+        }
+    };
+    check server.attach(obj);
     error? res = server.start();
 
     if (res is ()) {
