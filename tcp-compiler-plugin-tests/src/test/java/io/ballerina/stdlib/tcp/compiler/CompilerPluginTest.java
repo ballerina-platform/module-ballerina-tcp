@@ -18,14 +18,17 @@
 
 package io.ballerina.stdlib.tcp.compiler;
 
+import io.ballerina.projects.DiagnosticResult;
 import io.ballerina.projects.Package;
+import io.ballerina.projects.PackageCompilation;
 import io.ballerina.projects.ProjectEnvironmentBuilder;
 import io.ballerina.projects.directory.BuildProject;
 import io.ballerina.projects.environment.Environment;
 import io.ballerina.projects.environment.EnvironmentBuilder;
+import io.ballerina.tools.diagnostics.Diagnostic;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import java.io.PrintStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -40,10 +43,14 @@ public class CompilerPluginTest {
             .toAbsolutePath();
 
     @Test
-    public void test() {
+    public void testServiceWithUnacceptedFunction() {
         Package currentPackage = loadPackage("sample_package_1");
-        PrintStream console = System.out;
-        console.println("Tests running: " + currentPackage.getDefaultModule());
+        PackageCompilation compilation = currentPackage.getCompilation();
+        DiagnosticResult diagnosticResult = compilation.diagnosticResult();
+        Assert.assertEquals(diagnosticResult.diagnostics().size(), 1);
+        Diagnostic diagnostic = (Diagnostic) diagnosticResult.diagnostics().toArray()[0];
+        Assert.assertEquals(diagnostic.diagnosticInfo().messageFormat(),
+                TcpServiceValidator.FUNCTION_0_NOT_ACCEPTED_BY_THE_SERVICE);
     }
 
     private Package loadPackage(String path) {
