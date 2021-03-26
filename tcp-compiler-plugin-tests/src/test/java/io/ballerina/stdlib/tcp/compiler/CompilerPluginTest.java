@@ -53,6 +53,82 @@ public class CompilerPluginTest {
                 TcpServiceValidator.FUNCTION_0_NOT_ACCEPTED_BY_THE_SERVICE);
     }
 
+    @Test
+    public void testServiceWithoutOnBytes() {
+        Package currentPackage = loadPackage("sample_package_2");
+        PackageCompilation compilation = currentPackage.getCompilation();
+        DiagnosticResult diagnosticResult = compilation.diagnosticResult();
+        Assert.assertEquals(diagnosticResult.diagnostics().size(), 1);
+        Diagnostic diagnostic = (Diagnostic) diagnosticResult.diagnostics().toArray()[0];
+        Assert.assertEquals(diagnostic.diagnosticInfo().messageFormat(),
+                TcpConnectionServiceValidator.SERVICE_DOES_NOT_CONTAIN_ON_BYTES_FUNCTION);
+    }
+
+    @Test
+    public void testRemoteFunctionsWithoutRemoteKeyword() {
+        Package currentPackage = loadPackage("sample_package_3");
+        PackageCompilation compilation = currentPackage.getCompilation();
+        DiagnosticResult diagnosticResult = compilation.diagnosticResult();
+        Assert.assertEquals(diagnosticResult.diagnostics().size(), 3);
+        for (Diagnostic diagnostic : diagnosticResult.diagnostics()) {
+            Assert.assertEquals(diagnostic.diagnosticInfo().messageFormat(),
+                    TcpConnectionServiceValidator.REMOTE_KEYWORD_EXPECTED_IN_0_FUNCTION_SIGNATURE);
+        }
+    }
+
+    @Test
+    public void testOnBytesOnErrorFunctionsWithoutParameters() {
+        Package currentPackage = loadPackage("sample_package_4");
+        PackageCompilation compilation = currentPackage.getCompilation();
+        DiagnosticResult diagnosticResult = compilation.diagnosticResult();
+        Assert.assertEquals(diagnosticResult.diagnostics().size(), 2);
+        for (Diagnostic diagnostic : diagnosticResult.diagnostics()) {
+            Assert.assertEquals(diagnostic.diagnosticInfo().messageFormat(),
+                    TcpConnectionServiceValidator.NO_PARAMETER_PROVIDED_FOR_0_FUNCTION_EXPECTS_1_AS_A_PARAMETER);
+        }
+    }
+
+    @Test
+    public void testOnBytesFunctionWithInvalidParameter() {
+        Package currentPackage = loadPackage("sample_package_5");
+        PackageCompilation compilation = currentPackage.getCompilation();
+        DiagnosticResult diagnosticResult = compilation.diagnosticResult();
+        Assert.assertEquals(diagnosticResult.diagnostics().size(), 1);
+        Diagnostic diagnostic = (Diagnostic) diagnosticResult.diagnostics().toArray()[0];
+        Assert.assertEquals(diagnostic.diagnosticInfo().messageFormat(),
+                TcpConnectionServiceValidator.INVALID_PARAMETER_0_PROVIDED_FOR_1_FUNCTION);
+    }
+
+    @Test
+    public void testOnErrorFunctionWithInvalidParameter() {
+        Package currentPackage = loadPackage("sample_package_6");
+        PackageCompilation compilation = currentPackage.getCompilation();
+        DiagnosticResult diagnosticResult = compilation.diagnosticResult();
+        Assert.assertEquals(diagnosticResult.diagnostics().size(), 1);
+        Diagnostic diagnostic = (Diagnostic) diagnosticResult.diagnostics().toArray()[0];
+        Assert.assertEquals(diagnostic.diagnosticInfo().messageFormat(),
+                TcpConnectionServiceValidator.INVALID_PARAMETER_0_PROVIDED_FOR_1_FUNCTION_EXPECTS_2);
+    }
+
+    @Test(description = "test onBytes function with byte[] parameter, without readonly intersection")
+    public void testOnBytesWithoutReadonlyParameters() {
+        Package currentPackage = loadPackage("sample_package_7");
+        PackageCompilation compilation = currentPackage.getCompilation();
+        DiagnosticResult diagnosticResult = compilation.diagnosticResult();
+        Assert.assertEquals(diagnosticResult.diagnostics().size(), 1);
+        Diagnostic diagnostic = (Diagnostic) diagnosticResult.diagnostics().toArray()[0];
+        Assert.assertEquals(diagnostic.diagnosticInfo().messageFormat(),
+                TcpConnectionServiceValidator.INVALID_PARAMETER_0_PROVIDED_FOR_1_FUNCTION_EXPECTS_2);
+    }
+
+    @Test
+    public void testValidService() {
+        Package currentPackage = loadPackage("sample_package_8");
+        PackageCompilation compilation = currentPackage.getCompilation();
+        DiagnosticResult diagnosticResult = compilation.diagnosticResult();
+        Assert.assertEquals(diagnosticResult.diagnostics().size(), 0);
+    }
+
     private Package loadPackage(String path) {
         Path projectDirPath = RESOURCE_DIRECTORY.resolve(path);
         BuildProject project = BuildProject.load(getEnvironmentBuilder(), projectDirPath);
