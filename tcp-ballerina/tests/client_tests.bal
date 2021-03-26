@@ -19,8 +19,8 @@ import ballerina/io;
 import ballerina/jballerina.java;
 
 @test:BeforeSuite
-function setup() {
-    var result = startEchoServer();
+function setup() returns error? {
+    check startEchoServer();
 }
 
 @test:Config {}
@@ -83,8 +83,8 @@ function testServerAlreadyClosed() returns  @tainted error? {
 }
 
 @test:AfterSuite {}
-function stopAll() {
-    var result = stopEchoServer();
+function stopAll() returns error? {
+    check stopEchoServer();
 }
 
 public function startEchoServer() returns error? = @java:Method {
