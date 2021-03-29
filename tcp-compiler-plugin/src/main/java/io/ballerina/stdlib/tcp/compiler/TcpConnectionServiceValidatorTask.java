@@ -20,6 +20,7 @@ package io.ballerina.stdlib.tcp.compiler;
 
 import io.ballerina.compiler.syntax.tree.ImportDeclarationNode;
 import io.ballerina.compiler.syntax.tree.ModulePartNode;
+import io.ballerina.compiler.syntax.tree.SyntaxKind;
 import io.ballerina.projects.plugins.AnalysisTask;
 import io.ballerina.projects.plugins.SyntaxNodeAnalysisContext;
 import org.ballerinalang.stdlib.tcp.Constants;
@@ -42,8 +43,9 @@ public class TcpConnectionServiceValidatorTask implements AnalysisTask<SyntaxNod
                 break;
             }
         }
-
-        TcpConnectionServiceValidator serviceValidator = new TcpConnectionServiceValidator(ctx, modulePrefix + ":");
+        // Todo: filter only the tcp:ConnectionService classes
+        TcpConnectionServiceValidator serviceValidator = new TcpConnectionServiceValidator(ctx,
+                modulePrefix + SyntaxKind.COLON_TOKEN.stringValue());
         serviceValidator.validate();
     }
 }

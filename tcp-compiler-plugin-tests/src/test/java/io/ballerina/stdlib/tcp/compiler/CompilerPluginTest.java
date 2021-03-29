@@ -129,6 +129,74 @@ public class CompilerPluginTest {
         Assert.assertEquals(diagnosticResult.diagnostics().size(), 0);
     }
 
+    @Test
+    public void testWithAliasModuleNamePrefix() {
+        Package currentPackage = loadPackage("sample_package_9");
+        PackageCompilation compilation = currentPackage.getCompilation();
+        DiagnosticResult diagnosticResult = compilation.diagnosticResult();
+        Assert.assertEquals(diagnosticResult.diagnostics().size(), 1);
+        Diagnostic diagnostic = (Diagnostic) diagnosticResult.diagnostics().toArray()[0];
+        Assert.assertEquals(diagnostic.diagnosticInfo().messageFormat(),
+                TcpConnectionServiceValidator.INVALID_PARAMETER_0_PROVIDED_FOR_1_FUNCTION_EXPECTS_2);
+    }
+
+//    @Test
+//    public void testWithOtherModuleServices() {
+//        Package currentPackage = loadPackage("sample_package_10");
+//        PackageCompilation compilation = currentPackage.getCompilation();
+//        DiagnosticResult diagnosticResult = compilation.diagnosticResult();
+////        Assert.assertEquals(diagnosticResult.diagnostics().size(), 0);
+//        PrintStream console = System.out;
+//        for (Diagnostic diagnostic : diagnosticResult.diagnostics()) {
+//            console.println(diagnostic.diagnosticInfo().messageFormat());
+//        }
+//    }
+
+    @Test
+    public void testConnectionServiceWithInvalidReturnType() {
+        Package currentPackage = loadPackage("sample_package_11");
+        PackageCompilation compilation = currentPackage.getCompilation();
+        DiagnosticResult diagnosticResult = compilation.diagnosticResult();
+        Assert.assertEquals(diagnosticResult.diagnostics().size(), 3);
+        for (Diagnostic diagnostic : diagnosticResult.diagnostics()) {
+            Assert.assertEquals(diagnostic.diagnosticInfo().messageFormat(),
+                    TcpConnectionServiceValidator
+                            .INVALID_RETURN_TYPE_0_FUNCTION_1_RETURN_TYPE_SHOULD_BE_A_SUBTYPE_OF_2);
+        }
+    }
+
+    @Test
+    public void testWithUnSupportedFunctionNames() {
+        Package currentPackage = loadPackage("sample_package_12");
+        PackageCompilation compilation = currentPackage.getCompilation();
+        DiagnosticResult diagnosticResult = compilation.diagnosticResult();
+        Assert.assertEquals(diagnosticResult.diagnostics().size(), 2);
+        for (Diagnostic diagnostic : diagnosticResult.diagnostics()) {
+            Assert.assertEquals(diagnostic.diagnosticInfo().messageFormat(),
+                    TcpConnectionServiceValidator.FUNCTION_0_NOT_ACCEPTED_BY_THE_SERVICE);
+        }
+    }
+
+    @Test
+    public void testConnectionServiceWithMoreThanExpectedParameterCount() {
+        Package currentPackage = loadPackage("sample_package_13");
+        PackageCompilation compilation = currentPackage.getCompilation();
+        DiagnosticResult diagnosticResult = compilation.diagnosticResult();
+        Assert.assertEquals(diagnosticResult.diagnostics().size(), 2);
+        for (Diagnostic diagnostic : diagnosticResult.diagnostics()) {
+            Assert.assertEquals(diagnostic.diagnosticInfo().messageFormat(),
+                    TcpConnectionServiceValidator.PROVIDED_0_PARAMETERS_1_CAN_HAVE_ONLY_2_PARAMETERS);
+        }
+
+        currentPackage = loadPackage("sample_package_14");
+        compilation = currentPackage.getCompilation();
+        diagnosticResult = compilation.diagnosticResult();
+        Assert.assertEquals(diagnosticResult.diagnostics().size(), 1);
+        Diagnostic diagnostic = (Diagnostic) diagnosticResult.diagnostics().toArray()[0];
+        Assert.assertEquals(diagnostic.diagnosticInfo().messageFormat(),
+                TcpConnectionServiceValidator.PROVIDED_0_PARAMETERS_ON_CLOSE_FUNCTION_CANNOT_HAVE_ANY_PARAMETERS);
+    }
+
     private Package loadPackage(String path) {
         Path projectDirPath = RESOURCE_DIRECTORY.resolve(path);
         BuildProject project = BuildProject.load(getEnvironmentBuilder(), projectDirPath);
