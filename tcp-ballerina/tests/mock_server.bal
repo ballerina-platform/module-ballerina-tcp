@@ -109,7 +109,7 @@ service on new Listener(PORT4, secureSocket = {
 
 service class SecureEchoService {
 
-    remote function onBytes(readonly & byte[] data) returns readonly & byte[] {
+    remote function onBytes(readonly & byte[] data) returns byte[] {
         io:println("Echo: ", 'string:fromBytes(data));
         return data;
     }
