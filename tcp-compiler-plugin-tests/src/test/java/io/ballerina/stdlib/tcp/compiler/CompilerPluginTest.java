@@ -47,10 +47,11 @@ public class CompilerPluginTest {
         Package currentPackage = loadPackage("sample_package_1");
         PackageCompilation compilation = currentPackage.getCompilation();
         DiagnosticResult diagnosticResult = compilation.diagnosticResult();
-        Assert.assertEquals(diagnosticResult.diagnostics().size(), 1);
-        Diagnostic diagnostic = (Diagnostic) diagnosticResult.diagnostics().toArray()[0];
-        Assert.assertEquals(diagnostic.diagnosticInfo().messageFormat(),
-                TcpServiceValidator.FUNCTION_0_NOT_ACCEPTED_BY_THE_SERVICE);
+        Assert.assertEquals(diagnosticResult.diagnostics().size(), 2);
+        for (Diagnostic diagnostic : diagnosticResult.diagnostics()) {
+            Assert.assertEquals(diagnostic.diagnosticInfo().messageFormat(),
+                    TcpServiceValidator.FUNCTION_0_NOT_ACCEPTED_BY_THE_SERVICE);
+        }
     }
 
     @Test

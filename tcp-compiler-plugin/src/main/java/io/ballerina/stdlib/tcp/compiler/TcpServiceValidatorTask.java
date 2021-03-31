@@ -18,18 +18,19 @@
 
 package io.ballerina.stdlib.tcp.compiler;
 
-import io.ballerina.compiler.syntax.tree.ExplicitNewExpressionNode;
-import io.ballerina.compiler.syntax.tree.ExpressionNode;
-import io.ballerina.compiler.syntax.tree.ImportDeclarationNode;
-import io.ballerina.compiler.syntax.tree.ModulePartNode;
-import io.ballerina.compiler.syntax.tree.Node;
-import io.ballerina.compiler.syntax.tree.SeparatedNodeList;
+import io.ballerina.compiler.api.symbols.ServiceDeclarationSymbol;
+import io.ballerina.compiler.api.symbols.Symbol;
+import io.ballerina.compiler.api.symbols.TypeDescKind;
+import io.ballerina.compiler.api.symbols.TypeReferenceTypeSymbol;
+import io.ballerina.compiler.api.symbols.TypeSymbol;
+import io.ballerina.compiler.api.symbols.UnionTypeSymbol;
 import io.ballerina.compiler.syntax.tree.ServiceDeclarationNode;
-import io.ballerina.compiler.syntax.tree.SyntaxKind;
-import io.ballerina.compiler.syntax.tree.TypeDescriptorNode;
 import io.ballerina.projects.plugins.AnalysisTask;
 import io.ballerina.projects.plugins.SyntaxNodeAnalysisContext;
 import org.ballerinalang.stdlib.tcp.Constants;
+
+import java.util.List;
+import java.util.Optional;
 
 /**
  * Class to Validate TCP services.
@@ -39,27 +40,23 @@ public class TcpServiceValidatorTask implements AnalysisTask<SyntaxNodeAnalysisC
     @Override
     public void perform(SyntaxNodeAnalysisContext ctx) {
         ServiceDeclarationNode serviceDeclarationNode = (ServiceDeclarationNode) ctx.node();
-        SeparatedNodeList<ExpressionNode> expressions = serviceDeclarationNode.expressions();
 
-        String modulePrefix = Constants.TCP;
-        ModulePartNode modulePartNode = ctx.syntaxTree().rootNode();
-        for (ImportDeclarationNode importDeclaration : modulePartNode.imports()) {
-            if (importDeclaration.moduleName().get(0).toString().split(" ")[0].compareTo(Constants.TCP) == 0) {
-                if (importDeclaration.prefix().isPresent()) {
-                    modulePrefix = importDeclaration.prefix().get().children().get(1).toString();
-                }
-                break;
-            }
-        }
-
+        Optional<Symbol> serviceDeclarationSymbol = ctx.semanticModel().symbol(serviceDeclarationNode);
         TcpServiceValidator tcpServiceValidator = null;
-        for (ExpressionNode expressionNode : expressions) {
-            if (expressionNode.kind() == SyntaxKind.EXPLICIT_NEW_EXPRESSION) {
-
-                TypeDescriptorNode typeDescriptorNode = ((ExplicitNewExpressionNode) expressionNode).typeDescriptor();
-                Node moduleIdentifierTokenOfListener = typeDescriptorNode.children().get(0);
-                if (moduleIdentifierTokenOfListener.toString().compareTo(modulePrefix) == 0) {
+        if (serviceDeclarationSymbol.isPresent()) {
+            List<TypeSymbol> listenerTypes = ((ServiceDeclarationSymbol) serviceDeclarationSymbol.get())
+                    .listenerTypes();
+            for (TypeSymbol listenerType : listenerTypes) {
+                if (listenerType.typeKind() == TypeDescKind.UNION
+                        && ((UnionTypeSymbol) listenerType).memberTypeDescriptors().get(0).getModule()
+                        .flatMap(Symbol::getName).orElse("").compareTo(Constants.TCP) == 0) {
                     tcpServiceValidator = new TcpServiceValidator(ctx);
+                    break;
+                } else if (listenerType.typeKind() == TypeDescKind.TYPE_REFERENCE
+                        && ((TypeReferenceTypeSymbol) listenerType).typeDescriptor().getModule()
+                        .flatMap(Symbol::getName).orElse("").compareTo(Constants.TCP) == 0) {
+                    tcpServiceValidator = new TcpServiceValidator(ctx);
+                    break;
                 }
             }
         }

@@ -32,20 +32,37 @@ public class TcpConnectionServiceValidatorTask implements AnalysisTask<SyntaxNod
 
     @Override
     public void perform(SyntaxNodeAnalysisContext ctx) {
+        String modulePrefix = getPrefix(ctx);
 
-        String modulePrefix = Constants.TCP;
+//        ClassDefinitionNode classDefinitionNode = (ClassDefinitionNode) ctx.node();
+//        List<Node> typeReferenceNodes = classDefinitionNode.members()
+//                .stream().filter(member -> member.kind() == SyntaxKind.TYPE_REFERENCE).collect(Collectors.toList());
+//
+//        for (Node node : typeReferenceNodes) {
+//            if (((TypeReferenceNode) node).typeName().toSourceCode()
+//            .compareTo(modulePrefix + SyntaxKind.COLON_TOKEN.stringValue() + Constants.CONNECTION_SERVICE) == 0) {
+//                TcpConnectionServiceValidator serviceValidator = new TcpConnectionServiceValidator(ctx,
+//                        modulePrefix + SyntaxKind.COLON_TOKEN.stringValue());
+//                serviceValidator.validate();
+//                break;
+//            }
+//        }
+
+        TcpConnectionServiceValidator serviceValidator = new TcpConnectionServiceValidator(ctx,
+                modulePrefix + SyntaxKind.COLON_TOKEN.stringValue());
+        serviceValidator.validate();
+    }
+
+    private String getPrefix(SyntaxNodeAnalysisContext ctx) {
         ModulePartNode modulePartNode = ctx.syntaxTree().rootNode();
         for (ImportDeclarationNode importDeclaration : modulePartNode.imports()) {
             if (importDeclaration.moduleName().get(0).toString().split(" ")[0].compareTo(Constants.TCP) == 0) {
                 if (importDeclaration.prefix().isPresent()) {
-                    modulePrefix = importDeclaration.prefix().get().children().get(1).toString();
+                    return importDeclaration.prefix().get().children().get(1).toString();
                 }
                 break;
             }
         }
-        // Todo: filter only the tcp:ConnectionService classes
-        TcpConnectionServiceValidator serviceValidator = new TcpConnectionServiceValidator(ctx,
-                modulePrefix + SyntaxKind.COLON_TOKEN.stringValue());
-        serviceValidator.validate();
+        return Constants.TCP;
     }
 }
