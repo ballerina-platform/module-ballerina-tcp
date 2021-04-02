@@ -281,6 +281,8 @@ publishing {
             credentials {
                 username = System.getenv("packageUser")
                 password = System.getenv("packagePAT")
+                username = System.getenv("publishUser")
+                password = System.getenv("publishPAT")
             }
         }
     }
