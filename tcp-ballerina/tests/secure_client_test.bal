@@ -19,8 +19,8 @@ import ballerina/jballerina.java;
 import ballerina/io;
 
 @test:BeforeSuite
-function setupServer() {
-    var result = startSecureServer();
+function setupServer() returns error? {
+    check startSecureServer();
 }
 
 @test:Config {dependsOn: [testListenerEcho], enable: true}
@@ -153,8 +153,8 @@ isolated function testSecureClientWithInvalidCertPath() returns @tainted error? 
 }
 
 @test:AfterSuite {}
-function stopServer() {
-    var result = stopSecureServer();
+function stopServer() returns error? {
+    check stopSecureServer();
 }
 
 public function startSecureServer() returns error? = @java:Method {
