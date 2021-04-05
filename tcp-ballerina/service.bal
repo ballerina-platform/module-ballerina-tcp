@@ -23,7 +23,6 @@ public type Service service object {
 public type ConnectionService service object {
   // ConnectionService can have these optional remote methods
   // remote function onError(readonly & Error err) returns Error?;
-  // remote function onBytes(readonly & byte[] data) returns Error?;
-  // remote function onBlockAsStream(readonly & stream<byte[]> dataStream) returns Error?;
+  // remote function onBytes(readonly & byte[] data) returns byte[]|Error?;
   // remote function onClose() returns Error?;
 };
