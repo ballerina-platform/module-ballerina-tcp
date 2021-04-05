@@ -56,7 +56,7 @@ public class TcpConnectionServiceValidatorTask implements AnalysisTask<SyntaxNod
     private String getPrefix(SyntaxNodeAnalysisContext ctx) {
         ModulePartNode modulePartNode = ctx.syntaxTree().rootNode();
         for (ImportDeclarationNode importDeclaration : modulePartNode.imports()) {
-            if (importDeclaration.moduleName().get(0).toString().split(" ")[0].compareTo(Constants.TCP) == 0) {
+            if (Utils.equals(importDeclaration.moduleName().get(0).toString().stripTrailing(), (Constants.TCP))) {
                 if (importDeclaration.prefix().isPresent()) {
                     return importDeclaration.prefix().get().children().get(1).toString();
                 }

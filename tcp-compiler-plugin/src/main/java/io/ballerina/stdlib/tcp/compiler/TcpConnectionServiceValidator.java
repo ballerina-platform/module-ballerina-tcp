@@ -86,15 +86,15 @@ public class TcpConnectionServiceValidator {
                         || child.kind() == SyntaxKind.RESOURCE_ACCESSOR_DEFINITION).forEach(node -> {
             FunctionDefinitionNode functionDefinitionNode = (FunctionDefinitionNode) node;
             String functionName = functionDefinitionNode.functionName().toString();
-            if (functionName.compareTo(Constants.ON_BYTES) != 0 && functionName.compareTo(Constants.ON_ERROR) != 0
-                    && functionName.compareTo(Constants.ON_CLOSE) != 0) {
+            if (!Utils.equals(functionName, Constants.ON_BYTES) && !Utils.equals(functionName, Constants.ON_ERROR)
+                    && !Utils.equals(functionName, Constants.ON_CLOSE)) {
                 reportInvalidFunction(functionDefinitionNode);
             } else {
-                onBytesFunctionNode = functionName.compareTo(Constants.ON_BYTES) == 0 ? functionDefinitionNode
+                onBytesFunctionNode = Utils.equals(functionName, Constants.ON_BYTES) ? functionDefinitionNode
                         : onBytesFunctionNode;
-                onErrorFunctionNode = functionName.compareTo(Constants.ON_ERROR) == 0 ? functionDefinitionNode
+                onErrorFunctionNode = Utils.equals(functionName, Constants.ON_ERROR) ? functionDefinitionNode
                         : onErrorFunctionNode;
-                onCloseFunctionNode = functionName.compareTo(Constants.ON_CLOSE) == 0 ? functionDefinitionNode
+                onCloseFunctionNode = Utils.equals(functionName, Constants.ON_CLOSE) ? functionDefinitionNode
                         : onCloseFunctionNode;
             }
         });
@@ -235,23 +235,23 @@ public class TcpConnectionServiceValidator {
         }
 
         Node returnTypeDescriptor = returnTypeDescriptorNode.get().type();
-        String returnTypeDescWithoutTrailingSpace = returnTypeDescriptor.toString().split(" ")[0];
+        String returnTypeDescriptorType = returnTypeDescriptor.toString().stripTrailing();
 
         if (functionName.equals(Constants.ON_BYTES) && returnTypeDescriptor.kind() == SyntaxKind.ARRAY_TYPE_DESC
-                && returnTypeDescWithoutTrailingSpace.compareTo(BYTE_ARRAY) == 0) {
+                && Utils.equals(returnTypeDescriptorType, BYTE_ARRAY)) {
             return;
         }
 
         if (functionName.equals(Constants.ON_BYTES) && returnTypeDescriptor.kind() == SyntaxKind.OPTIONAL_TYPE_DESC
-                && (returnTypeDescWithoutTrailingSpace.compareTo(modulePrefix + ERROR + OPTIONAL) == 0
-                || returnTypeDescWithoutTrailingSpace.compareTo(BYTE_ARRAY + OPTIONAL) == 0)) {
+                && (Utils.equals(returnTypeDescriptorType, modulePrefix + ERROR + OPTIONAL)
+                || Utils.equals(returnTypeDescriptorType, BYTE_ARRAY + OPTIONAL))) {
             return;
         }
 
 
         if ((functionName.equals(Constants.ON_ERROR) || functionName.equals(Constants.ON_CLOSE))
                 && returnTypeDescriptor.kind() == SyntaxKind.OPTIONAL_TYPE_DESC
-                && returnTypeDescWithoutTrailingSpace.compareTo(modulePrefix + ERROR + OPTIONAL) == 0) {
+                && Utils.equals(returnTypeDescriptorType, modulePrefix + ERROR + OPTIONAL)) {
             return;
         }
 
@@ -265,18 +265,18 @@ public class TcpConnectionServiceValidator {
             isUnionTypeDesc = true;
             UnionTypeDescriptorNode unionTypeDescriptorNode = (UnionTypeDescriptorNode) returnTypeDescriptor;
             for (Node descriptor : unionTypeDescriptorNode.children()) {
-                String descriptorWithoutTrailingSpace = descriptor.toString().split(" ")[0];
+                String descriptorType = descriptor.toString().stripTrailing();
                 if (descriptor.kind() == SyntaxKind.PIPE_TOKEN) {
                     continue;
                 } else if (descriptor.kind() == SyntaxKind.ARRAY_TYPE_DESC
-                        && descriptorWithoutTrailingSpace.compareTo(BYTE_ARRAY) == 0) {
+                        && Utils.equals(descriptorType, BYTE_ARRAY)) {
                     continue;
                 } else if (descriptor.kind() == SyntaxKind.OPTIONAL_TYPE_DESC
-                        && descriptorWithoutTrailingSpace.compareTo(modulePrefix + ERROR + OPTIONAL) == 0) {
+                        && Utils.equals(descriptorType, modulePrefix + ERROR + OPTIONAL)) {
                     continue;
                 } else if (descriptor.kind() == SyntaxKind.OPTIONAL_TYPE_DESC
-                        && (descriptorWithoutTrailingSpace.compareTo(modulePrefix + ERROR + OPTIONAL) == 0
-                        || descriptorWithoutTrailingSpace.compareTo(BYTE_ARRAY + OPTIONAL) == 0)) {
+                        && (Utils.equals(descriptorType, modulePrefix + ERROR + OPTIONAL)
+                        || Utils.equals(descriptorType, BYTE_ARRAY + OPTIONAL))) {
                     continue;
                 } else {
                     hasInvalidUnionTypeDesc = true;

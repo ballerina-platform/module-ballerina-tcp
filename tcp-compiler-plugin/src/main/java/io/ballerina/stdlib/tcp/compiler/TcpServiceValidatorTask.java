@@ -48,13 +48,13 @@ public class TcpServiceValidatorTask implements AnalysisTask<SyntaxNodeAnalysisC
                     .listenerTypes();
             for (TypeSymbol listenerType : listenerTypes) {
                 if (listenerType.typeKind() == TypeDescKind.UNION
-                        && ((UnionTypeSymbol) listenerType).memberTypeDescriptors().get(0).getModule()
-                        .flatMap(Symbol::getName).orElse("").compareTo(Constants.TCP) == 0) {
+                        && Utils.equals(((UnionTypeSymbol) listenerType).memberTypeDescriptors().get(0).getModule()
+                        .flatMap(Symbol::getName).orElse(""), Constants.TCP)) {
                     tcpServiceValidator = new TcpServiceValidator(ctx);
                     break;
                 } else if (listenerType.typeKind() == TypeDescKind.TYPE_REFERENCE
-                        && ((TypeReferenceTypeSymbol) listenerType).typeDescriptor().getModule()
-                        .flatMap(Symbol::getName).orElse("").compareTo(Constants.TCP) == 0) {
+                        && Utils.equals(((TypeReferenceTypeSymbol) listenerType).typeDescriptor().getModule()
+                        .flatMap(Symbol::getName).orElse(""), Constants.TCP)) {
                     tcpServiceValidator = new TcpServiceValidator(ctx);
                     break;
                 }
