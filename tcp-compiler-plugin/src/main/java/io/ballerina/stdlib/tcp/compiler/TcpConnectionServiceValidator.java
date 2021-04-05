@@ -84,26 +84,29 @@ public class TcpConnectionServiceValidator {
         classDefinitionNode.members().stream()
                 .filter(child -> child.kind() == SyntaxKind.OBJECT_METHOD_DEFINITION
                         || child.kind() == SyntaxKind.RESOURCE_ACCESSOR_DEFINITION).forEach(node -> {
-            FunctionDefinitionNode functionDefinitionNode = (FunctionDefinitionNode) node;
-            String functionName = functionDefinitionNode.functionName().toString();
-            if (Utils.hasRemoteKeyword(functionDefinitionNode)
-                    && !Utils.equals(functionName, Constants.ON_BYTES)
-                    && !Utils.equals(functionName, Constants.ON_ERROR)
-                    && !Utils.equals(functionName, Constants.ON_CLOSE)) {
-                reportInvalidFunction(functionDefinitionNode);
-            } else {
-                onBytesFunctionNode = Utils.equals(functionName, Constants.ON_BYTES) ? functionDefinitionNode
-                        : onBytesFunctionNode;
-                onErrorFunctionNode = Utils.equals(functionName, Constants.ON_ERROR) ? functionDefinitionNode
-                        : onErrorFunctionNode;
-                onCloseFunctionNode = Utils.equals(functionName, Constants.ON_CLOSE) ? functionDefinitionNode
-                        : onCloseFunctionNode;
-            }
+            filterRemoteMethods((FunctionDefinitionNode) node);
         });
         checkOnBytesFunctionExistence();
         validateFunctionSignature(onBytesFunctionNode, Constants.ON_BYTES);
         validateFunctionSignature(onErrorFunctionNode, Constants.ON_ERROR);
         validateFunctionSignature(onCloseFunctionNode, Constants.ON_CLOSE);
+    }
+
+    private void filterRemoteMethods(FunctionDefinitionNode functionDefinitionNode) {
+        String functionName = functionDefinitionNode.functionName().toString();
+        if (Utils.hasRemoteKeyword(functionDefinitionNode)
+                && !Utils.equals(functionName, Constants.ON_BYTES)
+                && !Utils.equals(functionName, Constants.ON_ERROR)
+                && !Utils.equals(functionName, Constants.ON_CLOSE)) {
+            reportInvalidFunction(functionDefinitionNode);
+        } else {
+            onBytesFunctionNode = Utils.equals(functionName, Constants.ON_BYTES) ? functionDefinitionNode
+                    : onBytesFunctionNode;
+            onErrorFunctionNode = Utils.equals(functionName, Constants.ON_ERROR) ? functionDefinitionNode
+                    : onErrorFunctionNode;
+            onCloseFunctionNode = Utils.equals(functionName, Constants.ON_CLOSE) ? functionDefinitionNode
+                    : onCloseFunctionNode;
+        }
     }
 
     private void reportInvalidFunction(FunctionDefinitionNode functionDefinitionNode) {
