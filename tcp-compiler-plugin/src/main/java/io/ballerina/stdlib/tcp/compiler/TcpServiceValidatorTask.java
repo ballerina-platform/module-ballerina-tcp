@@ -45,31 +45,37 @@ public class TcpServiceValidatorTask implements AnalysisTask<SyntaxNodeAnalysisC
         ServiceDeclarationNode serviceDeclarationNode = (ServiceDeclarationNode) ctx.node();
 
         Optional<Symbol> serviceDeclarationSymbol = ctx.semanticModel().symbol(serviceDeclarationNode);
-        TcpServiceValidator tcpServiceValidator = null;
+        TcpServiceValidator tcpServiceValidator;
         if (serviceDeclarationSymbol.isPresent()) {
             List<TypeSymbol> listenerTypes = ((ServiceDeclarationSymbol) serviceDeclarationSymbol.get())
                     .listenerTypes();
             for (TypeSymbol listenerType : listenerTypes) {
-                if (listenerType.typeKind() == TypeDescKind.UNION
-                        && isTcpModule(((UnionTypeSymbol) listenerType).memberTypeDescriptors()
-                        .get(0).getModule().get())) {
+                if (isListenerBelongsToTcpModule(listenerType)) {
                     tcpServiceValidator = new TcpServiceValidator(ctx);
-                    break;
-                } else if (listenerType.typeKind() == TypeDescKind.TYPE_REFERENCE
-                        && isTcpModule(((TypeReferenceTypeSymbol) listenerType).typeDescriptor().getModule().get())) {
-                    tcpServiceValidator = new TcpServiceValidator(ctx);
-                    break;
+                    tcpServiceValidator.validate();
+                    return;
                 }
             }
-        }
-
-        if (tcpServiceValidator != null) {
-            tcpServiceValidator.validate();
         }
     }
 
     private boolean isTcpModule(ModuleSymbol moduleSymbol) {
         return Utils.equals(moduleSymbol.getName().get(), Constants.TCP)
                 && Utils.equals(moduleSymbol.id().orgName(), ORG_NAME);
+    }
+
+    private boolean isListenerBelongsToTcpModule(TypeSymbol listenerType) {
+        if (listenerType.typeKind() == TypeDescKind.UNION) {
+            return ((UnionTypeSymbol) listenerType).memberTypeDescriptors().stream()
+                    .filter(typeDescriptor -> typeDescriptor instanceof TypeReferenceTypeSymbol)
+                    .map(typeReferenceTypeSymbol -> (TypeReferenceTypeSymbol) typeReferenceTypeSymbol)
+                    .anyMatch(typeReferenceTypeSymbol -> isTcpModule(typeReferenceTypeSymbol.getModule().get()));
+        }
+
+        if (listenerType.typeKind() == TypeDescKind.TYPE_REFERENCE) {
+            return isTcpModule(((TypeReferenceTypeSymbol) listenerType).typeDescriptor().getModule().get());
+        }
+
+        return false;
     }
 }
