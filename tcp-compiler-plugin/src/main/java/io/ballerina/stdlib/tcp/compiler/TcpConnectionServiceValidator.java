@@ -272,9 +272,6 @@ public class TcpConnectionServiceValidator {
                         && Utils.equals(descriptorType, BYTE_ARRAY)) {
                     continue;
                 } else if (descriptor.kind() == SyntaxKind.OPTIONAL_TYPE_DESC
-                        && Utils.equals(descriptorType, modulePrefix + ERROR + OPTIONAL)) {
-                    continue;
-                } else if (descriptor.kind() == SyntaxKind.OPTIONAL_TYPE_DESC
                         && (Utils.equals(descriptorType, modulePrefix + ERROR + OPTIONAL)
                         || Utils.equals(descriptorType, BYTE_ARRAY + OPTIONAL))) {
                     continue;
