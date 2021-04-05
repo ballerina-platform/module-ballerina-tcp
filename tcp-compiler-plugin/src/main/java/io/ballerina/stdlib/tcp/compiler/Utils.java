@@ -18,6 +18,9 @@
 
 package io.ballerina.stdlib.tcp.compiler;
 
+import io.ballerina.compiler.syntax.tree.FunctionDefinitionNode;
+import io.ballerina.compiler.syntax.tree.SyntaxKind;
+
 /**
  * Compiler-plugin utility class.
  */
@@ -25,5 +28,10 @@ public class Utils {
 
     public static boolean equals(String actual, String expected) {
         return actual.compareTo(expected) == 0;
+    }
+
+    public static boolean hasRemoteKeyword(FunctionDefinitionNode functionDefinitionNode) {
+        return functionDefinitionNode.qualifierList().stream()
+                .filter(q -> q.kind() == SyntaxKind.REMOTE_KEYWORD).toArray().length == 1;
     }
 }

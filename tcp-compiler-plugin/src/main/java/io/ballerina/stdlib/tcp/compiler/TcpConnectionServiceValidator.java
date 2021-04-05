@@ -86,7 +86,9 @@ public class TcpConnectionServiceValidator {
                         || child.kind() == SyntaxKind.RESOURCE_ACCESSOR_DEFINITION).forEach(node -> {
             FunctionDefinitionNode functionDefinitionNode = (FunctionDefinitionNode) node;
             String functionName = functionDefinitionNode.functionName().toString();
-            if (!Utils.equals(functionName, Constants.ON_BYTES) && !Utils.equals(functionName, Constants.ON_ERROR)
+            if (Utils.hasRemoteKeyword(functionDefinitionNode)
+                    && !Utils.equals(functionName, Constants.ON_BYTES)
+                    && !Utils.equals(functionName, Constants.ON_ERROR)
                     && !Utils.equals(functionName, Constants.ON_CLOSE)) {
                 reportInvalidFunction(functionDefinitionNode);
             } else {
@@ -135,8 +137,7 @@ public class TcpConnectionServiceValidator {
     }
 
     private void hasRemoteKeyword(FunctionDefinitionNode functionDefinitionNode, String functionName) {
-        boolean hasRemoteKeyword = functionDefinitionNode.qualifierList().stream()
-                .filter(q -> q.kind() == SyntaxKind.REMOTE_KEYWORD).toArray().length == 1;
+        boolean hasRemoteKeyword = Utils.hasRemoteKeyword(functionDefinitionNode);
         if (!hasRemoteKeyword) {
             DiagnosticInfo diagnosticInfo = new DiagnosticInfo(CODE,
                     REMOTE_KEYWORD_EXPECTED_IN_0_FUNCTION_SIGNATURE,

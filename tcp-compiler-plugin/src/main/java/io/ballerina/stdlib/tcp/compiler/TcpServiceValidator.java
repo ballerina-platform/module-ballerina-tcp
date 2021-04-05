@@ -47,7 +47,7 @@ public class TcpServiceValidator {
                         || child.kind() == SyntaxKind.RESOURCE_ACCESSOR_DEFINITION).forEach(node -> {
             FunctionDefinitionNode functionDefinitionNode = (FunctionDefinitionNode) node;
             String functionName = functionDefinitionNode.functionName().toString();
-            if (!Utils.equals(functionName, Constants.ON_CONNECT)) {
+            if (Utils.hasRemoteKeyword(functionDefinitionNode) && !Utils.equals(functionName, Constants.ON_CONNECT)) {
                 reportInvalidFunction(functionDefinitionNode);
             }
         });

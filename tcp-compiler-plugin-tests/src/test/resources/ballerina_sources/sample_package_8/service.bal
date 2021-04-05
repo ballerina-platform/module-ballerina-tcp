@@ -5,6 +5,10 @@ service on new tcp:Listener(3000) {
     remote function onConnect(tcp:Caller caller) returns tcp:ConnectionService {
         return new EchoService();
     }
+
+    function someFuntions() {
+
+    }
 }
 
 service class EchoService {
@@ -18,6 +22,10 @@ service class EchoService {
     }
 
     remote function onError(tcp:Error err) returns tcp:Error? {
+
+    }
+
+    function someUtilFunction() {
 
     }
 }
