@@ -18,6 +18,7 @@
 
 package io.ballerina.stdlib.tcp.compiler;
 
+import io.ballerina.compiler.api.symbols.ModuleSymbol;
 import io.ballerina.compiler.api.symbols.ServiceDeclarationSymbol;
 import io.ballerina.compiler.api.symbols.Symbol;
 import io.ballerina.compiler.api.symbols.TypeDescKind;
@@ -37,6 +38,8 @@ import java.util.Optional;
  */
 public class TcpServiceValidatorTask implements AnalysisTask<SyntaxNodeAnalysisContext> {
 
+    private static final String ORG_NAME = "ballerina";
+
     @Override
     public void perform(SyntaxNodeAnalysisContext ctx) {
         ServiceDeclarationNode serviceDeclarationNode = (ServiceDeclarationNode) ctx.node();
@@ -48,13 +51,12 @@ public class TcpServiceValidatorTask implements AnalysisTask<SyntaxNodeAnalysisC
                     .listenerTypes();
             for (TypeSymbol listenerType : listenerTypes) {
                 if (listenerType.typeKind() == TypeDescKind.UNION
-                        && Utils.equals(((UnionTypeSymbol) listenerType).memberTypeDescriptors().get(0).getModule()
-                        .flatMap(Symbol::getName).orElse(""), Constants.TCP)) {
+                        && isTcpModule(((UnionTypeSymbol) listenerType).memberTypeDescriptors()
+                        .get(0).getModule().get())) {
                     tcpServiceValidator = new TcpServiceValidator(ctx);
                     break;
                 } else if (listenerType.typeKind() == TypeDescKind.TYPE_REFERENCE
-                        && Utils.equals(((TypeReferenceTypeSymbol) listenerType).typeDescriptor().getModule()
-                        .flatMap(Symbol::getName).orElse(""), Constants.TCP)) {
+                        && isTcpModule(((TypeReferenceTypeSymbol) listenerType).typeDescriptor().getModule().get())) {
                     tcpServiceValidator = new TcpServiceValidator(ctx);
                     break;
                 }
@@ -64,5 +66,10 @@ public class TcpServiceValidatorTask implements AnalysisTask<SyntaxNodeAnalysisC
         if (tcpServiceValidator != null) {
             tcpServiceValidator.validate();
         }
+    }
+
+    private boolean isTcpModule(ModuleSymbol moduleSymbol) {
+        return Utils.equals(moduleSymbol.getName().get(), Constants.TCP)
+                && Utils.equals(moduleSymbol.id().orgName(), ORG_NAME);
     }
 }
