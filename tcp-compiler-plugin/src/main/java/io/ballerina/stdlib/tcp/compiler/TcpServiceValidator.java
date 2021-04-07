@@ -33,7 +33,7 @@ import org.ballerinalang.stdlib.tcp.Constants;
 public class TcpServiceValidator {
     private SyntaxNodeAnalysisContext ctx;
 
-    private static final String CODE = "TCP_101";
+    public static final String TCP_103 = "TCP_103";
     public static final String FUNCTION_0_NOT_ACCEPTED_BY_THE_SERVICE = "Function `{0}` not accepted by the service";
 
     public TcpServiceValidator(SyntaxNodeAnalysisContext syntaxNodeAnalysisContext) {
@@ -54,7 +54,7 @@ public class TcpServiceValidator {
     }
 
     private void reportInvalidFunction(FunctionDefinitionNode functionDefinitionNode) {
-        DiagnosticInfo diagnosticInfo = new DiagnosticInfo(CODE, FUNCTION_0_NOT_ACCEPTED_BY_THE_SERVICE,
+        DiagnosticInfo diagnosticInfo = new DiagnosticInfo(TCP_103, FUNCTION_0_NOT_ACCEPTED_BY_THE_SERVICE,
                 DiagnosticSeverity.ERROR);
         ctx.reportDiagnostic(DiagnosticFactory.createDiagnostic(diagnosticInfo,
                 functionDefinitionNode.location(), functionDefinitionNode.functionName().toString()));

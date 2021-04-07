@@ -45,8 +45,14 @@ public class TcpConnectionServiceValidator {
     private final String modulePrefix;
     private final SyntaxNodeAnalysisContext ctx;
 
+    // Error codes for reporting error diagnostics
+    public static final String TCP_101 = "TCP_101";
+    public static final String TCP_102 = "TCP_102";
+    public static final String TCP_103 = "TCP_103";
+    public static final String TCP_104 = "TCP_104";
+    public static final String TCP_105 = "TCP_105";
+
     // Message formats for reporting error diagnostics
-    private static final String CODE = "UDP_101";
     public static final String SERVICE_DOES_NOT_CONTAIN_ON_BYTES_FUNCTION
             = "Service does not contain `onBytes` function.";
     public static final String NO_PARAMETER_PROVIDED_FOR_0_FUNCTION_EXPECTS_1_AS_A_PARAMETER
@@ -71,7 +77,7 @@ public class TcpConnectionServiceValidator {
     public static final String BYTE_ARRAY = "byte[]";
     public static final String ERROR = "Error";
     public static final String OPTIONAL = "?";
-    public static final String NILL = "()";
+    public static final String NIL = "()";
 
     public TcpConnectionServiceValidator(SyntaxNodeAnalysisContext syntaxNodeAnalysisContext,
                                          String modulePrefixOrModuleName) {
@@ -110,7 +116,7 @@ public class TcpConnectionServiceValidator {
     }
 
     private void reportInvalidFunction(FunctionDefinitionNode functionDefinitionNode) {
-        DiagnosticInfo diagnosticInfo = new DiagnosticInfo(CODE, FUNCTION_0_NOT_ACCEPTED_BY_THE_SERVICE,
+        DiagnosticInfo diagnosticInfo = new DiagnosticInfo(TCP_103, FUNCTION_0_NOT_ACCEPTED_BY_THE_SERVICE,
                 DiagnosticSeverity.ERROR);
         ctx.reportDiagnostic(DiagnosticFactory.createDiagnostic(diagnosticInfo,
                 functionDefinitionNode.location(), functionDefinitionNode.functionName().toString()));
@@ -132,7 +138,7 @@ public class TcpConnectionServiceValidator {
     private void checkOnBytesFunctionExistence() {
         if (onBytesFunctionNode == null) {
             // ConnectionService should contain onBytes method
-            DiagnosticInfo diagnosticInfo = new DiagnosticInfo(CODE, SERVICE_DOES_NOT_CONTAIN_ON_BYTES_FUNCTION,
+            DiagnosticInfo diagnosticInfo = new DiagnosticInfo(TCP_102, SERVICE_DOES_NOT_CONTAIN_ON_BYTES_FUNCTION,
                     DiagnosticSeverity.ERROR);
             ctx.reportDiagnostic(DiagnosticFactory.createDiagnostic(diagnosticInfo,
                     ctx.node().location()));
@@ -142,7 +148,7 @@ public class TcpConnectionServiceValidator {
     private void hasRemoteKeyword(FunctionDefinitionNode functionDefinitionNode, String functionName) {
         boolean hasRemoteKeyword = Utils.hasRemoteKeyword(functionDefinitionNode);
         if (!hasRemoteKeyword) {
-            DiagnosticInfo diagnosticInfo = new DiagnosticInfo(CODE,
+            DiagnosticInfo diagnosticInfo = new DiagnosticInfo(TCP_101,
                     REMOTE_KEYWORD_EXPECTED_IN_0_FUNCTION_SIGNATURE,
                     DiagnosticSeverity.ERROR);
             ctx.reportDiagnostic(DiagnosticFactory.createDiagnostic(diagnosticInfo,
@@ -153,7 +159,7 @@ public class TcpConnectionServiceValidator {
     private boolean hasNoParameters(SeparatedNodeList<ParameterNode> parameterNodes,
                                     FunctionDefinitionNode functionDefinitionNode, String functionName) {
         if (parameterNodes.isEmpty()) {
-            DiagnosticInfo diagnosticInfo = new DiagnosticInfo(CODE,
+            DiagnosticInfo diagnosticInfo = new DiagnosticInfo(TCP_104,
                     NO_PARAMETER_PROVIDED_FOR_0_FUNCTION_EXPECTS_1_AS_A_PARAMETER, DiagnosticSeverity.ERROR);
             String expectedParameter = functionName.equals(Constants.ON_BYTES) ?
                     READONLY_INTERSECTION + BYTE_ARRAY : modulePrefix + ERROR;
@@ -176,13 +182,13 @@ public class TcpConnectionServiceValidator {
                 if (functionName.equals(Constants.ON_BYTES)
                         && ((parameterTypeName.kind() == SyntaxKind.INTERSECTION_TYPE_DESC && !hasByteArray)
                         || (parameterTypeName.kind() == SyntaxKind.QUALIFIED_NAME_REFERENCE && !hasCaller))) {
-                    diagnosticInfo = new DiagnosticInfo(CODE, INVALID_PARAMETER_0_PROVIDED_FOR_1_FUNCTION,
+                    diagnosticInfo = new DiagnosticInfo(TCP_104, INVALID_PARAMETER_0_PROVIDED_FOR_1_FUNCTION,
                             DiagnosticSeverity.ERROR);
                     ctx.reportDiagnostic(DiagnosticFactory.createDiagnostic(diagnosticInfo,
                             requiredParameterNode.location(), requiredParameterNode, functionName));
                 } else if (functionName.equals(Constants.ON_ERROR)
                         && !parameterTypeName.toString().contains(modulePrefix + ERROR)) {
-                    diagnosticInfo = new DiagnosticInfo(CODE,
+                    diagnosticInfo = new DiagnosticInfo(TCP_104,
                             INVALID_PARAMETER_0_PROVIDED_FOR_1_FUNCTION_EXPECTS_2, DiagnosticSeverity.ERROR);
                     ctx.reportDiagnostic(DiagnosticFactory.createDiagnostic(diagnosticInfo,
                             requiredParameterNode.location(), requiredParameterNode, functionName,
@@ -190,13 +196,13 @@ public class TcpConnectionServiceValidator {
                 } else if (parameterTypeName.kind() != SyntaxKind.QUALIFIED_NAME_REFERENCE
                         && parameterTypeName.kind() != SyntaxKind.INTERSECTION_TYPE_DESC) {
                     if (functionName.equals(Constants.ON_BYTES) && hasByteArray) {
-                        diagnosticInfo = new DiagnosticInfo(CODE,
+                        diagnosticInfo = new DiagnosticInfo(TCP_104,
                                 INVALID_PARAMETER_0_PROVIDED_FOR_1_FUNCTION_EXPECTS_2, DiagnosticSeverity.ERROR);
                         ctx.reportDiagnostic(DiagnosticFactory.createDiagnostic(diagnosticInfo,
                                 requiredParameterNode.location(), requiredParameterNode, functionName,
                                 READONLY_INTERSECTION + modulePrefix + BYTE_ARRAY));
                     } else {
-                        diagnosticInfo = new DiagnosticInfo(CODE, INVALID_PARAMETER_0_PROVIDED_FOR_1_FUNCTION,
+                        diagnosticInfo = new DiagnosticInfo(TCP_104, INVALID_PARAMETER_0_PROVIDED_FOR_1_FUNCTION,
                                 DiagnosticSeverity.ERROR);
                         ctx.reportDiagnostic(DiagnosticFactory.createDiagnostic(diagnosticInfo,
                                 requiredParameterNode.location(), requiredParameterNode, functionName));
@@ -209,20 +215,20 @@ public class TcpConnectionServiceValidator {
     private boolean hasValidParameterCount(int parameterCount, String functionName) {
         DiagnosticInfo diagnosticInfo;
         if (functionName.equals(Constants.ON_BYTES) && parameterCount > 2) {
-            diagnosticInfo = new DiagnosticInfo(CODE, PROVIDED_0_PARAMETERS_1_CAN_HAVE_ONLY_2_PARAMETERS,
+            diagnosticInfo = new DiagnosticInfo(TCP_104, PROVIDED_0_PARAMETERS_1_CAN_HAVE_ONLY_2_PARAMETERS,
                     DiagnosticSeverity.ERROR);
             ctx.reportDiagnostic(DiagnosticFactory.createDiagnostic(diagnosticInfo,
                     onBytesFunctionNode.location(), parameterCount, functionName, 2));
             return false;
         } else if (functionName.equals(Constants.ON_ERROR) && parameterCount > 1) {
-            diagnosticInfo = new DiagnosticInfo(CODE, PROVIDED_0_PARAMETERS_1_CAN_HAVE_ONLY_2_PARAMETERS,
+            diagnosticInfo = new DiagnosticInfo(TCP_104, PROVIDED_0_PARAMETERS_1_CAN_HAVE_ONLY_2_PARAMETERS,
                     DiagnosticSeverity.ERROR);
             ctx.reportDiagnostic(DiagnosticFactory.createDiagnostic(diagnosticInfo,
                     onErrorFunctionNode.location(), parameterCount, functionName, 1));
 
             return false;
         } else if (functionName.equals(Constants.ON_CLOSE) && parameterCount > 0) {
-            diagnosticInfo = new DiagnosticInfo(CODE,
+            diagnosticInfo = new DiagnosticInfo(TCP_104,
                     PROVIDED_0_PARAMETERS_ON_CLOSE_FUNCTION_CANNOT_HAVE_ANY_PARAMETERS, DiagnosticSeverity.ERROR);
             ctx.reportDiagnostic(DiagnosticFactory.createDiagnostic(diagnosticInfo,
                     onCloseFunctionNode.location(), parameterCount, functionName, 2));
@@ -285,7 +291,7 @@ public class TcpConnectionServiceValidator {
             }
         }
 
-        DiagnosticInfo diagnosticInfo = new DiagnosticInfo(CODE,
+        DiagnosticInfo diagnosticInfo = new DiagnosticInfo(TCP_105,
                 INVALID_RETURN_TYPE_0_FUNCTION_1_RETURN_TYPE_SHOULD_BE_A_SUBTYPE_OF_2, DiagnosticSeverity.ERROR);
         if (functionName.equals(Constants.ON_BYTES) && (hasInvalidUnionTypeDesc || !isUnionTypeDesc)) {
             ctx.reportDiagnostic(DiagnosticFactory.createDiagnostic(diagnosticInfo,
@@ -294,7 +300,7 @@ public class TcpConnectionServiceValidator {
         } else if (!isUnionTypeDesc) {
             ctx.reportDiagnostic(DiagnosticFactory.createDiagnostic(diagnosticInfo,
                     returnTypeDescriptor.location(), returnTypeDescriptor.toString(), functionName,
-                    modulePrefix + ERROR + " | " + NILL));
+                    modulePrefix + ERROR + " | " + NIL));
         }
     }
 }
