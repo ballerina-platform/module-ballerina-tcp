@@ -18,7 +18,12 @@
 
 package io.ballerina.stdlib.tcp.compiler;
 
+import io.ballerina.compiler.api.symbols.ClassSymbol;
+import io.ballerina.compiler.api.symbols.TypeReferenceTypeSymbol;
+import io.ballerina.compiler.syntax.tree.ExplicitNewExpressionNode;
+import io.ballerina.compiler.syntax.tree.ExpressionNode;
 import io.ballerina.compiler.syntax.tree.FunctionDefinitionNode;
+import io.ballerina.compiler.syntax.tree.ReturnStatementNode;
 import io.ballerina.compiler.syntax.tree.ServiceDeclarationNode;
 import io.ballerina.compiler.syntax.tree.SyntaxKind;
 import io.ballerina.projects.plugins.SyntaxNodeAnalysisContext;
@@ -49,6 +54,23 @@ public class TcpServiceValidator {
             String functionName = functionDefinitionNode.functionName().toString();
             if (Utils.hasRemoteKeyword(functionDefinitionNode) && !Utils.equals(functionName, Constants.ON_CONNECT)) {
                 reportInvalidFunction(functionDefinitionNode);
+            } else if (Utils.equals(functionName, Constants.ON_CONNECT)) {
+
+                ReturnStatementNodeVisitor returnStatementNodeVisitor = new ReturnStatementNodeVisitor();
+                functionDefinitionNode.accept(returnStatementNodeVisitor);
+
+                for (ReturnStatementNode returnStatementNode : returnStatementNodeVisitor.getReturnStatementNodes()) {
+                    ExpressionNode expressionNode = returnStatementNode.expression().get();
+
+                    if (expressionNode instanceof ExplicitNewExpressionNode) { // handle return new HelloService();
+                        TypeReferenceTypeSymbol typeReferenceTypeSymbol = (TypeReferenceTypeSymbol) ctx.semanticModel()
+                                .symbol(expressionNode).get();
+                        ClassSymbol classSymbol = (ClassSymbol) typeReferenceTypeSymbol.typeDescriptor();
+                        TcpConnectionServiceValidator tcpConnectionServiceValidator =
+                                new TcpConnectionServiceValidator(ctx, classSymbol);
+                        tcpConnectionServiceValidator.validate();
+                    }
+                }
             }
         });
     }

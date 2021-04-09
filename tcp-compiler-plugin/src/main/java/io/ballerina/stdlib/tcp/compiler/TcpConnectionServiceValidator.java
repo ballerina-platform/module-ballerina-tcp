@@ -18,31 +18,33 @@
 
 package io.ballerina.stdlib.tcp.compiler;
 
-import io.ballerina.compiler.syntax.tree.ClassDefinitionNode;
-import io.ballerina.compiler.syntax.tree.FunctionDefinitionNode;
-import io.ballerina.compiler.syntax.tree.Node;
-import io.ballerina.compiler.syntax.tree.ParameterNode;
-import io.ballerina.compiler.syntax.tree.RequiredParameterNode;
-import io.ballerina.compiler.syntax.tree.ReturnTypeDescriptorNode;
-import io.ballerina.compiler.syntax.tree.SeparatedNodeList;
+import io.ballerina.compiler.api.symbols.ClassSymbol;
+import io.ballerina.compiler.api.symbols.MethodSymbol;
+import io.ballerina.compiler.api.symbols.ParameterSymbol;
+import io.ballerina.compiler.api.symbols.TypeDescKind;
+import io.ballerina.compiler.api.symbols.TypeSymbol;
+import io.ballerina.compiler.api.symbols.UnionTypeSymbol;
 import io.ballerina.compiler.syntax.tree.SyntaxKind;
-import io.ballerina.compiler.syntax.tree.UnionTypeDescriptorNode;
 import io.ballerina.projects.plugins.SyntaxNodeAnalysisContext;
 import io.ballerina.tools.diagnostics.DiagnosticFactory;
 import io.ballerina.tools.diagnostics.DiagnosticInfo;
 import io.ballerina.tools.diagnostics.DiagnosticSeverity;
+import io.ballerina.tools.diagnostics.Location;
 import org.ballerinalang.stdlib.tcp.Constants;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
  * Class to Validate TCP ConnectionServices.
  */
 public class TcpConnectionServiceValidator {
-    private FunctionDefinitionNode onCloseFunctionNode;
-    private FunctionDefinitionNode onBytesFunctionNode;
-    private FunctionDefinitionNode onErrorFunctionNode;
-    private final String modulePrefix;
+
+    private MethodSymbol onCloseFunctionSymbol;
+    private MethodSymbol onBytesFunctionSymbol;
+    private MethodSymbol onErrorFunctionSymbol;
+    private final ClassSymbol classSymbol;
+    private static final String modulePrefix = "ballerina/tcp" + SyntaxKind.COLON_TOKEN.stringValue();
     private final SyntaxNodeAnalysisContext ctx;
 
     // Error codes for reporting error diagnostics
@@ -79,64 +81,59 @@ public class TcpConnectionServiceValidator {
     public static final String OPTIONAL = "?";
     public static final String NIL = "()";
 
-    public TcpConnectionServiceValidator(SyntaxNodeAnalysisContext syntaxNodeAnalysisContext,
-                                         String modulePrefixOrModuleName) {
+    public TcpConnectionServiceValidator(SyntaxNodeAnalysisContext syntaxNodeAnalysisContext, ClassSymbol classSymbol) {
         ctx = syntaxNodeAnalysisContext;
-        modulePrefix = modulePrefixOrModuleName;
+        this.classSymbol = classSymbol;
     }
 
     public void validate() {
-        ClassDefinitionNode classDefinitionNode = (ClassDefinitionNode) ctx.node();
-        classDefinitionNode.members().stream()
-                .filter(child -> child.kind() == SyntaxKind.OBJECT_METHOD_DEFINITION
-                        || child.kind() == SyntaxKind.RESOURCE_ACCESSOR_DEFINITION).forEach(node -> {
-            filterRemoteMethods((FunctionDefinitionNode) node);
-        });
+        classSymbol.methods().values().stream()
+                .forEach(methodSymbol -> filterRemoteMethods(methodSymbol));
         checkOnBytesFunctionExistence();
-        validateFunctionSignature(onBytesFunctionNode, Constants.ON_BYTES);
-        validateFunctionSignature(onErrorFunctionNode, Constants.ON_ERROR);
-        validateFunctionSignature(onCloseFunctionNode, Constants.ON_CLOSE);
+        validateFunctionSignature(onBytesFunctionSymbol, Constants.ON_BYTES);
+        validateFunctionSignature(onErrorFunctionSymbol, Constants.ON_ERROR);
+        validateFunctionSignature(onCloseFunctionSymbol, Constants.ON_CLOSE);
     }
 
-    private void filterRemoteMethods(FunctionDefinitionNode functionDefinitionNode) {
-        String functionName = functionDefinitionNode.functionName().toString();
-        if (Utils.hasRemoteKeyword(functionDefinitionNode)
+    private void filterRemoteMethods(MethodSymbol methodSymbol) {
+        String functionName = methodSymbol.getName().get();
+        if (Utils.hasRemoteKeyword(methodSymbol)
                 && !Utils.equals(functionName, Constants.ON_BYTES)
                 && !Utils.equals(functionName, Constants.ON_ERROR)
                 && !Utils.equals(functionName, Constants.ON_CLOSE)) {
-            reportInvalidFunction(functionDefinitionNode);
+            reportInvalidFunction(methodSymbol);
         } else {
-            onBytesFunctionNode = Utils.equals(functionName, Constants.ON_BYTES) ? functionDefinitionNode
-                    : onBytesFunctionNode;
-            onErrorFunctionNode = Utils.equals(functionName, Constants.ON_ERROR) ? functionDefinitionNode
-                    : onErrorFunctionNode;
-            onCloseFunctionNode = Utils.equals(functionName, Constants.ON_CLOSE) ? functionDefinitionNode
-                    : onCloseFunctionNode;
+            onBytesFunctionSymbol = Utils.equals(functionName, Constants.ON_BYTES) ? methodSymbol
+                    : onBytesFunctionSymbol;
+            onErrorFunctionSymbol = Utils.equals(functionName, Constants.ON_ERROR) ? methodSymbol
+                    : onErrorFunctionSymbol;
+            onCloseFunctionSymbol = Utils.equals(functionName, Constants.ON_CLOSE) ? methodSymbol
+                    : onCloseFunctionSymbol;
         }
     }
 
-    private void reportInvalidFunction(FunctionDefinitionNode functionDefinitionNode) {
+    private void reportInvalidFunction(MethodSymbol methodSymbol) {
         DiagnosticInfo diagnosticInfo = new DiagnosticInfo(TCP_103, FUNCTION_0_NOT_ACCEPTED_BY_THE_SERVICE,
                 DiagnosticSeverity.ERROR);
         ctx.reportDiagnostic(DiagnosticFactory.createDiagnostic(diagnosticInfo,
-                functionDefinitionNode.location(), functionDefinitionNode.functionName().toString()));
+                methodSymbol.getLocation().get(), methodSymbol.getName().get()));
     }
 
-    private void validateFunctionSignature(FunctionDefinitionNode functionDefinitionNode, String functionName) {
-        if (functionDefinitionNode != null) {
-            hasRemoteKeyword(functionDefinitionNode, functionName);
-            SeparatedNodeList<ParameterNode> parameterNodes = functionDefinitionNode.functionSignature().parameters();
+    private void validateFunctionSignature(MethodSymbol methodSymbol, String functionName) {
+        if (methodSymbol != null) {
+            hasRemoteKeyword(methodSymbol, functionName);
+            List<ParameterSymbol> parameterSymbols = methodSymbol.typeDescriptor().parameters();
             if (!functionName.equals(Constants.ON_CLOSE)
-                    && hasNoParameters(parameterNodes, functionDefinitionNode, functionName)) {
+                    && hasNoParameters(parameterSymbols, methodSymbol, functionName)) {
                 return;
             }
-            validateParameter(parameterNodes, functionName);
-            validateFunctionReturnTypeDesc(functionDefinitionNode, functionName);
+            validateParameter(parameterSymbols, functionName);
+            validateFunctionReturnTypeDesc(methodSymbol, functionName);
         }
     }
 
     private void checkOnBytesFunctionExistence() {
-        if (onBytesFunctionNode == null) {
+        if (onBytesFunctionSymbol == null) {
             // ConnectionService should contain onBytes method
             DiagnosticInfo diagnosticInfo = new DiagnosticInfo(TCP_102, SERVICE_DOES_NOT_CONTAIN_ON_BYTES_FUNCTION,
                     DiagnosticSeverity.ERROR);
@@ -145,67 +142,71 @@ public class TcpConnectionServiceValidator {
         }
     }
 
-    private void hasRemoteKeyword(FunctionDefinitionNode functionDefinitionNode, String functionName) {
-        boolean hasRemoteKeyword = Utils.hasRemoteKeyword(functionDefinitionNode);
+    private void hasRemoteKeyword(MethodSymbol methodSymbol, String functionName) {
+        boolean hasRemoteKeyword = Utils.hasRemoteKeyword(methodSymbol);
         if (!hasRemoteKeyword) {
             DiagnosticInfo diagnosticInfo = new DiagnosticInfo(TCP_101,
                     REMOTE_KEYWORD_EXPECTED_IN_0_FUNCTION_SIGNATURE,
                     DiagnosticSeverity.ERROR);
             ctx.reportDiagnostic(DiagnosticFactory.createDiagnostic(diagnosticInfo,
-                    functionDefinitionNode.functionKeyword().location(), functionName));
+                    methodSymbol.getLocation().get(), functionName));
         }
     }
 
-    private boolean hasNoParameters(SeparatedNodeList<ParameterNode> parameterNodes,
-                                    FunctionDefinitionNode functionDefinitionNode, String functionName) {
-        if (parameterNodes.isEmpty()) {
+    private boolean hasNoParameters(List<ParameterSymbol> parameterSymbols,
+                                    MethodSymbol methodSymbol, String functionName) {
+        if (parameterSymbols.isEmpty()) {
             DiagnosticInfo diagnosticInfo = new DiagnosticInfo(TCP_104,
                     NO_PARAMETER_PROVIDED_FOR_0_FUNCTION_EXPECTS_1_AS_A_PARAMETER, DiagnosticSeverity.ERROR);
             String expectedParameter = functionName.equals(Constants.ON_BYTES) ?
                     READONLY_INTERSECTION + BYTE_ARRAY : modulePrefix + ERROR;
             ctx.reportDiagnostic(DiagnosticFactory.createDiagnostic(diagnosticInfo,
-                    functionDefinitionNode.functionSignature().location(), functionName, expectedParameter));
+                    methodSymbol.getLocation().get(), functionName, expectedParameter));
             return true;
         }
         return false;
     }
 
-    private void validateParameter(SeparatedNodeList<ParameterNode> parameterNodes, String functionName) {
-        if (hasValidParameterCount(parameterNodes.size(), functionName)) {
-            for (ParameterNode parameterNode : parameterNodes) {
-                RequiredParameterNode requiredParameterNode = (RequiredParameterNode) parameterNode;
-                Node parameterTypeName = requiredParameterNode.typeName();
-                boolean hasCaller = parameterTypeName.toString().contains(modulePrefix + CALLER);
-                boolean hasByteArray = parameterTypeName.toString().contains(BYTE_ARRAY);
+    private void validateParameter(List<ParameterSymbol> parameterSymbols, String functionName) {
+        if (hasValidParameterCount(parameterSymbols.size(), functionName)) {
+            for (ParameterSymbol parameterSymbol : parameterSymbols) {
+                TypeSymbol typeSymbol = parameterSymbol.typeDescriptor();
+                String signature = typeSymbol.signature();
+                boolean hasCaller = signature.startsWith(modulePrefix)
+                        && signature.endsWith(SyntaxKind.COLON_TOKEN.stringValue() + CALLER);
+                boolean hasError = signature.startsWith(modulePrefix)
+                        && signature.endsWith(SyntaxKind.COLON_TOKEN.stringValue() + ERROR);
+                boolean hasByteArray = signature.contains(BYTE_ARRAY);
                 DiagnosticInfo diagnosticInfo;
 
                 if (functionName.equals(Constants.ON_BYTES)
-                        && ((parameterTypeName.kind() == SyntaxKind.INTERSECTION_TYPE_DESC && !hasByteArray)
-                        || (parameterTypeName.kind() == SyntaxKind.QUALIFIED_NAME_REFERENCE && !hasCaller))) {
+                        && ((typeSymbol.typeKind() == TypeDescKind.INTERSECTION && !hasByteArray)
+                        || (typeSymbol.typeKind() == TypeDescKind.TYPE_REFERENCE && !hasCaller))) {
                     diagnosticInfo = new DiagnosticInfo(TCP_104, INVALID_PARAMETER_0_PROVIDED_FOR_1_FUNCTION,
                             DiagnosticSeverity.ERROR);
                     ctx.reportDiagnostic(DiagnosticFactory.createDiagnostic(diagnosticInfo,
-                            requiredParameterNode.location(), requiredParameterNode, functionName));
+                            parameterSymbol.getLocation().get(), parameterSymbol.signature(), functionName));
                 } else if (functionName.equals(Constants.ON_ERROR)
-                        && !parameterTypeName.toString().contains(modulePrefix + ERROR)) {
+                        && (typeSymbol.typeKind() != TypeDescKind.ERROR || !hasError)) {
                     diagnosticInfo = new DiagnosticInfo(TCP_104,
                             INVALID_PARAMETER_0_PROVIDED_FOR_1_FUNCTION_EXPECTS_2, DiagnosticSeverity.ERROR);
                     ctx.reportDiagnostic(DiagnosticFactory.createDiagnostic(diagnosticInfo,
-                            requiredParameterNode.location(), requiredParameterNode, functionName,
+                            parameterSymbol.getLocation().get(), parameterSymbol.signature(), functionName,
                             modulePrefix + ERROR));
-                } else if (parameterTypeName.kind() != SyntaxKind.QUALIFIED_NAME_REFERENCE
-                        && parameterTypeName.kind() != SyntaxKind.INTERSECTION_TYPE_DESC) {
+                } else if (typeSymbol.typeKind() != TypeDescKind.TYPE_REFERENCE
+                        && typeSymbol.typeKind() != TypeDescKind.INTERSECTION
+                        && typeSymbol.typeKind() != TypeDescKind.ERROR) {
                     if (functionName.equals(Constants.ON_BYTES) && hasByteArray) {
                         diagnosticInfo = new DiagnosticInfo(TCP_104,
                                 INVALID_PARAMETER_0_PROVIDED_FOR_1_FUNCTION_EXPECTS_2, DiagnosticSeverity.ERROR);
                         ctx.reportDiagnostic(DiagnosticFactory.createDiagnostic(diagnosticInfo,
-                                requiredParameterNode.location(), requiredParameterNode, functionName,
-                                READONLY_INTERSECTION + modulePrefix + BYTE_ARRAY));
+                                parameterSymbol.getLocation().get(), parameterSymbol.signature(), functionName,
+                                READONLY_INTERSECTION + BYTE_ARRAY));
                     } else {
                         diagnosticInfo = new DiagnosticInfo(TCP_104, INVALID_PARAMETER_0_PROVIDED_FOR_1_FUNCTION,
                                 DiagnosticSeverity.ERROR);
                         ctx.reportDiagnostic(DiagnosticFactory.createDiagnostic(diagnosticInfo,
-                                requiredParameterNode.location(), requiredParameterNode, functionName));
+                                parameterSymbol.getLocation().get(), parameterSymbol.signature(), functionName));
                     }
                 }
             }
@@ -218,89 +219,93 @@ public class TcpConnectionServiceValidator {
             diagnosticInfo = new DiagnosticInfo(TCP_104, PROVIDED_0_PARAMETERS_1_CAN_HAVE_ONLY_2_PARAMETERS,
                     DiagnosticSeverity.ERROR);
             ctx.reportDiagnostic(DiagnosticFactory.createDiagnostic(diagnosticInfo,
-                    onBytesFunctionNode.location(), parameterCount, functionName, 2));
+                    onBytesFunctionSymbol.getLocation().get(), parameterCount, functionName, 2));
             return false;
         } else if (functionName.equals(Constants.ON_ERROR) && parameterCount > 1) {
             diagnosticInfo = new DiagnosticInfo(TCP_104, PROVIDED_0_PARAMETERS_1_CAN_HAVE_ONLY_2_PARAMETERS,
                     DiagnosticSeverity.ERROR);
             ctx.reportDiagnostic(DiagnosticFactory.createDiagnostic(diagnosticInfo,
-                    onErrorFunctionNode.location(), parameterCount, functionName, 1));
+                    onErrorFunctionSymbol.getLocation().get(), parameterCount, functionName, 1));
 
             return false;
         } else if (functionName.equals(Constants.ON_CLOSE) && parameterCount > 0) {
             diagnosticInfo = new DiagnosticInfo(TCP_104,
                     PROVIDED_0_PARAMETERS_ON_CLOSE_FUNCTION_CANNOT_HAVE_ANY_PARAMETERS, DiagnosticSeverity.ERROR);
             ctx.reportDiagnostic(DiagnosticFactory.createDiagnostic(diagnosticInfo,
-                    onCloseFunctionNode.location(), parameterCount, functionName, 2));
+                    onCloseFunctionSymbol.getLocation().get(), parameterCount, functionName, 2));
             return false;
         }
         return true;
     }
 
-    private void validateFunctionReturnTypeDesc(FunctionDefinitionNode functionDefinitionNode, String functionName) {
-        Optional<ReturnTypeDescriptorNode> returnTypeDescriptorNode = functionDefinitionNode
-                .functionSignature().returnTypeDesc();
-        if (returnTypeDescriptorNode.isEmpty()) {
+    private void validateFunctionReturnTypeDesc(MethodSymbol methodSymbol, String functionName) {
+        Optional<TypeSymbol> typeSymbol = methodSymbol.typeDescriptor().returnTypeDescriptor();
+        if (typeSymbol.isEmpty()) {
             return;
         }
 
-        Node returnTypeDescriptor = returnTypeDescriptorNode.get().type();
-        String returnTypeDescriptorType = returnTypeDescriptor.toString().stripTrailing();
-
-        if (functionName.equals(Constants.ON_BYTES) && returnTypeDescriptor.kind() == SyntaxKind.ARRAY_TYPE_DESC
-                && Utils.equals(returnTypeDescriptorType, BYTE_ARRAY)) {
+        TypeSymbol returnTypeSymbol = typeSymbol.get();
+        if (functionName.equals(Constants.ON_BYTES) && returnTypeSymbol.typeKind() == TypeDescKind.ARRAY
+                && Utils.equals(returnTypeSymbol.signature(), BYTE_ARRAY)) {
             return;
         }
 
-        if (functionName.equals(Constants.ON_BYTES) && returnTypeDescriptor.kind() == SyntaxKind.OPTIONAL_TYPE_DESC
-                && (Utils.equals(returnTypeDescriptorType, modulePrefix + ERROR + OPTIONAL)
-                || Utils.equals(returnTypeDescriptorType, BYTE_ARRAY + OPTIONAL))) {
-            return;
-        }
-
-
-        if ((functionName.equals(Constants.ON_ERROR) || functionName.equals(Constants.ON_CLOSE))
-                && returnTypeDescriptor.kind() == SyntaxKind.OPTIONAL_TYPE_DESC
-                && Utils.equals(returnTypeDescriptorType, modulePrefix + ERROR + OPTIONAL)) {
-            return;
-        }
-
-        if (returnTypeDescriptor.kind() == SyntaxKind.NIL_TYPE_DESC) {
+        if (returnTypeSymbol.typeKind() == TypeDescKind.NIL) {
             return;
         }
 
         boolean hasInvalidUnionTypeDesc = false;
         boolean isUnionTypeDesc = false;
-        if (functionName.equals(Constants.ON_BYTES) && returnTypeDescriptor.kind() == SyntaxKind.UNION_TYPE_DESC) {
+        boolean isOptionalError = false;
+        if ((functionName.equals(Constants.ON_ERROR) || functionName.equals(Constants.ON_CLOSE))
+                && returnTypeSymbol.typeKind() == TypeDescKind.UNION) {
             isUnionTypeDesc = true;
-            UnionTypeDescriptorNode unionTypeDescriptorNode = (UnionTypeDescriptorNode) returnTypeDescriptor;
-            for (Node descriptor : unionTypeDescriptorNode.children()) {
-                String descriptorType = descriptor.toString().stripTrailing();
-                if (descriptor.kind() == SyntaxKind.PIPE_TOKEN) {
+            for (TypeSymbol symbol : ((UnionTypeSymbol) typeSymbol.get()).memberTypeDescriptors()) {
+                if (symbol.typeKind() == TypeDescKind.ERROR
+                        && symbol.signature().startsWith(modulePrefix)
+                        && symbol.signature().endsWith(SyntaxKind.COLON_TOKEN.stringValue() + ERROR)) {
                     continue;
-                } else if (descriptor.kind() == SyntaxKind.ARRAY_TYPE_DESC
-                        && Utils.equals(descriptorType, BYTE_ARRAY)) {
-                    continue;
-                } else if (descriptor.kind() == SyntaxKind.OPTIONAL_TYPE_DESC
-                        && (Utils.equals(descriptorType, modulePrefix + ERROR + OPTIONAL)
-                        || Utils.equals(descriptorType, BYTE_ARRAY + OPTIONAL))) {
+                } else if (symbol.typeKind() == TypeDescKind.NIL) {
+                    isOptionalError = true;
                     continue;
                 } else {
                     hasInvalidUnionTypeDesc = true;
+                    break;
+                }
+            }
+            hasInvalidUnionTypeDesc = !isOptionalError || hasInvalidUnionTypeDesc;
+        } else if (functionName.equals(Constants.ON_BYTES) && returnTypeSymbol.typeKind() == TypeDescKind.UNION) {
+            isUnionTypeDesc = true;
+            for (TypeSymbol symbol : ((UnionTypeSymbol) typeSymbol.get()).memberTypeDescriptors()) {
+                if (symbol.typeKind() == TypeDescKind.ARRAY && Utils.equals(symbol.signature(), BYTE_ARRAY)) {
+                    continue;
+                } else if (symbol.typeKind() == TypeDescKind.ERROR
+                        && symbol.signature().startsWith(modulePrefix)
+                        && symbol.signature().endsWith(SyntaxKind.COLON_TOKEN.stringValue() + ERROR)) {
+                    continue;
+                } else if (symbol.typeKind() == TypeDescKind.NIL) {
+                    continue;
+                } else {
+                    hasInvalidUnionTypeDesc = true;
+                    break;
                 }
             }
         }
 
         DiagnosticInfo diagnosticInfo = new DiagnosticInfo(TCP_105,
                 INVALID_RETURN_TYPE_0_FUNCTION_1_RETURN_TYPE_SHOULD_BE_A_SUBTYPE_OF_2, DiagnosticSeverity.ERROR);
-        if (functionName.equals(Constants.ON_BYTES) && (hasInvalidUnionTypeDesc || !isUnionTypeDesc)) {
-            ctx.reportDiagnostic(DiagnosticFactory.createDiagnostic(diagnosticInfo,
-                    returnTypeDescriptor.location(), returnTypeDescriptor.toString(), functionName,
-                    BYTE_ARRAY + " | " + modulePrefix + ERROR + OPTIONAL));
-        } else if (!isUnionTypeDesc) {
-            ctx.reportDiagnostic(DiagnosticFactory.createDiagnostic(diagnosticInfo,
-                    returnTypeDescriptor.location(), returnTypeDescriptor.toString(), functionName,
-                    modulePrefix + ERROR + " | " + NIL));
+        Location returnTypeSymbolLocation = returnTypeSymbol.getLocation().isPresent() ?
+                returnTypeSymbol.getLocation().get() : methodSymbol.getLocation().get();
+        if ((hasInvalidUnionTypeDesc || !isUnionTypeDesc)) {
+            if (functionName.equals(Constants.ON_BYTES)) {
+                ctx.reportDiagnostic(DiagnosticFactory.createDiagnostic(diagnosticInfo,
+                        returnTypeSymbolLocation, returnTypeSymbol.signature(), functionName,
+                        BYTE_ARRAY + "|" + modulePrefix + ERROR + OPTIONAL));
+            } else {
+                ctx.reportDiagnostic(DiagnosticFactory.createDiagnostic(diagnosticInfo,
+                        returnTypeSymbolLocation, returnTypeSymbol.signature(), functionName,
+                        modulePrefix + ERROR + "|" + NIL));
+            }
         }
     }
 }

@@ -30,8 +30,5 @@ public class TcpServiceAnalyzer extends CodeAnalyzer {
     @Override
     public void init(CodeAnalysisContext codeAnalysisContext) {
         codeAnalysisContext.addSyntaxNodeAnalysisTask(new TcpServiceValidatorTask(), SyntaxKind.SERVICE_DECLARATION);
-        codeAnalysisContext.addSyntaxNodeAnalysisTask(new TcpConnectionServiceValidatorTask(),
-                SyntaxKind.CLASS_DEFINITION);
-
     }
 }

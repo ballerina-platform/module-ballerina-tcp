@@ -18,6 +18,8 @@
 
 package io.ballerina.stdlib.tcp.compiler;
 
+import io.ballerina.compiler.api.symbols.MethodSymbol;
+import io.ballerina.compiler.api.symbols.Qualifier;
 import io.ballerina.compiler.syntax.tree.FunctionDefinitionNode;
 import io.ballerina.compiler.syntax.tree.SyntaxKind;
 
@@ -33,5 +35,10 @@ public class Utils {
     public static boolean hasRemoteKeyword(FunctionDefinitionNode functionDefinitionNode) {
         return functionDefinitionNode.qualifierList().stream()
                 .filter(q -> q.kind() == SyntaxKind.REMOTE_KEYWORD).toArray().length == 1;
+    }
+
+    public static boolean hasRemoteKeyword(MethodSymbol methodSymbol) {
+        return methodSymbol.qualifiers().stream()
+                .filter(qualifier -> qualifier == Qualifier.REMOTE).count() == 1;
     }
 }
