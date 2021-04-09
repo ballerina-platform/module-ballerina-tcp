@@ -29,36 +29,37 @@ public function main() returns error? {
 #### Listener
 The `tcp:Listener` is used to listen to the incoming socket request. The `onConnect(tcp:Caller)` remote method gets invoked when a new client is connected. The new client is represented using the `tcp:Caller`. The `onConnect(tcp:Caller)` method may return `tcp:ConnectionService|tcp:Error`.
 
-The `tcp:ConnectionService` can have following remote methods<br/>
-`onBytes(readonly & byte[] data)` - This remote method is invoked once the content is received from the client.<br/>
-`onError(readonly & tcp:Error err)` - This remote method is invoked in an error situation.<br/>
-`onClose()` - This remote method is invoked when the connection is closed.<br/>
+The `tcp:ConnectionService` can have following remote methods
+- `onBytes(readonly & byte[] data)` - This remote method is invoked once the content is received from the client.
+- `onError(readonly & tcp:Error err)` - This remote method is invoked in an error situation.
+- `onClose()` - This remote method is invoked when the connection is closed.
 
 A `tcp:Listener` can be defined as follows:
 ```ballerina
+import ballerina/tcp;
+import ballerina/io;
+import ballerina/log;
+
 service on new tcp:Listener(3000) {
     remote function onConnect(tcp:Caller caller) returns tcp:ConnectionService {
         io:println("Client connected to echoServer: ", caller.remotePort);
-        return new EchoService(caller);
+        return new EchoService();
     }
 }
 
 service class EchoService {
-    tcp:Caller caller;
 
-    public function init(tcp:Caller c) {self.caller = c;}
-
-    remote function onBytes(readonly & byte[] data) returns tcp:Error? {
+    remote function onBytes(readonly & byte[] data) returns byte[]|tcp:Error? {
         // echo back the data to the client
         return data;
     }
 
-    remote function onError(readonly & tcp:Error err) returns tcp:Error? {
+    remote function onError(tcp:Error err) returns tcp:Error? {
         log:printError("An error occurred", 'error = err);
     }
 
     remote function onClose() returns tcp:Error? {
-         io:println("Client left: ", self.caller.remotePort);
+         io:println("Client left");
     }
 }
 ```
