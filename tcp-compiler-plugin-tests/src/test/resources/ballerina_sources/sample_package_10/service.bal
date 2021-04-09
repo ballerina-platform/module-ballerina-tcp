@@ -1,4 +1,5 @@
 import ballerina/tcp;
+import sample_10.module as m;
 
 service on new tcp:Listener(3000) {
 
@@ -8,6 +9,7 @@ service on new tcp:Listener(3000) {
 }
 
 service class EchoService {
+    *tcp:ConnectionService;
 
     remote function onBytes(readonly & byte[] data) returns byte[] {
         return data;
@@ -20,4 +22,14 @@ service class EchoService {
     remote function onError(tcp:Error err) returns tcp:Error? {
 
     }
+}
+
+service on new m:Listener() {
+    remote function onConnect() returns m:ConnectionService {
+        return new DummyService();
+    }
+}
+
+service class DummyService {
+    *m:ConnectionService;
 }

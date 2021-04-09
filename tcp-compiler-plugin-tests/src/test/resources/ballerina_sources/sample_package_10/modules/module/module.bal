@@ -30,5 +30,4 @@ public type Service service object {
 };
 
 public type ConnectionService service object {
-
 };
