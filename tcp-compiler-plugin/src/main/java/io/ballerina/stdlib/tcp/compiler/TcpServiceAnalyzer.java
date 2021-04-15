@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2021, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -16,13 +16,19 @@
  * under the License.
  */
 
-module io.ballerina.stdlib.socket.testutils {
-    requires io.ballerina.runtime;
-    requires org.slf4j;
-    requires io.ballerina.stdlib.tcp;
-    requires io.netty.buffer;
-    requires io.netty.transport;
-    requires io.netty.common;
-    requires io.netty.handler;
-    exports org.ballerinalang.stdlib.tcp.testutils;
+package io.ballerina.stdlib.tcp.compiler;
+
+import io.ballerina.compiler.syntax.tree.SyntaxKind;
+import io.ballerina.projects.plugins.CodeAnalysisContext;
+import io.ballerina.projects.plugins.CodeAnalyzer;
+
+/**
+ * Class to analyze the ballerina TCP service.
+ */
+public class TcpServiceAnalyzer extends CodeAnalyzer {
+
+    @Override
+    public void init(CodeAnalysisContext codeAnalysisContext) {
+        codeAnalysisContext.addSyntaxNodeAnalysisTask(new TcpServiceValidatorTask(), SyntaxKind.SERVICE_DECLARATION);
+    }
 }

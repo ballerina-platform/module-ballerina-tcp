@@ -61,6 +61,7 @@ public class Constants {
     public static final String LOCAL_PORT = "localPort";
     public static final String SERVICE = "Service";
     public static final String CLIENT = "Client";
+    public static final String CONNECTION_SERVICE = "ConnectionService";
 
     // Constants related to secureSocket configuration
     public static final String PKCS_STORE_TYPE = "PKCS12";
@@ -82,6 +83,8 @@ public class Constants {
     public static final BString SECURESOCKET_CONFIG_HANDSHAKE_TIMEOUT = StringUtils.fromString("handshakeTimeout");
     public static final BString SECURESOCKET_CONFIG_SESSION_TIMEOUT = StringUtils.fromString("sessionTimeout");
     public static final String HTTPS_SCHEME = "http";
+    public static final String TCP = "tcp";
+
 
     private Constants() {}
 

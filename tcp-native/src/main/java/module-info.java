@@ -16,7 +16,7 @@
  * under the License.
  */
 
-module io.ballerina.stdlib.socket {
+module io.ballerina.stdlib.tcp {
     requires io.ballerina.runtime;
     requires io.ballerina.lang;
     requires io.ballerina.tools.api;
