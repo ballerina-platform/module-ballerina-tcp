@@ -81,6 +81,11 @@ allprojects {
             }
         }
     }
+
+    ext {
+        snapshotVersion= '-SNAPSHOT'
+        timestampedVersionRegex = '.*-\\d{8}-\\d{6}-\\w.*\$'
+    }
 }
 
 subprojects {
