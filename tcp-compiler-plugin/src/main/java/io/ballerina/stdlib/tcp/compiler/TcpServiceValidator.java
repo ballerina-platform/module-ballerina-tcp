@@ -64,7 +64,7 @@ public class TcpServiceValidator {
 
                     if (expressionNode instanceof ExplicitNewExpressionNode) { // handle return new HelloService();
                         TypeReferenceTypeSymbol typeReferenceTypeSymbol = (TypeReferenceTypeSymbol) ctx.semanticModel()
-                                .symbol(expressionNode).get();
+                                .type(expressionNode).get();
                         ClassSymbol classSymbol = (ClassSymbol) typeReferenceTypeSymbol.typeDescriptor();
                         TcpConnectionServiceValidator tcpConnectionServiceValidator =
                                 new TcpConnectionServiceValidator(ctx, classSymbol);
