@@ -152,5 +152,7 @@ public class Dispatcher {
             Dispatcher.invokeOnError(tcpService, e.getMessage());
         }
     }
+
+    private Dispatcher() {}
 }
 
