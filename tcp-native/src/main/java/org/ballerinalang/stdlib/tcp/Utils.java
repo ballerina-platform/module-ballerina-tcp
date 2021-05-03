@@ -129,17 +129,17 @@ public class Utils {
             String trustStorePassword = trustStore.getStringValue(Constants.SECURESOCKET_CONFIG_TRUSTSTORE_PASSWORD)
                     .getValue();
             if (trustStoreFile.isBlank()) {
-                throw new Exception("TrustStore file location must be provided for secure connection.");
+                throw new Exception("TrustStore file location must be provided for secure connection");
             }
             if (trustStorePassword.isBlank()) {
-                throw new Exception("TrustStore password must be provided for secure connection.");
+                throw new Exception("TrustStore password must be provided for secure connection");
             }
             sslConfig.setTrustStore(new File(trustStoreFile));
             sslConfig.setTrustStorePass(trustStorePassword);
         } else {
             String certFile = ((BString) cert).getValue();
             if (certFile.isBlank()) {
-                throw new Exception("Certificate file location must be provided for secure connection.");
+                throw new Exception("Certificate file location must be provided for secure connection");
             }
             sslConfig.setClientTrustCertificates(new File(certFile));
         }
