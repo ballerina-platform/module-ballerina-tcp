@@ -20,6 +20,7 @@ string certPath = "tests/etc/cert.pem";
 string keyPath = "tests/etc/key.pem";
 string keystore = "tests/etc/ballerinaKeystore.p12";
 string truststore = "tests/etc/ballerinaTruststore.p12";
+boolean onErrorInvoked = false;
 
 const int PORT1 = 8809;
 const int PORT2 = 8023;
@@ -28,11 +29,13 @@ const int PORT4 = 8641;
 const int PORT5 = 8642;
 const int PORT6 = 8643;
 const int PORT7 = 8645;
+const int PORT8 = 8646;
 
 listener Listener echoServer = check new Listener(PORT1);
 listener Listener discardServer = check new Listener(PORT2);
 listener Listener closeServer = check new Listener(PORT3);
 listener Listener helloServer = check new Listener(PORT6);
+listener Listener errorServer = check new Listener(PORT8);
 
 service on echoServer {
 
@@ -78,6 +81,22 @@ service class DiscardService {
     }
 
     isolated remote function onClose() returns Error? {
+    }
+}
+
+service on errorServer {
+    isolated remote function onConnect(Caller caller) returns ConnectionService {
+        io:println("Client connected to errorServer: ", caller.remotePort);
+        return new ErrorService();
+    }
+}
+
+service class ErrorService {
+    remote function onBytes(Service obj, readonly & byte[] data) returns Error? {
+    }
+
+    remote function onError(Error err) returns Error? {
+        onErrorInvoked = true;
     }
 }
 

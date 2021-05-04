@@ -56,7 +56,7 @@ public class Dispatcher {
         }
         try {
             MethodType methodType = Arrays.stream(tcpService.getConnectionService().getType().getMethods())
-                    .filter(m -> m.getName().equals(Constants.ON_CLOSE)).findFirst().orElse(null);
+                    .filter(m -> m.getName().equals(Constants.ON_ERROR)).findFirst().orElse(null);
             if (methodType != null) {
                 Object[] params = getOnErrorSignature(message);
                 tcpService.getRuntime().invokeMethodAsync(tcpService.getConnectionService(), Constants.ON_ERROR,
