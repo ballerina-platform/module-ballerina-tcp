@@ -56,7 +56,6 @@ function testSecureListenerWithClient() returns @tainted error? {
     check socketClient->close();
 }
 
-
 @test:Config {dependsOn: [testSecureListenerWithClient]}
 function testSecureListenerWithUnsuportedClientProtocol() returns @tainted error? {
     Error|Client socketClient = new ("localhost", PORT4, secureSocket = {
@@ -102,5 +101,84 @@ isolated function testListenerWithInvalidCertFilePath() returns error? {
         test:assertFail("Starting the listener should throw error since the provided key values are invalid");
     } else {
         io:print(res.message());
+    }
+}
+
+Service obj = service object {
+    isolated remote function onConnect(Caller caller) returns ConnectionService {
+        io:println("Client connected to HiServer: ", caller.remotePort);
+        return new HiService();
+    }
+};
+
+@test:Config {}
+function testListenerWithEmptyCertFilePath() returns error? {
+    Listener server = check new Listener(9999, secureSocket = {
+        key: {
+            certFile: "",
+            keyFile: "invalid"
+        }
+    });
+
+    check server.attach(obj);
+    error? res = server.start();
+    if (res is error) {
+        test:assertEquals(res.message(), "Certificate file location must be provided for secure connection");
+    } else {
+        test:assertFail(msg = "Empty cert file provided, initialization should fail.");
+    }
+}
+
+@test:Config {}
+function testListenerWithEmptyKeyFile() returns error? {
+    Listener server = check new Listener(9999, secureSocket = {
+        key: {
+            certFile: certPath,
+            keyFile: ""
+        }
+    });
+
+    check server.attach(obj);
+    error? res = server.start();
+    if (res is error) {
+        test:assertEquals(res.message(), "Private key file location must be provided for secure connection");
+    } else {
+        test:assertFail(msg = "Empty key file provided, initialization should fail.");
+    }
+}
+
+@test:Config {}
+function testListenerWithEmptyKeyStorePassword() returns error? {
+    Listener server = check new Listener(9999, secureSocket = {
+        key: {
+            path: keystore,
+            password: ""
+        }
+    });
+
+    check server.attach(obj);
+    error? res = server.start();
+    if (res is error) {
+        test:assertEquals(res.message(), "KeyStore password must be provided for secure connection");
+    } else {
+        test:assertFail(msg = "Empty password provided, initialization should fail.");
+    }
+}
+
+@test:Config {}
+function testListenerWithEmptyKeyStore() returns error? {
+    Listener server = check new Listener(9999, secureSocket = {
+        key: {
+            path: "",
+            password: "ballerina"
+        }
+    });
+
+    check server.attach(obj);
+    error? res = server.start();
+    if (res is error) {
+        test:assertEquals(res.message(), "KeyStore file location must be provided for secure connection");
+    } else {
+        test:assertFail(msg = "Empty Keystore path provided, initialization should fail.");
     }
 }
