@@ -1,7 +1,7 @@
 Ballerina TCP Library
 ===================
 
-  [![Build](https://github.com/ballerina-platform/module-ballerina-tcp/workflows/Build/badge.svg)](https://github.com/ballerina-platform/module-ballerina-socket/actions?query=workflow%3ABuild)
+  [![Build](https://github.com/ballerina-platform/module-ballerina-tcp/actions/workflows/build-timestamped-master.yml/badge.svg)](https://github.com/ballerina-platform/module-ballerina-socket/actions/workflows/build-timestamped-master.yml)
   [![GitHub Last Commit](https://img.shields.io/github/last-commit/ballerina-platform/module-ballerina-tcp.svg)](https://github.com/ballerina-platform/module-ballerina-socket/commits/master)
   [![Github issues](https://img.shields.io/github/issues/ballerina-platform/ballerina-standard-library/module/tcp.svg?label=Open%20Issues)](https://github.com/ballerina-platform/ballerina-standard-library/labels/module%2Fsocket)
   [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)

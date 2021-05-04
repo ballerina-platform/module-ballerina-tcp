@@ -18,6 +18,7 @@
 
 package org.ballerinalang.stdlib.tcp;
 
+import io.ballerina.runtime.api.TypeTags;
 import io.ballerina.runtime.api.creators.ValueCreator;
 import io.ballerina.runtime.api.types.MethodType;
 import io.ballerina.runtime.api.types.Type;
@@ -73,13 +74,13 @@ public class Dispatcher {
         Object[] bValues = new Object[parameterTypes.length * 2];
         int index = 0;
         for (Type param : parameterTypes) {
-            String typeName = param.getName();
-            switch (typeName) {
-                case Constants.READ_ONLY_BYTE_ARRAY:
+            int paramTag = param.getTag();
+            switch (paramTag) {
+                case TypeTags.INTERSECTION_TAG:
                     bValues[index++] = ValueCreator.createArrayValue(byteContent);
                     bValues[index++] = true;
                     break;
-                case Constants.CALLER:
+                case TypeTags.OBJECT_TYPE_TAG:
                     bValues[index++] = createClient(channel, tcpService);
                     bValues[index++] = true;
                     break;
