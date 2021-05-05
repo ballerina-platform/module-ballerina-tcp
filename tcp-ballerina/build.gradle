@@ -201,7 +201,7 @@ task initializeVariables {
         }
 
         if (graph.hasTask(":${packageName}-ballerina:test")) {
-            testParams = "--code-coverage --includes=*"
+            testParams = "--code-coverage --jacoco-xml --includes=org.ballerinalang.stdlib.tcp.*:ballerina.tcp.*"
         } else {
             testParams = "--skip-tests"
         }
