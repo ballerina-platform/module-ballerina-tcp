@@ -92,11 +92,11 @@ public class Utils {
         if (key.containsKey(Constants.SECURESOCKET_CONFIG_KEYSTORE_FILE_PATH)) {
             String keyStoreFile = key.getStringValue(Constants.SECURESOCKET_CONFIG_KEYSTORE_FILE_PATH).getValue();
             if (keyStoreFile.isBlank()) {
-                throw new Exception("KeyStore file location must be provided for secure connection.");
+                throw new Exception("KeyStore file location must be provided for secure connection");
             }
             String keyStorePassword = key.getStringValue(Constants.SECURESOCKET_CONFIG_KEYSTORE_PASSWORD).getValue();
             if (keyStorePassword.isBlank()) {
-                throw new Exception("KeyStore password must be provided for secure connection.");
+                throw new Exception("KeyStore password must be provided for secure connection");
             }
             sslConfig.setKeyStore(new File(keyStoreFile));
             sslConfig.setKeyStorePass(keyStorePassword);
@@ -107,10 +107,10 @@ public class Utils {
                     key.getStringValue(Constants.SECURESOCKET_CONFIG_CERTKEY_KEY_PASSWORD) :
                     null;
             if (certFile.isBlank()) {
-                throw new Error("Certificate file location must be provided for secure connection.");
+                throw new Error("Certificate file location must be provided for secure connection");
             }
             if (keyFile.isBlank()) {
-                throw new Error("Private key file location must be provided for secure connection.");
+                throw new Error("Private key file location must be provided for secure connection");
             }
 
             sslConfig.setServerCertificates(new File(certFile));
@@ -129,17 +129,17 @@ public class Utils {
             String trustStorePassword = trustStore.getStringValue(Constants.SECURESOCKET_CONFIG_TRUSTSTORE_PASSWORD)
                     .getValue();
             if (trustStoreFile.isBlank()) {
-                throw new Exception("TrustStore file location must be provided for secure connection.");
+                throw new Exception("TrustStore file location must be provided for secure connection");
             }
             if (trustStorePassword.isBlank()) {
-                throw new Exception("TrustStore password must be provided for secure connection.");
+                throw new Exception("TrustStore password must be provided for secure connection");
             }
             sslConfig.setTrustStore(new File(trustStoreFile));
             sslConfig.setTrustStorePass(trustStorePassword);
         } else {
             String certFile = ((BString) cert).getValue();
             if (certFile.isBlank()) {
-                throw new Exception("Certificate file location must be provided for secure connection.");
+                throw new Exception("Certificate file location must be provided for secure connection");
             }
             sslConfig.setClientTrustCertificates(new File(certFile));
         }

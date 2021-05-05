@@ -69,11 +69,6 @@ public class SSLConfig {
         return certPass;
     }
 
-    public SSLConfig setCertPass(String certPass) {
-        this.certPass = certPass;
-        return this;
-    }
-
     public File getTrustStore() {
         return trustStore;
     }
@@ -114,17 +109,6 @@ public class SSLConfig {
         this.sniMatchers = sniMatchers.split(SEPARATOR);
     }
 
-    public String[] getServerNames() {
-        return serverNames == null ? null : serverNames.clone();
-    }
-
-    public void setServerNames(String serverNames) {
-        if (log.isDebugEnabled()) {
-            log.debug("Using serverNames {}", serverNames);
-        }
-        this.serverNames = serverNames.replaceAll("\\s+", "").split(SEPARATOR);
-    }
-
     public boolean isWantClientAuth() {
         return wantClientAuth;
     }
@@ -161,13 +145,6 @@ public class SSLConfig {
 
     public String[] getCipherSuites() {
         return cipherSuites == null ? null : cipherSuites.clone();
-    }
-
-    public void setCipherSuites(String cipherSuites) {
-        if (log.isDebugEnabled()) {
-            log.debug("Set supported cipherSuites {}", cipherSuites);
-        }
-        this.cipherSuites = cipherSuites.replaceAll("\\s+", "").split(SEPARATOR);
     }
 
     public void setCipherSuites(String[] cipherSuites) {

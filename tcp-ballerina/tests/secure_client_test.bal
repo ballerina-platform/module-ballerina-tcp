@@ -152,6 +152,51 @@ isolated function testSecureClientWithInvalidCertPath() returns @tainted error? 
     }
 }
 
+@test:Config {}
+isolated function testSecureClientWithEmtyTrustStore() returns @tainted error? {
+    Error|Client socketClient = new ("localhost", 9002, secureSocket = {
+        cert: {
+            path: "",
+            password: "ballerina"
+        }
+    });
+
+    if (socketClient is Client) {
+        test:assertFail(msg = "Empty trustore path provided, initialization should fail.");
+    } else {
+        test:assertEquals(socketClient.message(), "TrustStore file location must be provided for secure connection");
+    }
+}
+
+@test:Config {}
+function testSecureClientWithEmtyTrustStorePassword() returns @tainted error? {
+    Error|Client socketClient = new ("localhost", 9002, secureSocket = {
+        cert: {
+            path: truststore,
+            password:""
+        }
+    });
+
+    if (socketClient is Client) {
+        test:assertFail(msg = "Empty trustore password provided, initialization should fail.");
+    } else {
+        test:assertEquals(socketClient.message(), "TrustStore password must be provided for secure connection");
+    }
+}
+
+@test:Config {}
+function testSecureClientWithEmtyCert() returns @tainted error? {
+    Error|Client socketClient = new ("localhost", 9002, secureSocket = {
+        cert: ""
+    });
+
+    if (socketClient is Client) {
+        test:assertFail(msg = "Empty trustore password provided, initialization should fail.");
+    } else {
+        test:assertEquals(socketClient.message(), "Certificate file location must be provided for secure connection");
+    }
+}
+
 @test:AfterSuite {}
 function stopServer() returns error? {
     check stopSecureServer();

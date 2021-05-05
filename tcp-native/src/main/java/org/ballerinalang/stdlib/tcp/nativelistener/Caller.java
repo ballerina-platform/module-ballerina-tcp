@@ -57,4 +57,6 @@ public class Caller {
         }
         return null;
     }
+
+    private Caller() {}
 }

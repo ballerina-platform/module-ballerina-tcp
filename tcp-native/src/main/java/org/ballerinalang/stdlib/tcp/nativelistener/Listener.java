@@ -99,4 +99,6 @@ public class Listener {
 
         return null;
     }
+
+    private Listener() {}
 }
