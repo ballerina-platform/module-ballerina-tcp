@@ -14,5 +14,5 @@
 // specific language governing permissions and limitations
 // under the License.
 
-# Represents tcp module related errors.
+# Represents TCP module related errors.
 public type Error distinct error;

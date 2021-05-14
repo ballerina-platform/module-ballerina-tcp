@@ -56,7 +56,7 @@ public type ListenerSecureSocket record {|
     decimal sessionTimeout?;
 |};
 
-# Represents combination of certificate, private key and private key password if encrypted.
+# Represents a combination of certificate, private key and private key password if encrypted.
 #
 # + certFile - A file containing the certificate
 # + keyFile - A file containing the private key in PKCS8 format
