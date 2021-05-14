@@ -1,4 +1,4 @@
-## Module Overview
+## Overview
 
 This module provides an implementation for sending/receiving messages to/from another application process (local or remote) over connection-oriented TCP protocol.
 
@@ -62,4 +62,31 @@ service class EchoService {
          io:println("Client left");
     }
 }
+```
+
+#### Using the TLS protocol
+
+The Ballerina TCP module allows the use of TLS in communication. This expects a secure socket to be set in the connection configuration as shown below.
+
+##### Configuring TLS in server side
+```ballerina
+tcp:ListenerSecureSocket listenerSecureSocket = {
+    key: {
+        certFile: "../resource/path/to/public.crt",
+        keyFile: "../resource/path/to/private.key"
+    }
+};
+
+service on new tcp:Listener(9002, secureSocket = listenerSecureSocket) {
+    isolated remote function onConnect(tcp:Caller caller) returns tcp:ConnectionService {
+        return new EchoService();
+    }
+}
+```
+
+##### Configuring TLS in client side
+```ballerina
+tcp:Client socketClient = check new ("localhost", 9002, secureSocket = {
+    cert: "../resource/path/to/public.crt",
+});
 ```
