@@ -159,8 +159,9 @@ public class SSLHandlerFactory {
             initializeKeyManagerFactory();
             sslContextBuilder = serverContextBuilderWithKs(provider);
         }
-        if (this.sslConfig.getCipherSuites() != null) {
-            setCiphers(sslContextBuilder, Arrays.asList(this.sslConfig.getCipherSuites()));
+        String[] ciphers = this.sslConfig.getCipherSuites();
+        if (ciphers != null) {
+            setCiphers(sslContextBuilder, Arrays.asList(ciphers));
         }
         setSslProtocol(sslContextBuilder);
         SslContext sslContext = sslContextBuilder.build();
