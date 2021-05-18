@@ -14,9 +14,6 @@
  * limitations under the License.
  *
  */
-
-import org.apache.tools.ant.taskdefs.condition.Os
-
 buildscript {
     repositories {
         maven {
@@ -36,24 +33,17 @@ description = 'Ballerina - TCP Ballerina Generator'
 
 def packageName = "tcp"
 def packageOrg = "ballerina"
-def platform = "java11"
-def snapshotVersion = "-SNAPSHOT"
 def tomlVersion = stripBallerinaExtensionVersion("${project.version}")
 def ballerinaConfigFile = new File("$project.projectDir/Ballerina.toml")
 def ballerinaDependencyFile = new File("$project.projectDir/Dependencies.toml")
 def compilerPluginTomlFile = new File("$project.projectDir/CompilerPlugin.toml")
-def artifactBallerinaDocs = file("$project.projectDir/build/docs_parent/")
-def artifactCacheParent = file("$project.projectDir/build/cache_parent/")
-def artifactLibParent = file("$project.projectDir/build/lib_parent/")
-def ballerinaCentralAccessToken = System.getenv('BALLERINA_CENTRAL_ACCESS_TOKEN')
 def originalConfig = ballerinaConfigFile.text
 def originalDependencies = ballerinaDependencyFile.text
 def originalCompilerPluginToml = compilerPluginTomlFile.text
-def distributionBinPath =  project.projectDir.absolutePath + "/build/target/extracted-distributions/jballerina-tools-zip/jballerina-tools-${ballerinaLangVersion}/bin"
 
 def stripBallerinaExtensionVersion(String extVersion) {
     if (extVersion.matches(project.ext.timestampedVersionRegex)) {
-        def splitVersion = extVersion.split('-');
+        def splitVersion = extVersion.split('-')
         if (splitVersion.length > 3) {
             def strippedValues = splitVersion[0..-4]
             return strippedValues.join('-')
@@ -71,29 +61,29 @@ configurations {
 }
 
 dependencies {
-    externalJars (group: 'io.netty', name: 'netty-buffer', version: "${nettyVersion}") {
+    externalJars(group: 'io.netty', name: 'netty-buffer', version: "${nettyVersion}") {
         transitive = false
     }
-    externalJars (group: 'io.netty', name: 'netty-handler', version: "${nettyVersion}") {
+    externalJars(group: 'io.netty', name: 'netty-handler', version: "${nettyVersion}") {
         transitive = false
     }
-    externalJars (group: 'io.netty', name: 'netty-transport', version: "${nettyVersion}") {
+    externalJars(group: 'io.netty', name: 'netty-transport', version: "${nettyVersion}") {
         transitive = false
     }
-    externalJars (group: 'io.netty', name: 'netty-common', version: "${nettyVersion}") {
+    externalJars(group: 'io.netty', name: 'netty-common', version: "${nettyVersion}") {
         transitive = false
     }
-    externalJars (group: 'io.netty', name: 'netty-resolver', version: "${nettyVersion}") {
+    externalJars(group: 'io.netty', name: 'netty-resolver', version: "${nettyVersion}") {
         transitive = false
     }
-    externalJars (group: 'io.netty', name: 'netty-codec', version: "${nettyVersion}") {
+    externalJars(group: 'io.netty', name: 'netty-codec', version: "${nettyVersion}") {
         transitive = false
     }
 }
 
 apply plugin: 'io.ballerina.plugin'
 
-ballerina{
+ballerina {
     module = packageName
     langVersion = ballerinaLangVersion
 }
