@@ -159,7 +159,9 @@ public class SSLHandlerFactory {
             initializeKeyManagerFactory();
             sslContextBuilder = serverContextBuilderWithKs(provider);
         }
-        setCiphers(sslContextBuilder, Arrays.asList(this.sslConfig.getCipherSuites()));
+        if (this.sslConfig.getCipherSuites() != null) {
+            setCiphers(sslContextBuilder, Arrays.asList(this.sslConfig.getCipherSuites()));
+        }
         setSslProtocol(sslContextBuilder);
         SslContext sslContext = sslContextBuilder.build();
         int sessionTimeout = sslConfig.getSessionTimeOut();
