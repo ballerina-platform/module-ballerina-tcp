@@ -182,3 +182,19 @@ function testListenerWithEmptyKeyStore() returns error? {
         test:assertFail(msg = "Empty Keystore path provided, initialization should fail.");
     }
 }
+
+@test:Config {}
+function testListenerWithEmptyCiphers() returns error? {
+    Listener server = check new Listener(9999, secureSocket = {
+        key: {
+            path: keystore,
+            password: "ballerina"
+        }
+    });
+
+    check server.attach(obj);
+    error? res = server.start();
+    if (res is error) {
+        test:assertFail(msg = "Without Ciphers. Should work");
+    }
+}
