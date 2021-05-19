@@ -35,14 +35,14 @@ public client class Caller {
   # Sends the response as byte[] to the same remote host.
   # 
   # + data - The data need to be sent to the remote host
-  # + return - () or else a `tcp:Error` if the given data can not be sent
+  # + return - () or else a `tcp:Error` if the given data cannot be sent
   isolated remote function writeBytes(byte[] data) returns Error? {
     return externWriteBytesCaller(self, data);
   }
 
   # Close the remote connection.
   # 
-  # + return - () or else a `tcp:Error` if the connection can not be properly
+  # + return - () or else a `tcp:Error` if the connection cannot be properly
   #            closed
   isolated remote function close() returns Error? {
     return externCloseCaller(self);

@@ -37,7 +37,7 @@ public client class Client {
     # ```
     #
     # + data - The data that need to be sent to the connected remote host
-    # + return - () or else a `tcp:Error` if the given data can not be sent
+    # + return - () or else a `tcp:Error` if the given data cannot be sent
     remote function writeBytes(byte[] data) returns Error? {
         return externWriteBytes(self, data);
     }
@@ -50,7 +50,7 @@ public client class Client {
     # ```
     #
     # + return - The `readonly & byte[]`, or else a `tcp:Error` if the data
-    #            can not be read from the remote host
+    #            cannot be read from the remote host
     remote function readBytes() returns (readonly & byte[])|Error {
         return externReadBytes(self);
     }
@@ -62,7 +62,7 @@ public client class Client {
     # tcp:Error? closeResult = socketClient->close();
     # ```
     #
-    # + return - A `tcp:Error` if it can not close the connection or else `()`
+    # + return - A `tcp:Error` if it cannot close the connection or else `()`
     isolated remote function close() returns Error? {
         return externClose(self);
     }
