@@ -16,19 +16,17 @@
 
 import ballerina/jballerina.java;
 
-# Initializes the TCP connection client based on the 
-# provided configurations.
+# Initializes the TCP connection client based on the provided configurations.
 public client class Client {
 
-    # Initializes the TCP client based on the 
-    # provided configurations.
+    # Initializes the TCP client based on the provided configurations.
     # ```ballerina
     # tcp:Client|tcp:Error? socketClient = new("www.remote.com", 80,
     #                              localHost = "localHost");
     # ```
     # + remoteHost - The hostname or the IP address of the remote host
-    # + remotePort - The port number of the remmote host
-    # + config - Connection oriented client related configuration
+    # + remotePort - The port number of the remote host
+    # + config - Connection-oriented client-related configurations
     public isolated function init(string remoteHost, int remotePort, *ClientConfiguration config) returns Error? {
         return externInit(self, remoteHost, remotePort, config);
     }
@@ -38,8 +36,8 @@ public client class Client {
     # tcp:Error? result = socketClient->writeBytes("msg".toBytes());
     # ```
     #
-    # + data - The data need to be sent to the connected remote host
-    # + return - () or else a `tcp:Error` if the given data can't be sent
+    # + data - The data that need to be sent to the connected remote host
+    # + return - `()` or else a `tcp:Error` if the given data cannot be sent
     remote function writeBytes(byte[] data) returns Error? {
         return externWriteBytes(self, data);
     }
@@ -51,32 +49,31 @@ public client class Client {
     # (readonly & byte[])|tcp:Error result = socketClient->readBytes();
     # ```
     #
-    # + return - The `readonly & byte[]`, or else a `tcp:Error` if the data
-    #            can't be read from the remote host
+    # + return - The `readonly & byte[]` or else a `tcp:Error` if the data
+    #            cannot be read from the remote host
     remote function readBytes() returns (readonly & byte[])|Error {
         return externReadBytes(self);
     }
 
     // remote function readBlocksAsStream() returns stream<byte[]>|Error { }
 
-    # Free up the occupied socket.
+    # Frees up the occupied socket.
     # ```ballerina
     # tcp:Error? closeResult = socketClient->close();
     # ```
     #
-    # + return - A `tcp:Error` if it can't close the connection or else `()`
+    # + return - A `tcp:Error` if it cannot close the connection or else `()`
     isolated remote function close() returns Error? {
         return externClose(self);
     }
 }
 
-# Configurations for the connection oriented tcp client.
+# Configurations for the connection-oriented TCP client.
 # 
-# + localHost - Local binding of the interface.
-# + timeout - The socket reading timeout value to be used 
-#             in seconds. If this is not set,the default value
-#             of 300 seconds (5 minutes) will be used.
-# + secureSocket - secureSocket configuratoin.
+# + localHost - Local binding of the interface
+# + timeout - The socket reading timeout value to be used in seconds. If this is not set, the default value
+#             of 300 seconds(5 minutes) will be used
+# + secureSocket - The `secureSocket` configuration
 public type ClientConfiguration record {|
     string localHost?;
     decimal timeout = 300;

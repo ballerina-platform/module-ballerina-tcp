@@ -21,7 +21,7 @@ import ballerina/jballerina.java;
 # initializing the endpoint using the provided configurations.
 public class Listener {
 
-    # Initializes the TCP listener based on the privovided configurations. 
+    # Initializes the TCP listener based on the provided configurations.
     # ```ballerina
     #  listener Listener|error? server1 = new (8080);
     # ```
@@ -36,35 +36,30 @@ public class Listener {
     # tcp:error? result = tcpListener.attach(helloService);
     # ```
     #
-    # + s - Type descriptor of the service
+    # + tcpService - Type descriptor of the service
     # + name - Name of the service
-    # + return - `()` or else a `tcp:Error` upon failure to register
-    #             the listener
-    public isolated function attach(Service s, () name = ()) returns error? {
-        return externAttach(self, s);
+    # + return - `()` or else a `tcp:Error` upon failure to register the listener
+    public isolated function attach(Service tcpService, () name = ()) returns error? {
+        return externAttach(self, tcpService);
     }
 
     # Starts the registered service programmatically.
     #
-    # + return - An `error` if an error occurred during the listener 
-    #            starting process
+    # + return - An `error` if an error occurred during the listener starting process
     public isolated function 'start() returns error? {
         return externStart(self);
     }
 
-    # Stops the service listener gracefully. Already-accepted requests will be
-    # served before connection closure.
+    # Stops the service listener gracefully. Already-accepted requests will be served before the connection closure.
     #
-    # + return - An `error` if an error occurred during the listener
-    #            stopping process
+    # + return - An `error` if an error occurred during the listener stopping process
     public isolated function gracefulStop() returns error? {
         return externGracefulStop(self);
     }
 
     # Stops the service listener immediately. It is not implemented yet.
     #
-    # + return - An `error` if an error occurred during the listener
-    #            stop process
+    # + return - An `error` if an error occurred during the listener stop process
     public isolated function immediateStop() returns error? {
         return ();
     }
@@ -74,9 +69,9 @@ public class Listener {
     # tcp:error? result = tcpListener.detach(helloService);
     # ```
     #
-    # + s - Type descriptor of the service
+    # + tcpService - Type descriptor of the service
     # + return - `()` or else a `tcp:Error` upon failure to detach the service
-    public isolated function detach(Service s) returns error? {
+    public isolated function detach(Service tcpService) returns error? {
         return externDetach(self);
     }
 }
