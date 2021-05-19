@@ -21,7 +21,7 @@ import ballerina/jballerina.java;
 # + remoteHost - The hostname or the IP address of the remote host
 # + remotePort - The port number of the remote host
 # + localHost - The bound hostname
-# + localPort - The port number which the socket is bound
+# + localPort - The port number to which the socket is bound
 public client class Caller {
 
   public string remoteHost = "";
@@ -35,14 +35,14 @@ public client class Caller {
   # Sends the response as byte[] to the same remote host.
   # 
   # + data - The data need to be sent to the remote host
-  # + return - () or else a `tcp:Error` if the given data cannot be sent
+  # + return - `()` or else a `tcp:Error` if the given data cannot be sent
   isolated remote function writeBytes(byte[] data) returns Error? {
     return externWriteBytesCaller(self, data);
   }
 
   # Close the remote connection.
   # 
-  # + return - () or else a `tcp:Error` if the connection cannot be properly
+  # + return - `()` or else a `tcp:Error` if the connection cannot be properly
   #            closed
   isolated remote function close() returns Error? {
     return externCloseCaller(self);

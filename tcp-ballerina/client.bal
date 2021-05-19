@@ -26,7 +26,7 @@ public client class Client {
     # ```
     # + remoteHost - The hostname or the IP address of the remote host
     # + remotePort - The port number of the remote host
-    # + config - Connection oriented client related configurations
+    # + config - Connection-oriented client-related configurations
     public isolated function init(string remoteHost, int remotePort, *ClientConfiguration config) returns Error? {
         return externInit(self, remoteHost, remotePort, config);
     }
@@ -37,7 +37,7 @@ public client class Client {
     # ```
     #
     # + data - The data that need to be sent to the connected remote host
-    # + return - () or else a `tcp:Error` if the given data cannot be sent
+    # + return - `()` or else a `tcp:Error` if the given data cannot be sent
     remote function writeBytes(byte[] data) returns Error? {
         return externWriteBytes(self, data);
     }
@@ -49,7 +49,7 @@ public client class Client {
     # (readonly & byte[])|tcp:Error result = socketClient->readBytes();
     # ```
     #
-    # + return - The `readonly & byte[]`, or else a `tcp:Error` if the data
+    # + return - The `readonly & byte[]` or else a `tcp:Error` if the data
     #            cannot be read from the remote host
     remote function readBytes() returns (readonly & byte[])|Error {
         return externReadBytes(self);
@@ -68,12 +68,12 @@ public client class Client {
     }
 }
 
-# Configurations for the connection oriented TCP client.
+# Configurations for the connection-oriented TCP client.
 # 
 # + localHost - Local binding of the interface
 # + timeout - The socket reading timeout value to be used in seconds. If this is not set, the default value
 #             of 300 seconds(5 minutes) will be used
-# + secureSocket - secureSocket configuration
+# + secureSocket - The `secureSocket` configuration
 public type ClientConfiguration record {|
     string localHost?;
     decimal timeout = 300;
