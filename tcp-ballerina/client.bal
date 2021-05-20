@@ -17,7 +17,7 @@
 import ballerina/jballerina.java;
 
 # Initializes the TCP connection client based on the provided configurations.
-public client class Client {
+public isolated client class Client {
 
     # Initializes the TCP client based on the provided configurations.
     # ```ballerina
@@ -28,7 +28,7 @@ public client class Client {
     # + remotePort - The port number of the remote host
     # + config - Connection-oriented client-related configurations
     public isolated function init(string remoteHost, int remotePort, *ClientConfiguration config) returns Error? {
-        return externInit(self, remoteHost, remotePort, config);
+        return self.externInit(remoteHost, remotePort, config);
     }
 
     # Sends the given data to the connected remote host.
@@ -38,9 +38,10 @@ public client class Client {
     #
     # + data - The data that need to be sent to the connected remote host
     # + return - `()` or else a `tcp:Error` if the given data cannot be sent
-    remote function writeBytes(byte[] data) returns Error? {
-        return externWriteBytes(self, data);
-    }
+    remote function writeBytes(byte[] data) returns Error? = @java:Method {
+        name: "externWriteBytes",
+        'class: "org.ballerinalang.stdlib.tcp.nativeclient.Client"
+    } external;
 
     // remote function writeBlocksFromStream(stream<byte[]> dataStream) returns Error? { }
 
@@ -51,9 +52,10 @@ public client class Client {
     #
     # + return - The `readonly & byte[]` or else a `tcp:Error` if the data
     #            cannot be read from the remote host
-    remote function readBytes() returns (readonly & byte[])|Error {
-        return externReadBytes(self);
-    }
+    remote function readBytes() returns (readonly & byte[])|Error = @java:Method {
+        name: "externReadBytes",
+        'class: "org.ballerinalang.stdlib.tcp.nativeclient.Client"
+    } external;
 
     // remote function readBlocksAsStream() returns stream<byte[]>|Error { }
 
@@ -63,9 +65,16 @@ public client class Client {
     # ```
     #
     # + return - A `tcp:Error` if it cannot close the connection or else `()`
-    isolated remote function close() returns Error? {
-        return externClose(self);
-    }
+    isolated remote function close() returns Error? = @java:Method {
+        name: "externClose",
+        'class: "org.ballerinalang.stdlib.tcp.nativeclient.Client"
+    } external;
+
+    isolated function externInit(string remoteHost, int remotePort, ClientConfiguration config)
+    returns Error? = @java:Method {
+        name: "externInit",
+        'class: "org.ballerinalang.stdlib.tcp.nativeclient.Client"
+    } external;
 }
 
 # Configurations for the connection-oriented TCP client.
@@ -79,24 +88,3 @@ public type ClientConfiguration record {|
     decimal timeout = 300;
     ClientSecureSocket secureSocket?;
 |};
-
-isolated function externInit(Client clientObj, string remoteHost, int remotePort, ClientConfiguration config) 
-returns Error? = @java:Method {
-    name: "externInit",
-    'class: "org.ballerinalang.stdlib.tcp.nativeclient.Client"
-} external;
-
-isolated function externWriteBytes(Client clientObj, byte[] content) returns Error? = @java:Method {
-    name: "externWriteBytes",
-    'class: "org.ballerinalang.stdlib.tcp.nativeclient.Client"
-} external;
-
-isolated function externReadBytes(Client clientObj) returns (readonly & byte[])|Error = @java:Method {
-    name: "externReadBytes",
-    'class: "org.ballerinalang.stdlib.tcp.nativeclient.Client"
-} external;
-
-isolated function externClose(Client clientObj) returns Error? = @java:Method {
-    name: "externClose",
-    'class: "org.ballerinalang.stdlib.tcp.nativeclient.Client"
-} external;

@@ -19,7 +19,7 @@ import ballerina/jballerina.java;
 # This is used for creating TCP server endpoints. A TCP server endpoint is
 # capable of responding to remote callers. The `Listener` is responsible for
 # initializing the endpoint using the provided configurations.
-public class Listener {
+public isolated class Listener {
 
     # Initializes the TCP listener based on the provided configurations.
     # ```ballerina
@@ -28,7 +28,7 @@ public class Listener {
     # + localPort - The port number of the remote service
     # + config - Configurations related to the `tcp:Listener`
     public isolated function init(int localPort, *ListenerConfiguration config) returns error? {
-        return externInitListener(self, localPort, config);
+        return self.externInitListener(localPort, config);
     }
 
     # Binds a service to the `tcp:Listener`.
@@ -40,22 +40,24 @@ public class Listener {
     # + name - Name of the service
     # + return - `()` or else a `tcp:Error` upon failure to register the listener
     public isolated function attach(Service tcpService, () name = ()) returns error? {
-        return externAttach(self, tcpService);
+        return self.externAttach(tcpService);
     }
 
     # Starts the registered service programmatically.
     #
     # + return - An `error` if an error occurred during the listener starting process
-    public isolated function 'start() returns error? {
-        return externStart(self);
-    }
+    public isolated function 'start() returns error? = @java:Method {
+        'class: "org.ballerinalang.stdlib.tcp.nativelistener.Listener",
+        name: "externStart"
+    } external;
 
     # Stops the service listener gracefully. Already-accepted requests will be served before the connection closure.
     #
     # + return - An `error` if an error occurred during the listener stopping process
-    public isolated function gracefulStop() returns error? {
-        return externGracefulStop(self);
-    }
+    public isolated function gracefulStop() returns error? = @java:Method {
+        'class: "org.ballerinalang.stdlib.tcp.nativelistener.Listener",
+        name: "externGracefulStop"
+    } external;
 
     # Stops the service listener immediately. It is not implemented yet.
     #
@@ -71,37 +73,23 @@ public class Listener {
     #
     # + tcpService - Type descriptor of the service
     # + return - `()` or else a `tcp:Error` upon failure to detach the service
-    public isolated function detach(Service tcpService) returns error? {
-        return externDetach(self);
-    }
+    public isolated function detach(Service tcpService) returns error? = @java:Method {
+        'class: "org.ballerinalang.stdlib.tcp.nativelistener.Listener",
+        name: "externDetach"
+    } external;
+
+    isolated function externAttach(service object {} s) returns error? = @java:Method {
+        'class: "org.ballerinalang.stdlib.tcp.nativelistener.Listener",
+        name: "externAttach"
+    } external;
+
+    isolated function externInitListener(int localPort, ListenerConfiguration config) returns error? = @java:Method {
+        'class: "org.ballerinalang.stdlib.tcp.nativelistener.Listener",
+        name: "externInit"
+    } external;
 }
 
 public type ListenerConfiguration record {|
    string localHost?;
    ListenerSecureSocket secureSocket?; 
 |};
-
-isolated function externInitListener(Listener listenerObj, int localPort, ListenerConfiguration config) returns error? = @java:Method {
-    'class: "org.ballerinalang.stdlib.tcp.nativelistener.Listener",
-    name: "externInit"
-} external;
-
-isolated function externAttach(Listener listenerObj, service object {} s) returns error? = @java:Method {
-    'class: "org.ballerinalang.stdlib.tcp.nativelistener.Listener",
-    name: "externAttach"
-} external;
-
-isolated function externStart(Listener listenerObj) returns error? = @java:Method {
-    'class: "org.ballerinalang.stdlib.tcp.nativelistener.Listener",
-    name: "externStart"
-} external;
-
-isolated function externGracefulStop(Listener listenerObj) returns error? = @java:Method {
-    'class: "org.ballerinalang.stdlib.tcp.nativelistener.Listener",
-    name: "externGracefulStop"
-} external;
-
-isolated function externDetach(Listener listenerObj) returns error? = @java:Method {
-    'class: "org.ballerinalang.stdlib.tcp.nativelistener.Listener",
-    name: "externDetach"
-} external;
