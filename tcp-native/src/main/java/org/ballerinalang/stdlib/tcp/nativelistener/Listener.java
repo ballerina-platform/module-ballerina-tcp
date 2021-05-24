@@ -46,7 +46,7 @@ public class Listener {
         return null;
     }
 
-    public static Object externAttach(Environment env, BObject listener, BObject service) {
+    public static Object externAttach(Environment env, BObject listener, BObject service, Object serviceName) {
         listener.addNativeData(Constants.SERVICE, new TcpService(env.getRuntime(), service));
         return null;
     }

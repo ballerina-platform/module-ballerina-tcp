@@ -39,9 +39,10 @@ public isolated class Listener {
     # + tcpService - Type descriptor of the service
     # + name - Name of the service
     # + return - `()` or else a `tcp:Error` upon failure to register the listener
-    public isolated function attach(Service tcpService, () name = ()) returns error? {
-        return self.externAttach(tcpService);
-    }
+    public isolated function attach(Service tcpService, string[]|string? name = ()) returns error? = @java:Method {
+        'class: "org.ballerinalang.stdlib.tcp.nativelistener.Listener",
+        name: "externAttach"
+    } external;
 
     # Starts the registered service programmatically.
     #
@@ -76,11 +77,6 @@ public isolated class Listener {
     public isolated function detach(Service tcpService) returns error? = @java:Method {
         'class: "org.ballerinalang.stdlib.tcp.nativelistener.Listener",
         name: "externDetach"
-    } external;
-
-    isolated function externAttach(service object {} s) returns error? = @java:Method {
-        'class: "org.ballerinalang.stdlib.tcp.nativelistener.Listener",
-        name: "externAttach"
     } external;
 
     isolated function externInitListener(int localPort, ListenerConfiguration config) returns error? = @java:Method {
