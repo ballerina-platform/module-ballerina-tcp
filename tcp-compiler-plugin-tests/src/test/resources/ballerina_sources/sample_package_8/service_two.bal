@@ -9,7 +9,7 @@ service on 'listener {
     }
 }
 
-service class EchoServer {
+service isolated class EchoServer {
 
     remote function onBytes(readonly & byte[] data) returns byte[] {
         return data;

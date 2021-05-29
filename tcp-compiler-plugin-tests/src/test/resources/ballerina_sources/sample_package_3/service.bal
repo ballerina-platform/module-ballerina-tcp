@@ -7,7 +7,7 @@ service on new tcp:Listener(3000) {
     }
 }
 
-service class EchoService {
+service isolated class EchoService {
 
     function onBytes(readonly & byte[] data) {
 

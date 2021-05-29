@@ -7,7 +7,7 @@ service on new tcp:Listener(3000) {
     }
 }
 
-service class EchoService {
+service isolated class EchoService {
 
     remote function onBytes(readonly & byte[] data, tcp:Caller caller, tcp:Caller another) returns byte[]|tcp:Error? {
         check caller->writeBytes(data);
