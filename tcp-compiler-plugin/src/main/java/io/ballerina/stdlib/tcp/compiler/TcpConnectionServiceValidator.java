@@ -187,7 +187,7 @@ public class TcpConnectionServiceValidator {
                     ctx.reportDiagnostic(DiagnosticFactory.createDiagnostic(diagnosticInfo,
                             parameterSymbol.getLocation().get(), parameterSymbol.signature(), functionName));
                 } else if (functionName.equals(Constants.ON_ERROR)
-                        && (typeSymbol.typeKind() != TypeDescKind.ERROR || !hasError)) {
+                        && (typeSymbol.typeKind() != TypeDescKind.TYPE_REFERENCE || !hasError)) {
                     diagnosticInfo = new DiagnosticInfo(TCP_104,
                             INVALID_PARAMETER_0_PROVIDED_FOR_1_FUNCTION_EXPECTS_2, DiagnosticSeverity.ERROR);
                     ctx.reportDiagnostic(DiagnosticFactory.createDiagnostic(diagnosticInfo,
@@ -261,7 +261,7 @@ public class TcpConnectionServiceValidator {
                 && returnTypeSymbol.typeKind() == TypeDescKind.UNION) {
             isUnionTypeDesc = true;
             for (TypeSymbol symbol : ((UnionTypeSymbol) typeSymbol.get()).memberTypeDescriptors()) {
-                if (symbol.typeKind() == TypeDescKind.ERROR
+                if (symbol.typeKind() == TypeDescKind.TYPE_REFERENCE
                         && symbol.signature().startsWith(modulePrefix)
                         && symbol.signature().endsWith(SyntaxKind.COLON_TOKEN.stringValue() + ERROR)) {
                     continue;
@@ -279,7 +279,7 @@ public class TcpConnectionServiceValidator {
             for (TypeSymbol symbol : ((UnionTypeSymbol) typeSymbol.get()).memberTypeDescriptors()) {
                 if (symbol.typeKind() == TypeDescKind.ARRAY && Utils.equals(symbol.signature(), BYTE_ARRAY)) {
                     continue;
-                } else if (symbol.typeKind() == TypeDescKind.ERROR
+                } else if (symbol.typeKind() == TypeDescKind.TYPE_REFERENCE
                         && symbol.signature().startsWith(modulePrefix)
                         && symbol.signature().endsWith(SyntaxKind.COLON_TOKEN.stringValue() + ERROR)) {
                     continue;
