@@ -133,7 +133,10 @@ public class SSLHandlerFactory {
             initializeTrustManagerFactory();
             sslContextBuilder = clientContextBuilderWithKs(provider);
         }
-        setCiphers(sslContextBuilder, Arrays.asList(this.sslConfig.getCipherSuites()));
+        String[] ciphers = this.sslConfig.getCipherSuites();
+        if (ciphers != null) {
+            setCiphers(sslContextBuilder, Arrays.asList(ciphers));
+        }
         setSslProtocol(sslContextBuilder);
         SslContext sslContext = sslContextBuilder.build();
         int sessionTimeout = sslConfig.getSessionTimeOut();
