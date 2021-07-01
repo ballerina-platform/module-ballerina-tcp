@@ -197,6 +197,22 @@ function testSecureClientWithEmtyCert() returns @tainted error? {
     }
 }
 
+@test:Config {}
+function testBasicSecureClient() returns error? {
+    Client socketClient = check new ("localhost", 9002, secureSocket = {
+        cert: certPath
+    });
+
+    string msg = "Hello Ballerina basic secure client";
+    byte[] msgByteArray = msg.toBytes();
+    check socketClient->writeBytes(msgByteArray);
+
+   readonly & byte[] receivedData = check socketClient->readBytes();
+   test:assertEquals('string:fromBytes(receivedData), msg, "Found unexpected output");
+
+    check socketClient->close();
+}
+
 @test:AfterSuite {}
 function stopServer() returns error? {
     check stopSecureServer();
