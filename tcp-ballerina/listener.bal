@@ -85,6 +85,10 @@ public isolated class Listener {
     } external;
 }
 
+# Provides a set of configurations for tcp listener.
+#
+# + localHost - The hostname
+# + secureSocket - The SSL configurations for the listener
 public type ListenerConfiguration record {|
    string localHost?;
    ListenerSecureSocket secureSocket?; 
