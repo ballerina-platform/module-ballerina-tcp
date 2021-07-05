@@ -30,9 +30,12 @@ public function main() returns error? {
 The `tcp:Listener` is used to listen to the incoming socket request. The `onConnect(tcp:Caller)` remote method gets invoked when a new client is connected. The new client is represented using the `tcp:Caller`. The `onConnect(tcp:Caller)` method may return `tcp:ConnectionService|tcp:Error`.
 
 The `tcp:ConnectionService` can have the following remote methods
-- `onBytes(readonly & byte[] data)` - This remote method is invoked once the content is received from the client.
-- `onError(readonly & tcp:Error err)` - This remote method is invoked in an error situation.
-- `onClose()` - This remote method is invoked when the connection is closed.
+
+**onBytes(readonly & byte[] data)** - This remote method is invoked once the content is received from the client.
+
+**onError(readonly & tcp:Error err)** - This remote method is invoked in an error situation.
+
+**onClose()** - This remote method is invoked when the connection is closed.
 
 A `tcp:Listener` can be defined as follows:
 ```ballerina
