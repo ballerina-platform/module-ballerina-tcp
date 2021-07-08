@@ -22,10 +22,14 @@ plugins {
 description = 'Ballerina - TCP Java Utils'
 
 dependencies {
-    compile group: 'org.ballerinalang', name: 'ballerina-lang', version: "${ballerinaLangVersion}"
-    compile group: 'org.ballerinalang', name: 'ballerina-runtime', version: "${ballerinaLangVersion}"
-    compile "org.slf4j:slf4j-jdk14:${slf4jVersion}"
-    compile project(":tcp-native")
+    implementation group: 'io.netty', name: 'netty-handler', version: "${nettyVersion}"
+    implementation group: 'io.netty', name: 'netty-buffer', version: "${nettyVersion}"
+    implementation group: 'io.netty', name: 'netty-transport', version: "${nettyVersion}"
+    implementation group: 'io.netty', name: 'netty-common', version: "${nettyVersion}"
+    implementation group: 'org.ballerinalang', name: 'ballerina-lang', version: "${ballerinaLangVersion}"
+    implementation group: 'org.ballerinalang', name: 'ballerina-runtime', version: "${ballerinaLangVersion}"
+    implementation "org.slf4j:slf4j-jdk14:${slf4jVersion}"
+    implementation project(":tcp-native")
 }
 
 compileJava {

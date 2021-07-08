@@ -12,8 +12,12 @@ plugins {
 }
 
 rootProject.name = 'tcp'
-include(':build-config:checkstyle')
-include ':tcp-native', ':tcp-test-utils', 'tcp-compiler-plugin', ':tcp-ballerina', 'tcp-compiler-plugin-tests'
+include ':build-config:checkstyle'
+include ':tcp-native'
+include ':tcp-test-utils'
+include ':tcp-ballerina'
+include ':tcp-compiler-plugin'
+include ':tcp-compiler-plugin-test'
 
 gradleEnterprise {
     buildScan {
