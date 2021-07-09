@@ -1,0 +1,6 @@
+[plugin]
+id = "tcp-plugin"
+class = "io.ballerina.stdlib.tcp.compiler.TcpCompilerPlugin"
+
+[[dependency]]
+path = "../compiler-plugin/build/libs/tcp-compiler-plugin-@project.version@.jar"

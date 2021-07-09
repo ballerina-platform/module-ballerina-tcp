@@ -18,8 +18,8 @@
 <FindBugsFilter>
     <Match>
         <Or>
-            <Class name="org.ballerinalang.stdlib.tcp.TcpClient"/>
-            <Class name="org.ballerinalang.stdlib.tcp.TcpListener"/>
+            <Class name="io.ballerina.stdlib.tcp.TcpClient"/>
+            <Class name="io.ballerina.stdlib.tcp.TcpListener"/>
 
         </Or>
         <Or>
