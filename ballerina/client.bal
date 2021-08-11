@@ -82,9 +82,12 @@ public isolated client class Client {
 # + localHost - Local binding of the interface
 # + timeout - The socket reading timeout value to be used in seconds. If this is not set, the default value
 #             of 300 seconds(5 minutes) will be used
+# + writeTimeout - The socket write timeout value to be used in seconds. If this is not set, the default value
+#             of 300 seconds(5 minutes) will be used
 # + secureSocket - The `secureSocket` configuration
 public type ClientConfiguration record {|
     string localHost?;
     decimal timeout = 300;
+    decimal writeTimeout = 300;
     ClientSecureSocket secureSocket?;
 |};

@@ -25,6 +25,7 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 
 import java.util.LinkedList;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * WriteFlowController used to write data via channelPipeline.
@@ -32,10 +33,12 @@ import java.util.LinkedList;
 public class WriteFlowController {
     protected ByteBuf sendBuffer;
     private Future balWriteCallback;
+    private AtomicBoolean futureCompleted;
 
-    WriteFlowController(ByteBuf buffer, Future callback) {
+    WriteFlowController(ByteBuf buffer, Future callback, AtomicBoolean futureCompleted) {
         this.balWriteCallback = callback;
         this.sendBuffer = buffer;
+        this.futureCompleted = futureCompleted;
     }
 
     public WriteFlowController(ByteBuf buffer) {
@@ -44,6 +47,9 @@ public class WriteFlowController {
 
     public synchronized void writeData(Channel channel, LinkedList<WriteFlowController> writeFlowControllers) {
         channel.writeAndFlush(sendBuffer).addListener((ChannelFutureListener) future -> {
+            if (channel.pipeline().get(Constants.WRITE_TIMEOUT_HANDLER) != null) {
+                channel.pipeline().remove(Constants.WRITE_TIMEOUT_HANDLER);
+            }
             completeCallback(future);
         });
         writeFlowControllers.remove(this);
@@ -51,10 +57,16 @@ public class WriteFlowController {
 
     private void completeCallback(ChannelFuture future) {
         if (future.isSuccess()) {
-            balWriteCallback.complete(null);
+            if (!futureCompleted.get()) {
+                futureCompleted.set(true);
+                balWriteCallback.complete(null);
+            }
         } else {
-            balWriteCallback.complete(Utils
-                    .createTcpError("Failed to write data: " + future.cause().getMessage()));
+            if (!futureCompleted.get()) {
+                futureCompleted.set(true);
+                balWriteCallback.complete(Utils
+                        .createTcpError("Failed to write data: " + future.cause().getMessage()));
+            }
         }
     }
 }

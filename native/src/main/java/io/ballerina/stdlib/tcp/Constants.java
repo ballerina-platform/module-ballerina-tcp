@@ -29,10 +29,12 @@ public class Constants {
     // Constants related to client config
     public static final String CONFIG_LOCALHOST = "localHost";
     public static final String CONFIG_READ_TIMEOUT = "timeout";
+    public static final String CONFIG_WRITE_TIMEOUT = "writeTimeout";
 
     // constant listener handler names
     public static final String LISTENER_HANDLER = "listenerHandler";
     public static final String READ_TIMEOUT_HANDLER = "readTimeoutHandler";
+    public static final String WRITE_TIMEOUT_HANDLER = "writeTimeoutHandler";
     public static final String CLIENT_HANDLER = "clientHandler";
     public static final String SSL_HANDLER = "SSL_Handler";
     public static final String SSL_HANDSHAKE_HANDLER = "SSL_handshakeHandler";

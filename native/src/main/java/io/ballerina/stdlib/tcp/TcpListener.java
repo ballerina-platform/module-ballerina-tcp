@@ -116,7 +116,8 @@ public class TcpListener {
     // Invoke when the caller call writeBytes
     public static void send(byte[] bytes, Channel channel, Future callback, TcpService tcpService) {
         if (!tcpService.getIsCallerClosed() && channel.isActive()) {
-            WriteFlowController writeFlowController = new WriteFlowController(Unpooled.wrappedBuffer(bytes), callback);
+            WriteFlowController writeFlowController = new WriteFlowController(Unpooled.wrappedBuffer(bytes), callback,
+                    new AtomicBoolean(false));
             TcpListenerHandler tcpListenerHandler = (TcpListenerHandler) channel.pipeline()
                     .get(Constants.LISTENER_HANDLER);
             tcpListenerHandler.addWriteFlowControl(writeFlowController);

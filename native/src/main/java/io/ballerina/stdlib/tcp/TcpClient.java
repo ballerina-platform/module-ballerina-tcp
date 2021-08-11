@@ -101,11 +101,18 @@ public class TcpClient {
                 new SslHandshakeClientEventHandler(tcpClientHandler, callback));
     }
 
-    public void writeData(byte[] bytes, Future callback) {
+    public void writeData(byte[] bytes, Future callback, double writeTimeoutInSec) {
+        AtomicBoolean futureCompleted = new AtomicBoolean(false);
+        long writeTimeoutInNano = (long) (writeTimeoutInSec * 1_000_000_000);
         if (channel.isActive()) {
-            WriteFlowController writeFlowController = new WriteFlowController(Unpooled.wrappedBuffer(bytes), callback);
+            channel.pipeline().addFirst(Constants.WRITE_TIMEOUT_HANDLER, new IdleStateHandler(0, writeTimeoutInNano, 0,
+                    TimeUnit.NANOSECONDS));
+            WriteFlowController writeFlowController = new WriteFlowController(Unpooled.wrappedBuffer(bytes), callback,
+                    futureCompleted);
             TcpClientHandler tcpClientHandler = (TcpClientHandler) channel.pipeline().get(Constants.CLIENT_HANDLER);
             tcpClientHandler.addWriteFlowControl(writeFlowController);
+            tcpClientHandler.setCallback(callback);
+            tcpClientHandler.setWriteFutureCompleted(futureCompleted);
             if (channel.isWritable()) {
                 writeFlowController.writeData(channel, tcpClientHandler.getWriteFlowControllers());
             }

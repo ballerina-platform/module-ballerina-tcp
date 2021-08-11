@@ -60,6 +60,9 @@ public class Client {
 
         double timeout = ((BDecimal) config.get(StringUtils.fromString(Constants.CONFIG_READ_TIMEOUT))).floatValue();
         client.addNativeData(Constants.CONFIG_READ_TIMEOUT, timeout);
+        double writeTimeout = ((BDecimal) config.get(StringUtils.fromString(Constants.CONFIG_WRITE_TIMEOUT)))
+                .floatValue();
+        client.addNativeData(Constants.CONFIG_WRITE_TIMEOUT, writeTimeout);
         BMap<BString, Object> secureSocket = (BMap<BString, Object>) config.getMapValue(Constants.SECURE_SOCKET);
 
         TcpClient tcpClient = TcpFactory.getInstance().
@@ -82,9 +85,10 @@ public class Client {
     public static Object externWriteBytes(Environment env, BObject client, BArray content) {
         final Future balFuture = env.markAsync();
 
+        double writeTimeOut = (double) client.getNativeData(Constants.CONFIG_WRITE_TIMEOUT);
         byte[] byteContent = content.getBytes();
         TcpClient tcpClient = (TcpClient) client.getNativeData(Constants.CLIENT);
-        tcpClient.writeData(byteContent, balFuture);
+        tcpClient.writeData(byteContent, balFuture, writeTimeOut);
 
         return null;
     }
