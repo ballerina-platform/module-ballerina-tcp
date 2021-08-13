@@ -22,9 +22,11 @@ import io.ballerina.runtime.api.Future;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
 
 import java.util.LinkedList;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * {@link TcpClientHandler} is a ChannelInboundHandler implementation for tcp client.
@@ -32,6 +34,7 @@ import java.util.LinkedList;
 public class TcpClientHandler extends SimpleChannelInboundHandler<ByteBuf> {
 
     private Future callback;
+    private AtomicBoolean writeFutureCompleted = new AtomicBoolean(false);
     private boolean isCloseTriggered = false;
     private LinkedList<WriteFlowController> writeFlowControllers = new LinkedList<>();
 
@@ -54,10 +57,19 @@ public class TcpClientHandler extends SimpleChannelInboundHandler<ByteBuf> {
     @Override
     public void userEventTriggered(ChannelHandlerContext ctx, Object event) throws Exception {
         if (event instanceof IdleStateEvent) {
-            // return timeout error
-            ctx.channel().pipeline().remove(Constants.READ_TIMEOUT_HANDLER);
-            if (callback != null) {
-                callback.complete(Utils.createTcpError("Read timed out"));
+            IdleStateEvent evt = (IdleStateEvent) event;
+            if (evt.state() == IdleState.READER_IDLE) {
+                // return read timeout error
+                ctx.channel().pipeline().remove(Constants.READ_TIMEOUT_HANDLER);
+                if (callback != null) {
+                    callback.complete(Utils.createTcpError("Read timed out"));
+                }
+            } else if (evt.state() == IdleState.WRITER_IDLE) {
+                ctx.channel().pipeline().remove(Constants.WRITE_TIMEOUT_HANDLER);
+                if (callback != null && !writeFutureCompleted.get()) {
+                    writeFutureCompleted.set(true);
+                    callback.complete(Utils.createTcpError("Write timed out"));
+                }
             }
         }
     }
@@ -84,6 +96,10 @@ public class TcpClientHandler extends SimpleChannelInboundHandler<ByteBuf> {
 
     public void setCallback(Future callback) {
         this.callback = callback;
+    }
+
+    public void setWriteFutureCompleted(AtomicBoolean writeFutureCompleted) {
+        this.writeFutureCompleted = writeFutureCompleted;
     }
 
     public void setIsCloseTriggered() {
