@@ -1,0 +1,30 @@
+[package]
+org = "ballerina"
+name = "tcp"
+version = "@toml.version@"
+distribution = "slbeta3"
+
+[[platform.java11.dependency]]
+path = "../native/build/libs/tcp-native-@project.version@.jar"
+
+[[platform.java11.dependency]]
+path = "../test-utils/build/libs/tcp-test-utils-@project.version@.jar"
+scope = "testOnly"
+
+[[platform.java11.dependency]]
+path = "./lib/netty-handler-@netty.version@.jar"
+
+[[platform.java11.dependency]]
+path = "./lib/netty-buffer-@netty.version@.jar"
+
+[[platform.java11.dependency]]
+path = "./lib/netty-transport-@netty.version@.jar"
+
+[[platform.java11.dependency]]
+path = "./lib/netty-common-@netty.version@.jar"
+
+[[platform.java11.dependency]]
+path = "./lib/netty-resolver-@netty.version@.jar"
+
+[[platform.java11.dependency]]
+path = "./lib/netty-codec-@netty.version@.jar"
