@@ -98,6 +98,22 @@ dependencies = [
 
 [[package]]
 org = "ballerina"
+name = "tcp"
+version = "1.0.0"
+transitive = false
+dependencies = [
+	{org = "ballerina", name = "crypto"},
+	{org = "ballerina", name = "io"},
+	{org = "ballerina", name = "jballerina.java"},
+	{org = "ballerina", name = "lang.runtime"},
+	{org = "ballerina", name = "test"}
+]
+modules = [
+	{org = "ballerina", packageName = "tcp", moduleName = "tcp"}
+]
+
+[[package]]
+org = "ballerina"
 name = "test"
 version = "0.0.0"
 scope = "testOnly"
