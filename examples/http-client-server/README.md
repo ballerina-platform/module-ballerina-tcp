@@ -7,15 +7,10 @@ This application shows how to use the Ballerina TCP package to implement a simpl
 ## Implementation
 
 ### The TCP Server
-The WebSocket server is in charge of registering users to the chat application and broadcasting the messages received by the users.
+The TCP server will echo back the text payload sent from the client as an HTTP response. The server will only accept the `POST` requests. Other requests will be returned with `400 Bad Request`.
 
-### Users - WebSocket Clients
-Clients can register for the chat application by sending requests to the WebSocket server. When the application starts it will request a username. Once a non-empty username is entered, the user will get registered.
-
-After getting registered, the users can send messages to the chat group by typing messages on the console and pressing `Enter`. Then, the server will broadcast messages by looping over the registered clients.
-If a user wants to exit from the chat, he/she can type in `exit` and `Enter` so that the connection will get closed, and the client gets unregistered from the chat.
-
-The client will have one Ballerina strand writing the messages to the WebSocket connection and one for reading.
+### The TCP Client
+TCP client has two records to represent the HTTP request and the response. The client will send a POST request as per the headers and the body defined in the Request record. Then read the echoed response coming from the server and then map the details of the response to the Response record.
 
 ## Run the Example
 
@@ -23,13 +18,13 @@ First, clone this repository, and then run the following commands to run this ex
 
 ```sh
 // Run the WebSocket server
-$ cd examples/chat-application/server
+$ cd examples/http-client-server/server
 $ bal run
 ```
 
 In another terminal, run the client as follows.
 ```sh
 // Run the WebSocket client
-$ cd examples/chat-application/client
+$ cd examples/http-client-server/client
 $ bal run
 ```
