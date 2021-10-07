@@ -90,8 +90,8 @@ public class TcpListener {
                         callback.complete(null);
                     } else {
                         if (!isCallbackCompleted.get()) {
-                            callback.complete(Utils.createTcpError("Error initializing the server: "
-                                    + channelFuture.cause().getMessage()));
+                            callback.complete(Utils.createTcpError(String.format("Error initializing the server: %s",
+                                    channelFuture.cause().getMessage())));
                         }
                     }
                 });
