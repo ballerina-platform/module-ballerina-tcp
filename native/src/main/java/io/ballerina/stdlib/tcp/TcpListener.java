@@ -90,7 +90,8 @@ public class TcpListener {
                         callback.complete(null);
                     } else {
                         if (!isCallbackCompleted.get()) {
-                            callback.complete(Utils.createTcpError("Error initializing the server."));
+                            callback.complete(Utils.createTcpError(String.format("Error initializing the server: %s",
+                                    channelFuture.cause().getMessage())));
                         }
                     }
                 });
@@ -170,12 +171,14 @@ public class TcpListener {
 
     // Shutdown the server
     public void close(Future callback) {
-        channel.close().addListener((ChannelFutureListener) future -> {
-            if (future.isSuccess()) {
-                callback.complete(null);
-            } else {
-                callback.complete(Utils.createTcpError("Failed to gracefully shutdown the Listener."));
-            }
-        });
+        if (channel != null) {
+            channel.close().addListener((ChannelFutureListener) future -> {
+                if (future.isSuccess()) {
+                    callback.complete(null);
+                } else {
+                    callback.complete(Utils.createTcpError("Failed to gracefully shutdown the Listener."));
+                }
+            });
+        }
     }
 }

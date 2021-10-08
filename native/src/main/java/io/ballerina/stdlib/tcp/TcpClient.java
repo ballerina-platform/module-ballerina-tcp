@@ -81,8 +81,8 @@ public class TcpClient {
                         }
                     } else {
                         if (!isCallbackCompleted.get()) {
-                            callback.complete(Utils.createTcpError("Unable to connect with remote host: "
-                                    + channelFuture.cause().getMessage()));
+                            callback.complete(Utils.createTcpError(String.format(
+                                    "Unable to connect with remote host: %s", channelFuture.cause().getMessage())));
                         }
                     }
                 });
@@ -144,8 +144,8 @@ public class TcpClient {
             if (future.isSuccess()) {
                 callback.complete(null);
             } else {
-                callback.complete(Utils.createTcpError("Unable to close the  TCP client. "
-                        + future.cause().getMessage()));
+                callback.complete(Utils.createTcpError(String.format("Unable to close the  TCP client: %s",
+                        future.cause().getMessage())));
             }
         });
     }
