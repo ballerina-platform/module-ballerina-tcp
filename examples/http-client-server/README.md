@@ -17,14 +17,14 @@ TCP client has two records to represent the HTTP request and the response. The c
 First, clone this repository, and then run the following commands to run this example in your local machine.
 
 ```sh
-// Run the WebSocket server
+// Run the server
 $ cd examples/http-client-server/server
 $ bal run
 ```
 
 In another terminal, run the client as follows.
 ```sh
-// Run the WebSocket client
+// Run the client
 $ cd examples/http-client-server/client
 $ bal run
 ```
