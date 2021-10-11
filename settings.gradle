@@ -18,14 +18,14 @@ include ':tcp-native'
 include ':tcp-test-utils'
 include ':tcp-ballerina'
 include ':tcp-compiler-plugin'
-include ':tcp-compiler-plugin-test'
+include ':tcp-compiler-plugin-tests'
 
 project(':checkstyle').projectDir = file("build-config${File.separator}checkstyle")
 project(':tcp-native').projectDir = file('native')
 project(':tcp-ballerina').projectDir = file('ballerina')
 project(':tcp-test-utils').projectDir = file('test-utils')
 project(':tcp-compiler-plugin').projectDir = file('compiler-plugin')
-project(':tcp-compiler-plugin-test').projectDir = file('compiler-plugin-test')
+project(':tcp-compiler-plugin-tests').projectDir = file('compiler-plugin-tests')
 
 gradleEnterprise {
     buildScan {
