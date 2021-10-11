@@ -19,7 +19,9 @@
 package io.ballerina.stdlib.tcp.compiler;
 
 import io.ballerina.compiler.api.symbols.ClassSymbol;
+import io.ballerina.compiler.api.symbols.TypeDescKind;
 import io.ballerina.compiler.api.symbols.TypeReferenceTypeSymbol;
+import io.ballerina.compiler.api.symbols.TypeSymbol;
 import io.ballerina.compiler.syntax.tree.ExplicitNewExpressionNode;
 import io.ballerina.compiler.syntax.tree.ExpressionNode;
 import io.ballerina.compiler.syntax.tree.FunctionDefinitionNode;
@@ -63,12 +65,14 @@ public class TcpServiceValidator {
                     ExpressionNode expressionNode = returnStatementNode.expression().get();
 
                     if (expressionNode instanceof ExplicitNewExpressionNode) { // handle return new HelloService();
-                        TypeReferenceTypeSymbol typeReferenceTypeSymbol = (TypeReferenceTypeSymbol) ctx.semanticModel()
-                                .type(expressionNode).get();
-                        ClassSymbol classSymbol = (ClassSymbol) typeReferenceTypeSymbol.typeDescriptor();
-                        TcpConnectionServiceValidator tcpConnectionServiceValidator =
-                                new TcpConnectionServiceValidator(ctx, classSymbol);
-                        tcpConnectionServiceValidator.validate();
+                        TypeSymbol symbol = ctx.semanticModel().type(expressionNode).get();
+                        if (symbol.typeKind() == TypeDescKind.TYPE_REFERENCE) {
+                            TypeReferenceTypeSymbol typeReferenceTypeSymbol = (TypeReferenceTypeSymbol) symbol;
+                            ClassSymbol classSymbol = (ClassSymbol) typeReferenceTypeSymbol.typeDescriptor();
+                            TcpConnectionServiceValidator tcpConnectionServiceValidator =
+                                    new TcpConnectionServiceValidator(ctx, classSymbol);
+                            tcpConnectionServiceValidator.validate();
+                        }
                     }
                 }
             }
