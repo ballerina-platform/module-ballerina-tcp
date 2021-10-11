@@ -19,6 +19,7 @@
 package io.ballerina.stdlib.tcp.compiler;
 
 import io.ballerina.compiler.api.symbols.ClassSymbol;
+import io.ballerina.compiler.api.symbols.TypeDescKind;
 import io.ballerina.compiler.api.symbols.TypeReferenceTypeSymbol;
 import io.ballerina.compiler.api.symbols.TypeSymbol;
 import io.ballerina.compiler.syntax.tree.ExplicitNewExpressionNode;
@@ -65,7 +66,7 @@ public class TcpServiceValidator {
 
                     if (expressionNode instanceof ExplicitNewExpressionNode) { // handle return new HelloService();
                         TypeSymbol symbol = ctx.semanticModel().type(expressionNode).get();
-                        if (symbol instanceof TypeReferenceTypeSymbol) {
+                        if (symbol.typeKind() == TypeDescKind.TYPE_REFERENCE) {
                             TypeReferenceTypeSymbol typeReferenceTypeSymbol = (TypeReferenceTypeSymbol) symbol;
                             ClassSymbol classSymbol = (ClassSymbol) typeReferenceTypeSymbol.typeDescriptor();
                             TcpConnectionServiceValidator tcpConnectionServiceValidator =
