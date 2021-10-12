@@ -210,6 +210,14 @@ public class CompilerPluginTest {
         Assert.assertEquals(diagnostic.diagnosticInfo().code(), TcpConnectionServiceValidator.TCP_104);
     }
 
+    @Test
+    public void testWithoutServiceClass() {
+        Package currentPackage = loadPackage("sample_package_16");
+        PackageCompilation compilation = currentPackage.getCompilation();
+        DiagnosticResult diagnosticResult = compilation.diagnosticResult();
+        Assert.assertEquals(diagnosticResult.diagnostics().size(), 1);
+    }
+
     private Package loadPackage(String path) {
         Path projectDirPath = RESOURCE_DIRECTORY.resolve(path);
         BuildProject project = BuildProject.load(getEnvironmentBuilder(), projectDirPath);
