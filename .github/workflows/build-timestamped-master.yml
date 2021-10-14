@@ -43,4 +43,4 @@ jobs:
           path: tcp-ballerina/ballerina-internal.log
           if-no-files-found: ignore
       - name: Generate CodeCov Report
-        uses: codecov/codecov-action@v1
+        uses: codecov/codecov-action@v2
