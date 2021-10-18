@@ -1,14 +1,14 @@
 [package]
 org = "ballerina"
 name = "tcp"
-version = "1.0.0"
+version = "1.0.1"
 distribution = "slbeta3"
 
 [[platform.java11.dependency]]
-path = "../native/build/libs/tcp-native-1.0.0.jar"
+path = "../native/build/libs/tcp-native-1.0.1-SNAPSHOT.jar"
 
 [[platform.java11.dependency]]
-path = "../test-utils/build/libs/tcp-test-utils-1.0.0.jar"
+path = "../test-utils/build/libs/tcp-test-utils-1.0.1-SNAPSHOT.jar"
 scope = "testOnly"
 
 [[platform.java11.dependency]]
