@@ -15,12 +15,18 @@
 // under the License.
 
 import ballerina/io;
-import ballerina/regex;
+import ballerina/lang.'int as ints;
 import ballerina/tcp;
+import ballerina/regex;
+
+string status = WAITING;
+string? bodyPart = ();
+map<string> headersMap = {};
+int remainingBytes = 0;
+final int bufferSize = 8192;
 
 service on new tcp:Listener(3000) {
     remote function onConnect(tcp:Caller caller) returns tcp:ConnectionService {
-        io:println("Client connected to echo server: ", caller.remotePort);
         return new EchoService();
     }
 }
@@ -28,11 +34,20 @@ service on new tcp:Listener(3000) {
 service class EchoService {
     remote function onBytes(tcp:Caller caller, readonly & byte[] data) returns tcp:Error? {
         string|error request = string:fromBytes(data);
+
         if (request is error) {
             check caller->writeBytes(createBadRequestResponse().toBytes());
         } else {
-            string response = createResponse(request);
-            check caller->writeBytes(response.toBytes());
+            if status == WAITING {
+                error? result = parseInitialChunk(request);
+            } else if status == RECEIVING_BODY {
+                error? result = parseBody(data);
+            }
+            if status == RECEIVED_BODY {
+                string response = createResponse();
+                check caller->writeBytes(response.toBytes());
+                reset();
+            }
         }
     }
 
@@ -41,20 +56,61 @@ service class EchoService {
     }
 }
 
-function createResponse(string request) returns string {
-    string[] reqArr = regex:split(request, "\r\n");
-    if (!reqArr[0].startsWith("POST")) {
-        return createBadRequestResponse();
+function parseInitialChunk(string req) returns error? {
+    string[] headerAndBodyArr = regex:split(req, "\r\n\r\n");
+    string[] headerArr = regex:split(headerAndBodyArr[0], "\r\n");
+    string[] filtered = headerArr.filter(i => !(i.startsWith("Host")) && !(i.startsWith("POST")));
+    foreach string header in filtered {
+        string[] keyValue = regex:split(header, ":");
+        headersMap[keyValue[0]] = keyValue[1];
     }
+    string contLen = headersMap.get("Content-Length");
+    remainingBytes = check ints:fromString(contLen.trim());
+    if headerAndBodyArr.length() == 2 {
+        status = RECEIVING_BODY;
+        byte[] body = headerAndBodyArr[1].toBytes();
+        check parseBody(body);
+    }
+}
+
+function parseBody(byte[] body) returns error? {
+    if remainingBytes <= body.length() {
+        if bodyPart is () {
+            bodyPart = check string:fromBytes(body.slice(0, remainingBytes));
+        } else {
+            bodyPart = <string> bodyPart + check string:fromBytes(body.slice(0, remainingBytes));
+        }
+        status = RECEIVED_BODY;
+    } else {
+        if bodyPart is () {
+            bodyPart = check string:fromBytes(body);
+        } else {
+            bodyPart = <string> bodyPart + check string:fromBytes(body);
+        }
+        remainingBytes = remainingBytes - body.length();
+    }
+}
+
+function createResponse() returns string {
     string response = "HTTP/1.1 200 Ok";
-    string[] filtered = reqArr.filter(i => !(i.startsWith("Host")) && !(i.startsWith("POST")));
-    foreach string item in filtered {
-        response = response + "\r\n" + item;
+    foreach var [k, v] in headersMap.entries() {
+        response = response + "\r\n" + k + ":" + v;
     }
-    return response;
+    return response + "\r\n\r\n" + <string> bodyPart;
+}
+
+function reset() {
+    status = WAITING;
+    bodyPart = ();
+    headersMap = {};
+    remainingBytes = 0;
 }
 
 function createBadRequestResponse() returns string {
     string response = "HTTP/1.1 404 Bad Request\r\nConnection: Close";
     return response;
+}
+
+enum stateMachine {
+    WAITING, RECEIVING_BODY, RECEIVED_BODY
 }

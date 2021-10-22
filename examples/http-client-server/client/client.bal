@@ -15,8 +15,9 @@
 // under the License.
 
 import ballerina/io;
-import ballerina/tcp;
+import ballerina/lang.'int as ints;
 import ballerina/regex;
+import ballerina/tcp;
 
 type Request record {
     map<string> headers;
@@ -31,14 +32,11 @@ Request request = {
 };
 
 type Response record {
-    map<string> headers;
-    string body;
+    map<string> headers?;
+    string? body?;
 };
 
-Response response = {
-    headers: {},
-    body: ""
-};
+Response response = {};
 public function main() returns error? {
     tcp:Client socketClient = check new ("localhost", 3000);
 
@@ -47,29 +45,50 @@ public function main() returns error? {
     check socketClient->writeBytes(requestString.toBytes());
 
     readonly & byte[] receivedData = check socketClient->readBytes();
+    string? bodyPart = ();
     string responseString = check string:fromBytes(receivedData);
-    io:println("\r\n", responseString);
     if responseString.startsWith("HTTP/1.1 200") {
-        createResponseRecord(responseString);
+        string[] respArr = regex:split(responseString, "\r\n\r\n");
+        string[] respHeaders = regex:split(respArr[0], "\r\n");
+        bodyPart = respArr[1];
+        string contLenHeader = respHeaders.filter(i => (i.startsWith("Content-Length")))[0];
+        int contLen = check ints:fromString(regex:split(contLenHeader, ":")[1].trim());
+        int remainingBytes = contLen - (<string>bodyPart).length();
+
+        final int bufferSize = 8192;
+        while remainingBytes > bufferSize {
+            byte[] data = check socketClient->readBytes();
+            bodyPart = <string> bodyPart + check string:fromBytes(data);
+            remainingBytes = remainingBytes - data.length();
+        }
+        if remainingBytes != 0 {
+            byte[] data = check socketClient->readBytes();
+            bodyPart = <string> bodyPart + check string:fromBytes(data.slice(0, remainingBytes));
+        }
     }
+    io:println("\r\n", responseString);
+    createResponseRecord(responseString, bodyPart);
+
     check socketClient->close();
 }
 
 function createRequest(Request req) returns string {
-    map<string> headers = req.headers;
+    map<string> headers = <map<string>> req.headers;
     string request = "POST /test HTTP/1.1\r\n";
     foreach var [key, value] in headers.entries() {
-        request = request + key + ":" + value + "\r\n";
+        request = request + key + ": " + value + "\r\n";
     }
-    request = request + "Content-Length: " + req.body.length().toString() + "\r\n" + "\r\n" + req.body;
+    string? body = req.body;
+    if (body is string) {
+        request = request + "Content-Length: " + body.length().toString() + "\r\n" + "\r\n" + body;
+    }
 
     return request;
 }
 
-function createResponseRecord(string resp) {
+function createResponseRecord(string resp, string? body) {
     string[] respArr = regex:split(resp, "\r\n");
     map<string> headersMap = {};
-    string body = respArr[respArr.length()-1];
     string[] filtered = respArr.filter(i => !(i.startsWith("HTTP/1.1")) && i.includes(":", 0));
     foreach string header in filtered {
         string[] keyValue = regex:split(header, ":");
