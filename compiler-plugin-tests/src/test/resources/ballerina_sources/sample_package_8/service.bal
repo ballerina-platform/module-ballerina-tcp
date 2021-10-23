@@ -18,11 +18,11 @@ service isolated class EchoService {
     }
 
     remote function onClose() returns tcp:Error? {
-
+        return ();
     }
 
     remote function onError(tcp:Error err) returns tcp:Error? {
-
+        return ();
     }
 
     function someUtilFunction() {

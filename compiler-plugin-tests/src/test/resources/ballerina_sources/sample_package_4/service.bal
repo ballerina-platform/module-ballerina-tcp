@@ -14,10 +14,10 @@ service isolated class EchoService {
     }
 
     remote function onError() returns tcp:Error? {
-
+        return ();
     }
 
     remote function onClose() returns tcp:Error? {
-
+        return ();
     }
 }
