@@ -16,10 +16,10 @@ service isolated class EchoServer {
     }
 
     remote function onClose() returns t:Error? {
-
+        return ();
     }
 
     remote function onError(t:Error err) returns t:Error? {
-
+        return ();
     }
 }

@@ -10,10 +10,10 @@ service on new tcp:Listener(3000) {
 service isolated class EchoService {
 
     remote function onError(tcp:Error err) returns tcp:Error? {
-
+        return ();
     }
 
     remote function onClose() returns tcp:Error? {
-
+        return ();
     }
 }
