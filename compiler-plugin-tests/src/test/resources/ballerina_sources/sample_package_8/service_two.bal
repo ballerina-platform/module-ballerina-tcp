@@ -3,7 +3,6 @@ import ballerina/tcp as t;
 listener t:Listener 'listener = new t:Listener(3000);
 
 service on 'listener {
-
     remote function onConnect(t:Caller caller) returns t:ConnectionService {
         return new EchoServer();
     }
