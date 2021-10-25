@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ## [Unreleased]
 
 ### Added
+- [Add an API to the Caller to get the unique connection id](https://github.com/ballerina-platform/ballerina-standard-library/issues/2131)
+
+## [1.2.0-beta.3] - 2021-10-10
+
+### Added
 - [Introduce write time out for TCP client](https://github.com/ballerina-platform/ballerina-standard-library/issues/1684)
 
 ## [1.2.0-beta.2] - 2021-07-07
