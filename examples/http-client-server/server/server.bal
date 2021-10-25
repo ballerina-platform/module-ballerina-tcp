@@ -19,10 +19,13 @@ import ballerina/lang.'int as ints;
 import ballerina/tcp;
 import ballerina/regex;
 
+enum stateMachine {
+    WAITING, RECEIVING_BODY, RECEIVED_BODY
+}
 string status = WAITING;
-string? bodyPart = ();
+string? payload = ();
 map<string> headersMap = {};
-int remainingBytes = 0;
+int payloadLength = 0;
 final int bufferSize = 8192;
 
 service on new tcp:Listener(3000) {
@@ -65,7 +68,7 @@ function parseInitialChunk(string req) returns error? {
         headersMap[keyValue[0]] = keyValue[1];
     }
     string contLen = headersMap.get("Content-Length");
-    remainingBytes = check ints:fromString(contLen.trim());
+    payloadLength = check ints:fromString(contLen.trim());
     if headerAndBodyArr.length() == 2 {
         status = RECEIVING_BODY;
         byte[] body = headerAndBodyArr[1].toBytes();
@@ -74,20 +77,20 @@ function parseInitialChunk(string req) returns error? {
 }
 
 function parseBody(byte[] body) returns error? {
-    if remainingBytes <= body.length() {
-        if bodyPart is () {
-            bodyPart = check string:fromBytes(body.slice(0, remainingBytes));
+    if payloadLength <= body.length() {
+        if payload is () {
+            payload = check string:fromBytes(body.slice(0, payloadLength));
         } else {
-            bodyPart = <string> bodyPart + check string:fromBytes(body.slice(0, remainingBytes));
+            payload = <string> payload + check string:fromBytes(body.slice(0, payloadLength));
         }
         status = RECEIVED_BODY;
     } else {
-        if bodyPart is () {
-            bodyPart = check string:fromBytes(body);
+        if payload is () {
+            payload = check string:fromBytes(body);
         } else {
-            bodyPart = <string> bodyPart + check string:fromBytes(body);
+            payload = <string> payload + check string:fromBytes(body);
         }
-        remainingBytes = remainingBytes - body.length();
+        payloadLength = payloadLength - body.length();
     }
 }
 
@@ -96,14 +99,14 @@ function createResponse() returns string {
     foreach var [k, v] in headersMap.entries() {
         response = response + "\r\n" + k + ":" + v;
     }
-    return response + "\r\n\r\n" + <string> bodyPart;
+    return response + "\r\n\r\n" + <string> payload;
 }
 
 function reset() {
     status = WAITING;
-    bodyPart = ();
+    payload = ();
     headersMap = {};
-    remainingBytes = 0;
+    payloadLength = 0;
 }
 
 function createBadRequestResponse() returns string {
@@ -111,6 +114,3 @@ function createBadRequestResponse() returns string {
     return response;
 }
 
-enum stateMachine {
-    WAITING, RECEIVING_BODY, RECEIVED_BODY
-}

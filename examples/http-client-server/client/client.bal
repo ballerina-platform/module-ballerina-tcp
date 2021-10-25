@@ -45,29 +45,29 @@ public function main() returns error? {
     check socketClient->writeBytes(requestString.toBytes());
 
     readonly & byte[] receivedData = check socketClient->readBytes();
-    string? bodyPart = ();
     string responseString = check string:fromBytes(receivedData);
+    string? payload = ();
     if responseString.startsWith("HTTP/1.1 200") {
         string[] respArr = regex:split(responseString, "\r\n\r\n");
         string[] respHeaders = regex:split(respArr[0], "\r\n");
-        bodyPart = respArr[1];
+        payload = respArr[1];
         string contLenHeader = respHeaders.filter(i => (i.startsWith("Content-Length")))[0];
         int contLen = check ints:fromString(regex:split(contLenHeader, ":")[1].trim());
-        int remainingBytes = contLen - (<string>bodyPart).length();
+        int remainingBytes = contLen - (<string>payload).length();
 
         final int bufferSize = 8192;
         while remainingBytes > bufferSize {
             byte[] data = check socketClient->readBytes();
-            bodyPart = <string> bodyPart + check string:fromBytes(data);
+            payload = <string> payload + check string:fromBytes(data);
             remainingBytes = remainingBytes - data.length();
         }
         if remainingBytes != 0 {
             byte[] data = check socketClient->readBytes();
-            bodyPart = <string> bodyPart + check string:fromBytes(data.slice(0, remainingBytes));
+            payload = <string> payload + check string:fromBytes(data.slice(0, remainingBytes));
         }
     }
     io:println("\r\n", responseString);
-    createResponseRecord(responseString, bodyPart);
+    createResponseRecord(responseString, payload);
 
     check socketClient->close();
 }
