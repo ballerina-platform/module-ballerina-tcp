@@ -107,6 +107,7 @@ public class Dispatcher {
                 StringUtils.fromString(localAddress.getHostName()));
         caller.addNativeData(Constants.CHANNEL, channel);
         caller.addNativeData(Constants.SERVICE, tcpService);
+        caller.addNativeData(Constants.CALLER_ID, channel.id().asLongText());
         return caller;
     }
 

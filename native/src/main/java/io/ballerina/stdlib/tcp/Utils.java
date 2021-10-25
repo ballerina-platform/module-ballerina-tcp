@@ -27,6 +27,7 @@ import io.ballerina.runtime.api.values.BArray;
 import io.ballerina.runtime.api.values.BDecimal;
 import io.ballerina.runtime.api.values.BError;
 import io.ballerina.runtime.api.values.BMap;
+import io.ballerina.runtime.api.values.BObject;
 import io.ballerina.runtime.api.values.BString;
 import io.netty.buffer.ByteBuf;
 
@@ -190,5 +191,9 @@ public class Utils {
 
     public static Module getModule() {
         return tcpModule;
+    }
+
+    public static BString getConnectionId(Environment env, BObject caller) {
+        return StringUtils.fromString((String) caller.getNativeData(Constants.CALLER_ID));
     }
 }
