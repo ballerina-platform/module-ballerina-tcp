@@ -46,7 +46,7 @@ public class TcpServiceValidatorTask implements AnalysisTask<SyntaxNodeAnalysisC
     public void perform(SyntaxNodeAnalysisContext ctx) {
         List<Diagnostic> diagnostics = ctx.semanticModel().diagnostics();
         for (Diagnostic diagnostic : diagnostics) {
-            if (Utils.equals(diagnostic.diagnosticInfo().severity().name(), String.valueOf(DiagnosticSeverity.ERROR))) {
+            if (diagnostic.diagnosticInfo().severity() == DiagnosticSeverity.ERROR) {
                 return;
             }
         }
