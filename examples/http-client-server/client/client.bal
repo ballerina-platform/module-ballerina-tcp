@@ -19,6 +19,7 @@ import ballerina/lang.'int as ints;
 import ballerina/regex;
 import ballerina/tcp;
 
+// have fields to method, the path and the HTTP version
 type Request record {
     map<string> headers;
     string body;
@@ -31,15 +32,19 @@ Request request = {
     body: "request body"
 };
 
+// Include status and the version
 type Response record {
     map<string> headers?;
-    string? body?;
+    // body should not be optional. if the cont-length is 0, it is nil;
+    string? body = ();
 };
 
 Response response = {};
 public function main() returns error? {
     tcp:Client socketClient = check new ("localhost", 3000);
 
+    // rename to serialize request which returns a byte array and pass it to `writeBytes()`
+    // top level functions to sendRequest and receiveResponse
     string requestString = createRequest(request);
     io:println(requestString);
     check socketClient->writeBytes(requestString.toBytes());
@@ -47,6 +52,7 @@ public function main() returns error? {
     readonly & byte[] receivedData = check socketClient->readBytes();
     string responseString = check string:fromBytes(receivedData);
     string? payload = ();
+    // parse headers first, and then parse the body. 
     if responseString.startsWith("HTTP/1.1 200") {
         string[] respArr = regex:split(responseString, "\r\n\r\n");
         string[] respHeaders = regex:split(respArr[0], "\r\n");

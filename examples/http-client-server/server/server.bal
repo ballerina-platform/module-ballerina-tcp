@@ -19,14 +19,10 @@ import ballerina/lang.'int as ints;
 import ballerina/tcp;
 import ballerina/regex;
 
+// Make the variables service level
 enum stateMachine {
     WAITING, RECEIVING_BODY, RECEIVED_BODY
 }
-string status = WAITING;
-string? payload = ();
-map<string> headersMap = {};
-int payloadLength = 0;
-final int bufferSize = 8192;
 
 service on new tcp:Listener(3000) {
     remote function onConnect(tcp:Caller caller) returns tcp:ConnectionService {
@@ -35,81 +31,82 @@ service on new tcp:Listener(3000) {
 }
 
 service class EchoService {
+
+    private string status = WAITING;
+    private string? payload = ();
+    private map<string> headersMap = {};
+    private int payloadLength = 0;
+    final int bufferSize = 8192;
+
     remote function onBytes(tcp:Caller caller, readonly & byte[] data) returns tcp:Error? {
         string|error request = string:fromBytes(data);
 
         if (request is error) {
             check caller->writeBytes(createBadRequestResponse().toBytes());
         } else {
-            if status == WAITING {
-                error? result = parseInitialChunk(request);
-            } else if status == RECEIVING_BODY {
-                error? result = parseBody(data);
+            // use the match statement.
+            if self.status == WAITING {
+                error? result = self.parseInitialChunk(request);
+            } else if self.status == RECEIVING_BODY {
+                error? result = self.parseBody(data);
             }
-            if status == RECEIVED_BODY {
-                string response = createResponse();
+            if self.status == RECEIVED_BODY {
+                // create a request record. if an error, create a error response record. serialize the record into a string
+                string response = self.createResponse();
                 check caller->writeBytes(response.toBytes());
-                reset();
             }
         }
     }
 
-    remote function onClose() returns tcp:Error? {
+    remote isolated  function onClose() returns tcp:Error? {
         io:println("Client closed the connection");
     }
-}
 
-function parseInitialChunk(string req) returns error? {
-    string[] headerAndBodyArr = regex:split(req, "\r\n\r\n");
-    string[] headerArr = regex:split(headerAndBodyArr[0], "\r\n");
-    string[] filtered = headerArr.filter(i => !(i.startsWith("Host")) && !(i.startsWith("POST")));
-    foreach string header in filtered {
-        string[] keyValue = regex:split(header, ":");
-        headersMap[keyValue[0]] = keyValue[1];
-    }
-    string contLen = headersMap.get("Content-Length");
-    payloadLength = check ints:fromString(contLen.trim());
-    if headerAndBodyArr.length() == 2 {
-        status = RECEIVING_BODY;
-        byte[] body = headerAndBodyArr[1].toBytes();
-        check parseBody(body);
-    }
-}
-
-function parseBody(byte[] body) returns error? {
-    if payloadLength <= body.length() {
-        if payload is () {
-            payload = check string:fromBytes(body.slice(0, payloadLength));
-        } else {
-            payload = <string> payload + check string:fromBytes(body.slice(0, payloadLength));
+    function parseInitialChunk(string req) returns error? {
+        string[] headerAndBodyArr = regex:split(req, "\r\n\r\n");
+        string[] headerArr = regex:split(headerAndBodyArr[0], "\r\n");
+        string[] filtered = headerArr.filter(i => !(i.startsWith("Host")) && !(i.startsWith("POST")));
+        foreach string header in filtered {
+            string[] keyValue = regex:split(header, ":");
+            self.headersMap[keyValue[0]] = keyValue[1];
         }
-        status = RECEIVED_BODY;
-    } else {
-        if payload is () {
-            payload = check string:fromBytes(body);
-        } else {
-            payload = <string> payload + check string:fromBytes(body);
+        string contLen = self.headersMap.get("Content-Length");
+        self.payloadLength = check ints:fromString(contLen.trim());
+        if headerAndBodyArr.length() == 2 {
+            self.status = RECEIVING_BODY;
+            byte[] body = headerAndBodyArr[1].toBytes();
+            check self.parseBody(body);
         }
-        payloadLength = payloadLength - body.length();
+    }
+
+    function parseBody(byte[] body) returns error? {
+        if self.payloadLength <= body.length() {
+            if self.payload is () {
+                self.payload = check string:fromBytes(body.slice(0, self.payloadLength));
+            } else {
+                self.payload = <string> self.payload + check string:fromBytes(body.slice(0, self.payloadLength));
+            }
+            self.status = RECEIVED_BODY;
+        } else {
+            if self.payload is () {
+                self.payload = check string:fromBytes(body);
+            } else {
+                self.payload = <string> self.payload + check string:fromBytes(body);
+            }
+            self.payloadLength = self.payloadLength - body.length();
+        }
+    }
+
+    function createResponse() returns string {
+        string response = "HTTP/1.1 200 Ok";
+        foreach var [k, v] in self.headersMap.entries() {
+            response = response + "\r\n" + k + ":" + v;
+        }
+        return response + "\r\n\r\n" + <string> self.payload;
     }
 }
 
-function createResponse() returns string {
-    string response = "HTTP/1.1 200 Ok";
-    foreach var [k, v] in headersMap.entries() {
-        response = response + "\r\n" + k + ":" + v;
-    }
-    return response + "\r\n\r\n" + <string> payload;
-}
-
-function reset() {
-    status = WAITING;
-    payload = ();
-    headersMap = {};
-    payloadLength = 0;
-}
-
-function createBadRequestResponse() returns string {
+isolated function createBadRequestResponse() returns string {
     string response = "HTTP/1.1 404 Bad Request\r\nConnection: Close";
     return response;
 }
