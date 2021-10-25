@@ -50,4 +50,11 @@ public client class Caller {
       'class: "io.ballerina.stdlib.tcp.nativelistener.Caller"
   } external;
 
+  # Gives the connection id associated with the connection.
+  #
+  # + return - The unique ID associated with the connection
+  public isolated function getId() returns string = @java:Method {
+      'class: "io.ballerina.stdlib.tcp.Utils"
+  } external;
+
 }

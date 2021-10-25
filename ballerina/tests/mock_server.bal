@@ -21,6 +21,7 @@ string keyPath = "tests/etc/key.pem";
 string keystore = "tests/etc/ballerinaKeystore.p12";
 string truststore = "tests/etc/ballerinaTruststore.p12";
 boolean onErrorInvoked = false;
+string conId = "xx";
 
 const int PORT1 = 8809;
 const int PORT2 = 8023;
@@ -168,6 +169,7 @@ service class HelloService {
 service class HiService {
 
     remote function onBytes(Caller caller, readonly & byte[] data) returns Error? {
+        conId = caller.getId();
         check caller->writeBytes("Hi".toBytes());
     }
 }
