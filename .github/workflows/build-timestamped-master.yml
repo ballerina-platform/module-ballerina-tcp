@@ -44,3 +44,8 @@ jobs:
           if-no-files-found: ignore
       - name: Generate CodeCov Report
         uses: codecov/codecov-action@v2
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: ballerina-runtime
+          path: target/ballerina-runtime/
