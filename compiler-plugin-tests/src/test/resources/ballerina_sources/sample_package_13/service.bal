@@ -10,14 +10,14 @@ service on new tcp:Listener(3000) {
 service isolated class EchoService {
 
     remote function onBytes(readonly & byte[] data, tcp:Caller caller, tcp:Caller another) returns byte[]|tcp:Error? {
-        check caller->writeBytes(data);
+        return caller->writeBytes(data);
     }
 
     remote function onClose() returns tcp:Error? {
-
+        return ();
     }
 
     remote function onError(tcp:Error err, tcp:Error another) returns tcp:Error? {
-
+        return ();
     }
 }

@@ -10,14 +10,14 @@ service on new tcp:Listener(3000) {
 service isolated class EchoService {
 
     remote function onBytes(readonly & byte[] data) returns int|float|tcp:Error? {
-
+        return 5;
     }
 
     remote function onClose() returns float? {
-
+        return ();
     }
 
     remote function onError(tcp:Error err) returns error? {
-
+        return ();
     }
 }

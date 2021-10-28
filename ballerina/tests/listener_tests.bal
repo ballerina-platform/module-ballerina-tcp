@@ -85,7 +85,7 @@ function testListenerDetach() returns @tainted error? {
 
     receivedData = check socketClient->readBytes();
     test:assertEquals(string:fromBytes(receivedData), "Hi", "Unexpected response");
-    test:assertNotEquals(conId, "");
+    test:assertNotEquals(conId, "xx");
 }
 
 @test:Config {dependsOn: [testListenerDetach]}

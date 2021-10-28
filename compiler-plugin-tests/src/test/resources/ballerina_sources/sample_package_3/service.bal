@@ -14,10 +14,10 @@ service isolated class EchoService {
     }
 
     function onError(tcp:Error err) returns tcp:Error? {
-
+        return ();
     }
 
     function onClose() returns tcp:Error? {
-
+        return ();
     }
 }

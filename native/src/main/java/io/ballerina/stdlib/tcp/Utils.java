@@ -193,7 +193,7 @@ public class Utils {
         return tcpModule;
     }
 
-    public static BString getConnectionId(Environment env, BObject caller) {
+    public static BString getId(Environment env, BObject caller) {
         return StringUtils.fromString((String) caller.getNativeData(Constants.CALLER_ID));
     }
 }
