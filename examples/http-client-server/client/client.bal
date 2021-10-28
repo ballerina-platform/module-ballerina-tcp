@@ -67,20 +67,20 @@ public function main() returns error? {
         string[] respHeaders = regex:split(respArr[0], "\r\n");
         if respArr.length() == 2 {
             payload = respArr[1];
-        }
-        string contLenHeader = respHeaders.filter(i => (i.startsWith("Content-Length")))[0];
-        int contLen = check ints:fromString(regex:split(contLenHeader, ":")[1].trim());
-        int remainingBytes = contLen - (<string>payload).length();
+            string contLenHeader = respHeaders.filter(i => (i.startsWith("Content-Length")))[0];
+            int contLen = check ints:fromString(regex:split(contLenHeader, ":")[1].trim());
+            int remainingBytes = contLen - (<string>payload).length();
 
-        final int bufferSize = 8192;
-        while remainingBytes > bufferSize {
-            byte[] data = check socketClient->readBytes();
-            payload = <string> payload + check string:fromBytes(data);
-            remainingBytes = remainingBytes - data.length();
-        }
-        if remainingBytes != 0 {
-            byte[] data = check socketClient->readBytes();
-            payload = <string> payload + check string:fromBytes(data.slice(0, remainingBytes));
+            while remainingBytes > 0 {
+                byte[] data = check socketClient->readBytes();
+                if remainingBytes <= data.length() {
+                    payload = <string> payload + check string:fromBytes(data.slice(0, remainingBytes));
+                    break;
+                } else {
+                    payload = <string> payload + check string:fromBytes(data);
+                    remainingBytes = remainingBytes - data.length();
+                }
+            }
         }
     }
     io:println("\r\n", responseString);

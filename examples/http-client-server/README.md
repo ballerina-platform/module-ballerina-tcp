@@ -28,3 +28,8 @@ In another terminal, run the client as follows.
 $ cd examples/http-client-server/client
 $ bal run
 ```
+
+To test the server, you can also use the following curl command,
+```sh
+curl -v -d "hello world" -H "Content-Type: text/plain" -X POST http://localhost:3000/test
+```
