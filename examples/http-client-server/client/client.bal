@@ -52,40 +52,9 @@ public function main() returns error? {
     };
     tcp:Client socketClient = check new ("localhost", 3000);
 
-    // rename to serialize request which returns a byte array and pass it to `writeBytes()`
-    // top level functions to sendRequest and receiveResponse
     byte[] serializedReq = serializeRequest(request);
     check sendRequest(socketClient, serializedReq);
-    //check socketClient->writeBytes(serializedReq);
-
-    readonly & byte[] receivedData = check socketClient->readBytes();
-    string responseString = check string:fromBytes(receivedData);
-    string? payload = ();
-    // parse headers first, and then parse the body.
-    if responseString.startsWith("HTTP/1.1 200") {
-        string[] respArr = regex:split(responseString, "\r\n\r\n");
-        string[] respHeaders = regex:split(respArr[0], "\r\n");
-        if respArr.length() == 2 {
-            payload = respArr[1];
-            string contLenHeader = respHeaders.filter(i => (i.startsWith("Content-Length")))[0];
-            int contLen = check ints:fromString(regex:split(contLenHeader, ":")[1].trim());
-            int remainingBytes = contLen - (<string>payload).length();
-
-            while remainingBytes > 0 {
-                byte[] data = check socketClient->readBytes();
-                if remainingBytes <= data.length() {
-                    payload = <string> payload + check string:fromBytes(data.slice(0, remainingBytes));
-                    break;
-                } else {
-                    payload = <string> payload + check string:fromBytes(data);
-                    remainingBytes = remainingBytes - data.length();
-                }
-            }
-        }
-    }
-    io:println("\r\n", responseString);
-    createResponseRecord(responseString, payload);
-
+    check receiveResponse(socketClient);
     check socketClient->close();
 }
 
@@ -110,6 +79,35 @@ function serializeRequest(Request req) returns byte[] {
 
 function sendRequest(tcp:Client socketClient, byte[] req) returns error? {
     check socketClient->writeBytes(req);
+}
+
+function receiveResponse(tcp:Client socketClient) returns error? {
+    readonly & byte[] receivedData = check socketClient->readBytes();
+    string responseString = check string:fromBytes(receivedData);
+    string? payload = ();
+    if responseString.startsWith("HTTP/1.1 200") {
+        string[] respArr = regex:split(responseString, "\r\n\r\n");
+        string[] respHeaders = regex:split(respArr[0], "\r\n");
+        if respArr.length() == 2 {
+            payload = respArr[1];
+            string contLenHeader = respHeaders.filter(i => (i.startsWith("Content-Length")))[0];
+            int contLen = check ints:fromString(regex:split(contLenHeader, ":")[1].trim());
+            int remainingBytes = contLen - (<string>payload).length();
+
+            while remainingBytes > 0 {
+                byte[] data = check socketClient->readBytes();
+                if remainingBytes <= data.length() {
+                    payload = <string> payload + check string:fromBytes(data.slice(0, remainingBytes));
+                    break;
+                } else {
+                    payload = <string> payload + check string:fromBytes(data);
+                    remainingBytes = remainingBytes - data.length();
+                }
+            }
+        }
+    }
+    io:println("\r\n", responseString);
+    createResponseRecord(responseString, payload);
 }
 
 function createResponseRecord(string resp, string? body) {
