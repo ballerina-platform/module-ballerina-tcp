@@ -14,15 +14,38 @@
 // specific language governing permissions and limitations
 // under the License.
 
-import ballerina/io;
 import ballerina/lang.'int as ints;
 import ballerina/tcp;
 import ballerina/regex;
+import ballerina/io;
 
-// Make the variables service level
 enum stateMachine {
     WAITING, RECEIVING_BODY, RECEIVED_BODY
 }
+
+type Request record {
+    map<string> headers;
+    string? body;
+    string HttpVersion = HTTP_1_1;
+    string Method = POST;
+    string path;
+};
+
+enum Method {
+    POST, GET
+}
+
+public enum HttpVersion {
+    HTTP_1_1,
+    HTTP_2
+}
+
+type Response record {
+    map<string> headers;
+    string? body = ();
+    string status;
+    string HttpVersion;
+};
 
 service on new tcp:Listener(3000) {
     remote function onConnect(tcp:Caller caller) returns tcp:ConnectionService {
@@ -36,35 +59,45 @@ service class EchoService {
     private string? payload = ();
     private map<string> headersMap = {};
     private int payloadLength = 0;
-    final int bufferSize = 8192;
+    private string httpVersion = "HTTP/1.1";
+    private string httpStatus = "200 Ok";
 
-    remote function onBytes(tcp:Caller caller, readonly & byte[] data) returns tcp:Error? {
+    remote isolated function onBytes(tcp:Caller caller, readonly & byte[] data) returns tcp:Error? {
         string|error request = string:fromBytes(data);
-
+        lock {
+            self.httpStatus = request is error ? "404 Bad Request" : "200 Ok";
+        }
         if (request is error) {
-            check caller->writeBytes(createBadRequestResponse().toBytes());
-        } else {
-            // use the match statement.
-            if self.status == WAITING {
-                error? result = self.parseInitialChunk(request);
-            } else if self.status == RECEIVING_BODY {
-                error? result = self.parseBody(data);
+            io:println("Error in request", request.message());
+            lock {
+                self.headersMap = {"Connection" : "close"};
             }
-            if self.status == RECEIVED_BODY {
-                // create a request record. if an error, create a error response record. serialize the record into a string
-                string response = self.createResponse();
-                check caller->writeBytes(response.toBytes());
+            byte[] response = self.serializeResponse();
+            check self.sendResponse(caller, response);
+        } else {
+            io:println(request);
+            lock {
+                match self.status {
+                    WAITING => {
+                        error? result = self.parseInitialChunk(request); 
+                    }
+                    RECEIVING_BODY => {
+                        error? result = self.parseBody(data);
+                    }
+                }
+                if self.status == RECEIVED_BODY {
+                    self.createRequestRecord();
+                    byte[] response = self.serializeResponse();
+                    check self.sendResponse(caller, response);
+                }
             }
         }
     }
 
-    remote isolated  function onClose() returns tcp:Error? {
-        io:println("Client closed the connection");
-    }
-
-    function parseInitialChunk(string req) returns error? {
+    isolated function parseInitialChunk(string req) returns error? {
         string[] headerAndBodyArr = regex:split(req, "\r\n\r\n");
         string[] headerArr = regex:split(headerAndBodyArr[0], "\r\n");
+        self.httpVersion = headerArr[0].substring(headerArr[0].length() - 8, headerArr[0].length());
         string[] filtered = headerArr.filter(i => !(i.startsWith("Host")) && !(i.startsWith("POST")));
         foreach string header in filtered {
             string[] keyValue = regex:split(header, ":");
@@ -79,7 +112,7 @@ service class EchoService {
         }
     }
 
-    function parseBody(byte[] body) returns error? {
+    isolated function parseBody(byte[] body) returns error? {
         if self.payloadLength <= body.length() {
             if self.payload is () {
                 self.payload = check string:fromBytes(body.slice(0, self.payloadLength));
@@ -97,17 +130,35 @@ service class EchoService {
         }
     }
 
-    function createResponse() returns string {
-        string response = "HTTP/1.1 200 Ok";
-        foreach var [k, v] in self.headersMap.entries() {
-            response = response + "\r\n" + k + ":" + v;
+    isolated function serializeResponse() returns byte[] {
+        Response response = {
+            headers: self.headersMap,
+            body: self.payload, 
+            status: self.httpStatus,
+            HttpVersion: self.httpVersion
+        };
+        string serliazedResponse = response.HttpVersion + " " + response.status;
+        foreach var [k, v] in response.headers.entries() {
+            serliazedResponse = serliazedResponse + "\r\n" + k + ":" + v;
         }
-        return response + "\r\n\r\n" + <string> self.payload;
+        if self.payload is string {
+            serliazedResponse = serliazedResponse + "\r\n\r\n" + <string> self.payload;
+        }
+        io:println(serliazedResponse);
+        return serliazedResponse.toBytes();
     }
-}
 
-isolated function createBadRequestResponse() returns string {
-    string response = "HTTP/1.1 404 Bad Request\r\nConnection: Close";
-    return response;
+    isolated function sendResponse(tcp:Caller caller, byte[] response) returns tcp:Error? {
+        check caller->writeBytes(response);
+    }
+
+    isolated function createRequestRecord() {
+        Request request = {
+            headers: self.headersMap,
+            body: self.payload, 
+            path: self.httpStatus,
+            HttpVersion: self.httpVersion
+        };
+    }
 }
 

@@ -19,44 +19,55 @@ import ballerina/lang.'int as ints;
 import ballerina/regex;
 import ballerina/tcp;
 
-// have fields to method, the path and the HTTP version
 type Request record {
     map<string> headers;
     string body;
+    string HttpVersion = HTTP_1_1;
+    string Method = POST;
+    string path;
 };
 
-map<string> headersMap = { "Host": "foo.example", "Content-Type": "text/plain", "custom-header": "header1" };
+enum Method {
+    POST, GET
+}
 
-Request request = {
-    headers: headersMap,
-    body: "request body"
-};
+public enum HttpVersion {
+    HTTP_1_1,
+    HTTP_2
+}
 
-// Include status and the version
 type Response record {
     map<string> headers?;
-    // body should not be optional. if the cont-length is 0, it is nil;
     string? body = ();
+    string status;
+    string HttpVersion;
 };
-
-Response response = {};
 public function main() returns error? {
+    map<string> headersMap = { "Host": "foo.example", "Content-Type": "text/plain", "custom-header": "header1" };
+
+    Request request = {
+        headers: headersMap,
+        body: "request body",
+        path: "/test"
+    };
     tcp:Client socketClient = check new ("localhost", 3000);
 
     // rename to serialize request which returns a byte array and pass it to `writeBytes()`
     // top level functions to sendRequest and receiveResponse
-    string requestString = createRequest(request);
-    io:println(requestString);
-    check socketClient->writeBytes(requestString.toBytes());
+    byte[] serializedReq = serializeRequest(request);
+    check sendRequest(socketClient, serializedReq);
+    //check socketClient->writeBytes(serializedReq);
 
     readonly & byte[] receivedData = check socketClient->readBytes();
     string responseString = check string:fromBytes(receivedData);
     string? payload = ();
-    // parse headers first, and then parse the body. 
+    // parse headers first, and then parse the body.
     if responseString.startsWith("HTTP/1.1 200") {
         string[] respArr = regex:split(responseString, "\r\n\r\n");
         string[] respHeaders = regex:split(respArr[0], "\r\n");
-        payload = respArr[1];
+        if respArr.length() == 2 {
+            payload = respArr[1];
+        }
         string contLenHeader = respHeaders.filter(i => (i.startsWith("Content-Length")))[0];
         int contLen = check ints:fromString(regex:split(contLenHeader, ":")[1].trim());
         int remainingBytes = contLen - (<string>payload).length();
@@ -78,30 +89,43 @@ public function main() returns error? {
     check socketClient->close();
 }
 
-function createRequest(Request req) returns string {
+function serializeRequest(Request req) returns byte[] {
     map<string> headers = <map<string>> req.headers;
-    string request = "POST /test HTTP/1.1\r\n";
+    string request = req.Method + " " + req.path + " ";
+    if req.HttpVersion == HTTP_1_1 {
+        request += "HTTP/1.1\r\n";
+    } else {
+        request += "HTTP/2.0\r\n";
+    }
     foreach var [key, value] in headers.entries() {
         request = request + key + ": " + value + "\r\n";
     }
     string? body = req.body;
     if (body is string) {
-        request = request + "Content-Length: " + body.length().toString() + "\r\n" + "\r\n" + body;
+        request = request + "Content-Length: " + body.length().toString() + "\r\n\r\n" + body;
     }
+    io:println(request);
+    return request.toBytes();
+}
 
-    return request;
+function sendRequest(tcp:Client socketClient, byte[] req) returns error? {
+    check socketClient->writeBytes(req);
 }
 
 function createResponseRecord(string resp, string? body) {
     string[] respArr = regex:split(resp, "\r\n");
     map<string> headersMap = {};
-    string[] filtered = respArr.filter(i => !(i.startsWith("HTTP/1.1")) && i.includes(":", 0));
+    string[] filtered = respArr.filter(i => !(i.startsWith("HTTP")) && i.includes(":", 0));
     foreach string header in filtered {
         string[] keyValue = regex:split(header, ":");
         headersMap[keyValue[0]] = keyValue[1];
     }
-    response = {
+    string status = respArr[0].substring(9, respArr[0].length());
+    string httpVersion = respArr[0].startsWith("HTTP/1.1") ? "HTTP/1.1" : "HTTP/2.0";
+    Response response = {
         headers: headersMap,
-        body: body
+        body: body,
+        status: status,
+        HttpVersion: httpVersion
     };
 }
