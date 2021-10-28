@@ -32,7 +32,7 @@ type Request record {
 };
 
 enum Method {
-    POST, GET
+    POST
 }
 
 public enum HttpVersion {
@@ -161,4 +161,3 @@ service class EchoService {
         };
     }
 }
-
