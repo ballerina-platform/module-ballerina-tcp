@@ -37,7 +37,7 @@ public enum HttpVersion {
 }
 
 type Response record {
-    map<string> headers?;
+    map<string> headers;
     string? body = ();
     string status;
     string HttpVersion;
