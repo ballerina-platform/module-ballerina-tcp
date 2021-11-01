@@ -88,10 +88,10 @@ function receiveResponse(tcp:Client socketClient) returns error? {
     if responseString.startsWith("HTTP/1.1 200") {
         string[] respArr = regex:split(responseString, "\r\n\r\n");
         string[] respHeaders = regex:split(respArr[0], "\r\n");
-        if respArr.length() == 2 {
+        string contLenHeader = respHeaders.filter(i => (i.startsWith("Content-Length")))[0];
+        int contLen = check ints:fromString(regex:split(contLenHeader, ":")[1].trim());
+        if contLen > 0 {
             payload = respArr[1];
-            string contLenHeader = respHeaders.filter(i => (i.startsWith("Content-Length")))[0];
-            int contLen = check ints:fromString(regex:split(contLenHeader, ":")[1].trim());
             int remainingBytes = contLen - (<string>payload).length();
 
             while remainingBytes > 0 {

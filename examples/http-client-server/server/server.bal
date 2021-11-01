@@ -103,9 +103,11 @@ service class EchoService {
             string[] keyValue = regex:split(header, ":");
             self.headersMap[keyValue[0]] = keyValue[1];
         }
-        string contLen = self.headersMap.get("Content-Length");
-        self.payloadLength = check ints:fromString(contLen.trim());
-        if headerAndBodyArr.length() == 2 {
+        string contLenHeader = self.headersMap.get("Content-Length");
+        int contLength = check ints:fromString(contLenHeader.trim());
+
+        if contLength > 0 {
+            self.payloadLength = contLength;
             self.status = RECEIVING_BODY;
             byte[] body = headerAndBodyArr[1].toBytes();
             check self.parseBody(body);
