@@ -2,6 +2,10 @@
 org = "ballerina"
 name = "tcp"
 version = "1.0.1"
+authors = ["Ballerina"]
+keywords = ["network", "socket", "service", "client"]
+repository = "https://github.com/ballerina-platform/module-ballerina-tcp"
+license = ["Apache-2.0"]
 distribution = "slbeta3"
 
 [[platform.java11.dependency]]
