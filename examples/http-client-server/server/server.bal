@@ -23,14 +23,6 @@ enum stateMachine {
     WAITING, RECEIVING_BODY, RECEIVED_BODY
 }
 
-type Request record {
-    map<string> headers;
-    string? body;
-    string HttpVersion = HTTP_1_1;
-    string Method = POST;
-    string path;
-};
-
 enum Method {
     POST
 }
@@ -39,6 +31,14 @@ public enum HttpVersion {
     HTTP_1_1,
     HTTP_2
 }
+
+type Request record {
+    map<string> headers;
+    string? body = ();
+    string HttpVersion = HTTP_1_1;
+    string Method = POST;
+    string path;
+};
 
 type Response record {
     map<string> headers;
@@ -49,11 +49,11 @@ type Response record {
 
 service on new tcp:Listener(3000) {
     remote function onConnect(tcp:Caller caller) returns tcp:ConnectionService {
-        return new EchoService();
+        return new EchoHttpService();
     }
 }
 
-service class EchoService {
+service class EchoHttpService {
 
     private string status = WAITING;
     private string? payload = ();
@@ -72,7 +72,13 @@ service class EchoService {
             lock {
                 self.headersMap = {"Connection" : "close"};
             }
-            byte[] response = self.serializeResponse();
+            Response responseRecord = {
+                headers: self.headersMap,
+                body: self.payload, 
+                status: self.httpStatus,
+                HttpVersion: self.httpVersion
+            };
+            byte[] response = self.serializeResponse(responseRecord, self.payload);
             check self.sendResponse(caller, response);
         } else {
             io:println(request);
@@ -86,8 +92,14 @@ service class EchoService {
                     }
                 }
                 if self.status == RECEIVED_BODY {
-                    self.createRequestRecord();
-                    byte[] response = self.serializeResponse();
+                    self.createRequestRecord(self.headersMap, self.payload, self.httpStatus, self.httpVersion);
+                    Response responseRecord = {
+                        headers: self.headersMap,
+                        body: self.payload, 
+                        status: self.httpStatus,
+                        HttpVersion: self.httpVersion
+                    };
+                    byte[] response = self.serializeResponse(responseRecord, self.payload);
                     check self.sendResponse(caller, response);
                 }
             }
@@ -132,19 +144,13 @@ service class EchoService {
         }
     }
 
-    isolated function serializeResponse() returns byte[] {
-        Response response = {
-            headers: self.headersMap,
-            body: self.payload, 
-            status: self.httpStatus,
-            HttpVersion: self.httpVersion
-        };
+    isolated function serializeResponse(Response response, string? payload) returns byte[] {
         string serliazedResponse = response.HttpVersion + " " + response.status;
         foreach var [k, v] in response.headers.entries() {
             serliazedResponse = serliazedResponse + "\r\n" + k + ":" + v;
         }
-        if self.payload is string {
-            serliazedResponse = serliazedResponse + "\r\n\r\n" + <string> self.payload;
+        if payload is string {
+            serliazedResponse = serliazedResponse + "\r\n\r\n" + <string> payload;
         }
         io:println(serliazedResponse);
         return serliazedResponse.toBytes();
@@ -154,12 +160,12 @@ service class EchoService {
         check caller->writeBytes(response);
     }
 
-    isolated function createRequestRecord() {
+    isolated function createRequestRecord(map<string> headersMap, string? payload, string httpStatus, string httpVersion) {
         Request request = {
-            headers: self.headersMap,
-            body: self.payload, 
-            path: self.httpStatus,
-            HttpVersion: self.httpVersion
+            headers: headersMap,
+            body: payload, 
+            path: httpStatus,
+            HttpVersion: httpVersion
         };
     }
 }

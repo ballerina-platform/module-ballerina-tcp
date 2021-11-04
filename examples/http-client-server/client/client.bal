@@ -19,14 +19,6 @@ import ballerina/lang.'int as ints;
 import ballerina/regex;
 import ballerina/tcp;
 
-type Request record {
-    map<string> headers;
-    string body;
-    string HttpVersion = HTTP_1_1;
-    string Method = POST;
-    string path;
-};
-
 enum Method {
     POST
 }
@@ -36,12 +28,21 @@ public enum HttpVersion {
     HTTP_2
 }
 
+type Request record {
+    map<string> headers;
+    string body;
+    string HttpVersion = HTTP_1_1;
+    string Method = POST;
+    string path;
+};
+
 type Response record {
     map<string> headers;
     string? body = ();
     string status;
     string HttpVersion;
 };
+
 public function main() returns error? {
     map<string> headersMap = { "Host": "foo.example", "Content-Type": "text/plain", "custom-header": "header1" };
 
