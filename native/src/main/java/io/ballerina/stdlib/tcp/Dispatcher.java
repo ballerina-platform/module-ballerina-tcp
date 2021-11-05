@@ -98,13 +98,10 @@ public class Dispatcher {
     private static BObject createClient(Channel channel, TcpService tcpService) {
         InetSocketAddress remoteAddress = (InetSocketAddress) channel.remoteAddress();
         InetSocketAddress localAddress = (InetSocketAddress) channel.localAddress();
-        final BObject caller = ValueCreator.createObjectValue(Utils.getTcpPackage(), Constants.CALLER);
-        caller.set(StringUtils.fromString(Constants.CALLER_REMOTE_PORT), remoteAddress.getPort());
-        caller.set(StringUtils.fromString(Constants.CALLER_REMOTE_HOST),
-                StringUtils.fromString(remoteAddress.getHostName()));
-        caller.set(StringUtils.fromString(Constants.CALLER_LOCAL_PORT), localAddress.getPort());
-        caller.set(StringUtils.fromString(Constants.CALLER_LOCAL_HOST),
-                StringUtils.fromString(localAddress.getHostName()));
+        final BObject caller = ValueCreator.createObjectValue(Utils.getTcpPackage(), Constants.CALLER,
+                StringUtils.fromString(remoteAddress.getHostName()), remoteAddress.getPort(),
+                StringUtils.fromString(localAddress.getHostName()),
+                localAddress.getPort(), StringUtils.fromString(channel.id().asLongText()));
         caller.addNativeData(Constants.CHANNEL, channel);
         caller.addNativeData(Constants.SERVICE, tcpService);
         caller.addNativeData(Constants.CALLER_ID, channel.id().asLongText());

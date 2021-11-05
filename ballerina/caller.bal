@@ -22,15 +22,23 @@ import ballerina/jballerina.java;
 # + remotePort - The port number of the remote host
 # + localHost - The bound hostname
 # + localPort - The port number to which the socket is bound
-public client class Caller {
+# + id - The unique ID associated with the connection
+public isolated client class Caller {
 
-  public string remoteHost = "";
-  public int remotePort = -1;
-  public string localHost = "";
-  public int localPort = -1;
+  public final string remoteHost;
+  public final int remotePort;
+  public final string localHost;
+  public final int localPort;
+  public final string id;
 
   // package level private init() to prevent object creation
-  isolated function init(){ }
+  isolated function init(string remoteHost, int remotePort, string localHost, int localPort, string id) {
+      self.remoteHost = remoteHost;
+      self.remotePort = remotePort;
+      self.localHost = localHost;
+      self.localPort = localPort;
+      self.id = id;
+  }
 
   # Sends the response as byte[] to the same remote host.
   # 
@@ -49,12 +57,4 @@ public client class Caller {
       name: "externClose",
       'class: "io.ballerina.stdlib.tcp.nativelistener.Caller"
   } external;
-
-  # Gives the connection id associated with the connection.
-  #
-  # + return - The unique ID associated with the connection
-  public isolated function getId() returns string = @java:Method {
-      'class: "io.ballerina.stdlib.tcp.Utils"
-  } external;
-
 }
