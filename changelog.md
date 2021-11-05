@@ -7,6 +7,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Added
 - [Add an API to the Caller to get the unique connection id](https://github.com/ballerina-platform/ballerina-standard-library/issues/2131)
+- [Make the tcp caller isolated](https://github.com/ballerina-platform/ballerina-standard-library/issues/2251)
 
 ## [1.2.0-beta.3] - 2021-10-10
 
