@@ -169,7 +169,7 @@ service class HelloService {
 service class HiService {
 
     remote function onBytes(Caller caller, readonly & byte[] data) returns Error? {
-        conId = caller.getId();
+        conId = caller.id;
         check caller->writeBytes("Hi".toBytes());
     }
 }
