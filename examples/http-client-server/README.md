@@ -1,4 +1,4 @@
-# HTTP Echo Example
+# HTTP Echo Server
 
 ## Overview
 
