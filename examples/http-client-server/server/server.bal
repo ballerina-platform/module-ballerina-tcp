@@ -67,7 +67,7 @@ service class EchoHttpService {
         lock {
             self.httpStatus = request is error ? "404 Bad Request" : "200 Ok";
         }
-        if (request is error) {
+        if request is error {
             io:println("Error in request", request.message());
             lock {
                 self.headersMap = {"Connection" : "close"};
