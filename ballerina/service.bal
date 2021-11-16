@@ -15,12 +15,12 @@
 // under the License.
 
 # Represent TCP Listener service type.
-public type Service service object {
+public type Service distinct service object {
   remote function onConnect(Caller caller) returns ConnectionService|Error?;
 };
 
 # Represent TCP Listener ConnectionService service type.
-public type ConnectionService service object {
+public type ConnectionService distinct service object {
   // ConnectionService can have these optional remote methods
   // remote function onError(readonly & Error err) returns Error?;
   // remote function onBytes(readonly & byte[] data) returns byte[]|Error?;
