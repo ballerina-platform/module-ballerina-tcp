@@ -54,6 +54,7 @@ service on new tcp:Listener(3000) {
 }
 
 service class EchoHttpService {
+    *tcp:ConnectionService;
 
     private string status = WAITING;
     private string? payload = ();

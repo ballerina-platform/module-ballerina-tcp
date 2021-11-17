@@ -9,7 +9,7 @@ service on 'listener {
 }
 
 service isolated class EchoServer {
-    *tcp:ConnectionService;
+    *t:ConnectionService;
 
     remote function onBytes(readonly & byte[] data) returns byte[] {
         return data;
