@@ -1,6 +1,6 @@
 ## Overview
 
-This module provides APIs for sending/receiving messages to/from another application process (local or remote) over connection-oriented TCP protocol.
+This module provides APIs for sending/receiving messages to/from another application process (local or remote) over the connection-oriented TCP protocol.
 
 #### Client
 
