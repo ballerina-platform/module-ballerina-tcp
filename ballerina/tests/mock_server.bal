@@ -47,6 +47,7 @@ service on echoServer {
 }
 
 service class EchoService {
+    *ConnectionService;
 
     remote function onBytes(Caller caller, readonly & byte[] data) returns Error? {
         io:println("Echo: ", 'string:fromBytes(data));
@@ -71,6 +72,7 @@ service on discardServer {
 }
 
 service class DiscardService {
+    *ConnectionService;
 
     remote function onBytes(readonly & byte[] data) returns Error? {
         // read and discard the message
@@ -93,6 +95,8 @@ service on errorServer {
 }
 
 service class ErrorService {
+    *ConnectionService;
+
     remote function onBytes(Service obj, readonly & byte[] data) returns Error? {
     }
 
@@ -128,6 +132,7 @@ service on new Listener(PORT4, secureSocket = {
 }
 
 service class SecureEchoService {
+    *ConnectionService;
 
     remote function onBytes(readonly & byte[] data) returns byte[] {
         io:println("Echo: ", 'string:fromBytes(data));
@@ -150,6 +155,7 @@ service on new Listener(PORT5) {
 }
 
 service class BigDataService {
+    *ConnectionService;
 
     remote function onBytes(Caller caller, readonly & byte[] data) returns Error? {
         io:println("Received: ", 'string:fromBytes(data));
@@ -160,6 +166,7 @@ service class BigDataService {
 }
 
 service class HelloService {
+    *ConnectionService;
 
     remote function onBytes(Caller caller, readonly & byte[] data) returns Error? {
         check caller->writeBytes("Hello".toBytes());
@@ -167,6 +174,7 @@ service class HelloService {
 }
 
 service class HiService {
+    *ConnectionService;
 
     remote function onBytes(Caller caller, readonly & byte[] data) returns Error? {
         conId = caller.id;

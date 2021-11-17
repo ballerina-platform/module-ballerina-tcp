@@ -7,6 +7,8 @@ service on new tcp:Listener(3000) {
 }
 
 service isolated class EchoService {
+    *tcp:ConnectionService;
+
     remote function onError(tcp:Error err) returns tcp:Error? {
         return ();
     }
