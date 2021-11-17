@@ -8,6 +8,7 @@ service on new t:Listener(3000) {
 }
 
 service isolated class EchoService {
+    *t:ConnectionService;
 
     remote function onBytes(readonly & byte[] data) returns byte[] {
         return data;
