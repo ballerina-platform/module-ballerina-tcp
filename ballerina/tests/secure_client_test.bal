@@ -36,7 +36,6 @@ function testProtocolVersion() returns @tainted error? {
 
     if (socketClient is Client) {
         test:assertFail(msg = "Server only support TLSv1.2 initialization should fail.");
-        check socketClient->close();
     }
     io:println("SecureClient: ", socketClient);
 }
