@@ -54,7 +54,6 @@ function testCiphers() returns @tainted error? {
 
     if (socketClient is Client) {
         test:assertFail(msg = "Server only support TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA cipher initialization should fail.");
-        check socketClient->close();
     }
     io:println("SecureClient: ", socketClient);
 }
