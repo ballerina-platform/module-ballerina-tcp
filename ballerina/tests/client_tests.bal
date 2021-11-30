@@ -57,9 +57,7 @@ function testClientReadTimeout() returns  @tainted error? {
     check socketClient->writeBytes(msgByteArray);
 
     Error|(readonly & byte[]) res = socketClient->readBytes();
-    if (res is (readonly & byte[])) {
-        test:assertFail(msg = "Read timeout test failed");
-    }
+    test:assertFalse(res is (readonly & byte[]), msg = "Read timeout test failed");
     // print expected timeout error
     io:println(res);
 
@@ -71,9 +69,7 @@ function testServerAlreadyClosed() returns  @tainted error? {
     Client socketClient = check new ("localhost", PORT3, timeout = 0.1);
 
     Error|(readonly & byte[]) res = socketClient->readBytes();
-    if (res is (readonly & byte[])) {
-        test:assertFail(msg = "Test for server already disconnected failed");
-    }
+    test:assertFalse(res is (readonly & byte[]), msg = "Test for server already disconnected failed");
     // print expected error
     io:println(res);
 

@@ -34,9 +34,7 @@ function testProtocolVersion() returns @tainted error? {
         ciphers: ["TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA"]
     });
 
-    if (socketClient is Client) {
-        test:assertFail(msg = "Server only support TLSv1.2 initialization should fail.");
-    }
+    test:assertFalse(socketClient is Client, msg = "Server only support TLSv1.2 initialization should fail");
     io:println("SecureClient: ", socketClient);
 }
 
@@ -51,9 +49,7 @@ function testCiphers() returns @tainted error? {
         ciphers: ["TLS_RSA_WITH_AES_128_CBC_SHA"] // server only support TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA write should fail
     });
 
-    if (socketClient is Client) {
-        test:assertFail(msg = "Server only support TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA cipher initialization should fail.");
-    }
+    test:assertFalse(socketClient is Client, msg = "Server only support TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA cipher initialization should fail");
     io:println("SecureClient: ", socketClient);
 }
 
