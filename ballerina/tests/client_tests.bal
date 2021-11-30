@@ -23,8 +23,9 @@ function setup() returns error? {
     check startEchoServer();
 }
 
-@test:Config {}
+@test:Config {enable: false}
 function testClientEcho() returns @tainted error? {
+    io:println("-------------------------------------testClientEcho---------------------");
     Client socketClient = check new ("localhost", 3000);
 
     string msg = "Hello Ballerina Echo from client";
@@ -37,8 +38,9 @@ function testClientEcho() returns @tainted error? {
     check socketClient->close();
 }
 
-@test:Config {dependsOn: [testClientEcho]}
+@test:Config {dependsOn: [testClientEcho], enable: false}
 function testInvalidNeworkInterface() returns @tainted error? {
+    io:println("-------------------------------------testInvalidNeworkInterface---------------------");
     Client|Error? socketClient = new ("localhost", 3000, localHost = "invalid");
 
     if (socketClient is Error) {
@@ -48,8 +50,9 @@ function testInvalidNeworkInterface() returns @tainted error? {
     }
 }
 
-@test:Config {dependsOn: [testInvalidNeworkInterface]}
+@test:Config {dependsOn: [testInvalidNeworkInterface], enable: false}
 function testClientReadTimeout() returns  @tainted error? {
+    io:println("-------------------------------------testClientReadTimeout---------------------");
     Client socketClient = check new ("localhost", PORT2, timeout = 0.1);
 
     string msg = "Do not reply";
@@ -67,8 +70,9 @@ function testClientReadTimeout() returns  @tainted error? {
     check socketClient->close();
 }
 
-@test:Config {dependsOn: [testClientReadTimeout]}
+@test:Config {dependsOn: [testClientReadTimeout], enable: false}
 function testServerAlreadyClosed() returns  @tainted error? {
+    io:println("-------------------------------------testServerAlreadyClosed---------------------");
     Client socketClient = check new ("localhost", PORT3, timeout = 0.1);
 
     Error|(readonly & byte[]) res = socketClient->readBytes();
@@ -84,6 +88,7 @@ function testServerAlreadyClosed() returns  @tainted error? {
 
 @test:AfterSuite {}
 function stopAll() returns error? {
+    io:println("--------------------Executing after suite client_tests-------------");
     check stopEchoServer();
 }
 
