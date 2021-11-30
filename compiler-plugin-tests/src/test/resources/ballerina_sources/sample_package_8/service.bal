@@ -12,6 +12,7 @@ service on new tcp:Listener(3000) {
 }
 
 service isolated class EchoService {
+    *tcp:ConnectionService;
 
     remote function onBytes(readonly & byte[] data) returns byte[] {
         return data;
