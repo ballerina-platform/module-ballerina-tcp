@@ -6,5 +6,5 @@ spec:
   template:
     spec:
       containers:
-      - name: "http-server"
+      - name: "http-server-deployment"
         imagePullPolicy: Always
