@@ -10,7 +10,7 @@ on:
         required: false
       clusterName:
         description: 'Cluster name'
-        default: 'bal-perf-cluster-test'
+        default: 'tcp-perf-cluster-test'
         required: false
 
 jobs:
