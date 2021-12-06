@@ -1,0 +1,8 @@
+[package]
+org = "wso2"
+name = "http_server"
+version = "0.0.1"
+
+[build-options]
+observabilityIncluded = false
+cloud = "k8s"
