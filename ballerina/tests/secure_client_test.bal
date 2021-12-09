@@ -139,7 +139,7 @@ isolated function testSecureClientWithInvalidCertPath() returns @tainted error? 
         ciphers: ["TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA"]
     });
     
-    if (socketClient is Client) {
+    if socketClient is Client {
         test:assertFail(msg = "Invalid trustore path provided initialization should fail.");
     } else {
         io:println(socketClient.message());
@@ -155,7 +155,7 @@ isolated function testSecureClientWithEmtyTrustStore() returns @tainted error? {
         }
     });
 
-    if (socketClient is Client) {
+    if socketClient is Client {
         test:assertFail(msg = "Empty trustore path provided, initialization should fail.");
     } else {
         test:assertEquals(socketClient.message(), "TrustStore file location must be provided for secure connection");
@@ -171,7 +171,7 @@ function testSecureClientWithEmtyTrustStorePassword() returns @tainted error? {
         }
     });
 
-    if (socketClient is Client) {
+    if socketClient is Client {
         test:assertFail(msg = "Empty trustore password provided, initialization should fail.");
     } else {
         test:assertEquals(socketClient.message(), "TrustStore password must be provided for secure connection");
@@ -184,7 +184,7 @@ function testSecureClientWithEmtyCert() returns @tainted error? {
         cert: ""
     });
 
-    if (socketClient is Client) {
+    if socketClient is Client {
         test:assertFail(msg = "Empty trustore password provided, initialization should fail.");
     } else {
         test:assertEquals(socketClient.message(), "Certificate file location must be provided for secure connection");

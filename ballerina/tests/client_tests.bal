@@ -41,7 +41,7 @@ function testClientEcho() returns @tainted error? {
 function testInvalidNeworkInterface() returns @tainted error? {
     Client|Error? socketClient = new ("localhost", 3000, localHost = "invalid");
 
-    if (socketClient is Error) {
+    if socketClient is Error {
         io:println(socketClient);
     } else {
         test:assertFail(msg = "Invalid network interface name provided, initializing client should result in an error");

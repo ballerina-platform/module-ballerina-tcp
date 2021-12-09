@@ -41,7 +41,7 @@ function testListenerSendingBigData() returns @tainted error? {
     int totalSize = 0;
 
     readonly & byte[] response;
-    while (totalSize < BIG_DATA_SIZE) {
+    while totalSize < BIG_DATA_SIZE {
         response = check socketClient->readBytes();
         totalSize += response.length();
     }
