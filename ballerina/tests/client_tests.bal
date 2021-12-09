@@ -24,7 +24,7 @@ function setup() returns error? {
 }
 
 @test:Config {}
-function testClientEcho() returns @tainted error? {
+function testClientEcho() returns error? {
     Client socketClient = check new ("localhost", 3000);
 
     string msg = "Hello Ballerina Echo from client";
@@ -38,7 +38,7 @@ function testClientEcho() returns @tainted error? {
 }
 
 @test:Config {dependsOn: [testClientEcho]}
-function testInvalidNeworkInterface() returns @tainted error? {
+function testInvalidNeworkInterface() returns error? {
     Client|Error? socketClient = new ("localhost", 3000, localHost = "invalid");
 
     if socketClient is Error {
@@ -49,7 +49,7 @@ function testInvalidNeworkInterface() returns @tainted error? {
 }
 
 @test:Config {dependsOn: [testInvalidNeworkInterface]}
-function testClientReadTimeout() returns  @tainted error? {
+function testClientReadTimeout() returns error? {
     Client socketClient = check new ("localhost", PORT2, timeout = 0.1);
 
     string msg = "Do not reply";
@@ -65,7 +65,7 @@ function testClientReadTimeout() returns  @tainted error? {
 }
 
 @test:Config {dependsOn: [testClientReadTimeout]}
-function testServerAlreadyClosed() returns  @tainted error? {
+function testServerAlreadyClosed() returns error? {
     Client socketClient = check new ("localhost", PORT3, timeout = 0.1);
 
     Error|(readonly & byte[]) res = socketClient->readBytes();

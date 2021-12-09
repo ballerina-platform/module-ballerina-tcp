@@ -24,7 +24,7 @@ function setupServer() returns error? {
 }
 
 @test:Config {dependsOn: [testListenerEcho], enable: true}
-function testProtocolVersion() returns @tainted error? {
+function testProtocolVersion() returns error? {
     Error|Client socketClient = new ("localhost", 9002, secureSocket = {
         cert: certPath,
         protocol: {
@@ -39,7 +39,7 @@ function testProtocolVersion() returns @tainted error? {
 }
 
 @test:Config {dependsOn: [testProtocolVersion], enable: true}
-function testCiphers() returns @tainted error? {
+function testCiphers() returns error? {
     Error|Client socketClient = new ("localhost", 9002, secureSocket = {
         cert: certPath,
         protocol: {
@@ -54,7 +54,7 @@ function testCiphers() returns @tainted error? {
 }
 
 @test:Config {dependsOn: [testCiphers], enable: true}
-function testSecureClientEcho() returns @tainted error? {
+function testSecureClientEcho() returns error? {
     Client socketClient = check new ("localhost", 9002, secureSocket = {
         cert: certPath,
         protocol: {
@@ -75,7 +75,7 @@ function testSecureClientEcho() returns @tainted error? {
 }
 
 @test:Config {dependsOn: [testSecureClientEcho], enable: true}
-function testSecureClientWithTruststore() returns @tainted error? {
+function testSecureClientWithTruststore() returns error? {
     Client socketClient = check new ("localhost", PORT7, secureSocket = {
         cert: {
             path: truststore,
@@ -101,7 +101,7 @@ function testSecureClientWithTruststore() returns @tainted error? {
 }
 
 @test:Config {dependsOn: [testSecureClientEcho], enable: true}
-function testSecureSocketConfigEnableFalse() returns @tainted error? {
+function testSecureSocketConfigEnableFalse() returns error? {
     Client socketClient = check new ("localhost", PORT1, secureSocket = {
         enable: false,
         cert: {
@@ -126,7 +126,7 @@ function testSecureSocketConfigEnableFalse() returns @tainted error? {
 }
 
 @test:Config {dependsOn: [testSecureSocketConfigEnableFalse], enable: true}
-isolated function testSecureClientWithInvalidCertPath() returns @tainted error? {
+isolated function testSecureClientWithInvalidCertPath() returns error? {
     Error|Client socketClient = new ("localhost", 9002, secureSocket = {
         cert: {
             path: "invalid",
@@ -147,7 +147,7 @@ isolated function testSecureClientWithInvalidCertPath() returns @tainted error? 
 }
 
 @test:Config {}
-isolated function testSecureClientWithEmtyTrustStore() returns @tainted error? {
+isolated function testSecureClientWithEmtyTrustStore() returns error? {
     Error|Client socketClient = new ("localhost", 9002, secureSocket = {
         cert: {
             path: "",
@@ -163,7 +163,7 @@ isolated function testSecureClientWithEmtyTrustStore() returns @tainted error? {
 }
 
 @test:Config {}
-function testSecureClientWithEmtyTrustStorePassword() returns @tainted error? {
+function testSecureClientWithEmtyTrustStorePassword() returns error? {
     Error|Client socketClient = new ("localhost", 9002, secureSocket = {
         cert: {
             path: truststore,
@@ -179,7 +179,7 @@ function testSecureClientWithEmtyTrustStorePassword() returns @tainted error? {
 }
 
 @test:Config {}
-function testSecureClientWithEmtyCert() returns @tainted error? {
+function testSecureClientWithEmtyCert() returns error? {
     Error|Client socketClient = new ("localhost", 9002, secureSocket = {
         cert: ""
     });

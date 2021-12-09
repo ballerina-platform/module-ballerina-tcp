@@ -19,7 +19,7 @@ import ballerina/lang.runtime as runtime;
 import ballerina/io;
 
 @test:Config {dependsOn: [testServerAlreadyClosed]}
-function testListenerEcho() returns @tainted error? {
+function testListenerEcho() returns error? {
     Client socketClient = check new ("localhost", PORT1);
 
     string msg = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam sit amet egestas neque.";
@@ -32,7 +32,7 @@ function testListenerEcho() returns @tainted error? {
 }
 
 @test:Config {dependsOn: [testServerAlreadyClosed]}
-function testListenerSendingBigData() returns @tainted error? {
+function testListenerSendingBigData() returns error? {
     Client socketClient = check new ("localhost", PORT5);
 
     string msg = "send the data";
@@ -52,7 +52,7 @@ function testListenerSendingBigData() returns @tainted error? {
 }
 
 @test:Config {dependsOn: [testSecureListenerWithUnsuportedClientProtocol]}
-function testListenerDetach() returns @tainted error? {
+function testListenerDetach() returns error? {
     Client socketClient = check new ("localhost", PORT6);
 
     check socketClient->writeBytes("What service is this?".toBytes());
@@ -89,7 +89,7 @@ function testListenerDetach() returns @tainted error? {
 }
 
 @test:Config {dependsOn: [testListenerDetach]}
-function testServiceOnErrorWhenDispatching() returns @tainted error? {
+function testServiceOnErrorWhenDispatching() returns error? {
     Client socketClient = check new ("localhost", PORT8);
     check socketClient->writeBytes("What service is this?".toBytes());
     runtime:sleep(5);

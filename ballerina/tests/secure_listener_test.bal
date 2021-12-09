@@ -18,7 +18,7 @@ import ballerina/test;
 import ballerina/io;
 
 @test:Config {dependsOn: [testSecureClientEcho], enable: true}
-function testSecureListenerWithSecureClient() returns @tainted error? {
+function testSecureListenerWithSecureClient() returns error? {
     Client socketClient = check new ("localhost", PORT4, secureSocket = {
         cert: certPath,
         protocol: {
@@ -39,7 +39,7 @@ function testSecureListenerWithSecureClient() returns @tainted error? {
 }
 
 @test:Config {dependsOn: [testSecureListenerWithSecureClient], enable: true }
-function testSecureListenerWithClient() returns @tainted error? {
+function testSecureListenerWithClient() returns error? {
     Client socketClient = check new ("localhost", PORT4);
 
     // This is not a secureClient since this is not a handshake msg,
@@ -57,7 +57,7 @@ function testSecureListenerWithClient() returns @tainted error? {
 }
 
 @test:Config {dependsOn: [testSecureListenerWithClient]}
-function testSecureListenerWithUnsuportedClientProtocol() returns @tainted error? {
+function testSecureListenerWithUnsuportedClientProtocol() returns error? {
     Error|Client socketClient = new ("localhost", PORT4, secureSocket = {
         cert: certPath,
         protocol: {
