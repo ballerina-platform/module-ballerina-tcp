@@ -17,7 +17,7 @@
 import ballerina/test;
 import ballerina/io;
 
-@test:Config {dependsOn: [testSecureClientEcho], enable: true}
+@test:Config {dependsOn: [testSecureClientEcho]}
 function testSecureListenerWithSecureClient() returns error? {
     Client socketClient = check new ("localhost", PORT4, secureSocket = {
         cert: certPath,
@@ -38,7 +38,7 @@ function testSecureListenerWithSecureClient() returns error? {
     check socketClient->close();
 }
 
-@test:Config {dependsOn: [testSecureListenerWithSecureClient], enable: true }
+@test:Config {dependsOn: [testSecureListenerWithSecureClient]}
 function testSecureListenerWithClient() returns error? {
     Client socketClient = check new ("localhost", PORT4);
 

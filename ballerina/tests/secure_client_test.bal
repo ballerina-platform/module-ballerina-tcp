@@ -23,7 +23,7 @@ function setupServer() returns error? {
     check startSecureServer();
 }
 
-@test:Config {dependsOn: [testListenerEcho], enable: true}
+@test:Config {dependsOn: [testListenerEcho]}
 function testProtocolVersion() returns error? {
     Error|Client socketClient = new ("localhost", 9002, secureSocket = {
         cert: certPath,
@@ -38,7 +38,7 @@ function testProtocolVersion() returns error? {
     io:println("SecureClient: ", socketClient);
 }
 
-@test:Config {dependsOn: [testProtocolVersion], enable: true}
+@test:Config {dependsOn: [testProtocolVersion]}
 function testCiphers() returns error? {
     Error|Client socketClient = new ("localhost", 9002, secureSocket = {
         cert: certPath,
@@ -53,7 +53,7 @@ function testCiphers() returns error? {
     io:println("SecureClient: ", socketClient);
 }
 
-@test:Config {dependsOn: [testCiphers], enable: true}
+@test:Config {dependsOn: [testCiphers]}
 function testSecureClientEcho() returns error? {
     Client socketClient = check new ("localhost", 9002, secureSocket = {
         cert: certPath,
@@ -74,7 +74,7 @@ function testSecureClientEcho() returns error? {
     check socketClient->close();
 }
 
-@test:Config {dependsOn: [testSecureClientEcho], enable: true}
+@test:Config {dependsOn: [testSecureClientEcho]}
 function testSecureClientWithTruststore() returns error? {
     Client socketClient = check new ("localhost", PORT7, secureSocket = {
         cert: {
@@ -100,7 +100,7 @@ function testSecureClientWithTruststore() returns error? {
     check socketClient->close();
 }
 
-@test:Config {dependsOn: [testSecureClientEcho], enable: true}
+@test:Config {dependsOn: [testSecureClientEcho]}
 function testSecureSocketConfigEnableFalse() returns error? {
     Client socketClient = check new ("localhost", PORT1, secureSocket = {
         enable: false,
@@ -125,7 +125,7 @@ function testSecureSocketConfigEnableFalse() returns error? {
    check socketClient->close();
 }
 
-@test:Config {dependsOn: [testSecureSocketConfigEnableFalse], enable: true}
+@test:Config {dependsOn: [testSecureSocketConfigEnableFalse]}
 isolated function testSecureClientWithInvalidCertPath() returns error? {
     Error|Client socketClient = new ("localhost", 9002, secureSocket = {
         cert: {

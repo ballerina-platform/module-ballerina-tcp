@@ -39,7 +39,7 @@ function testClientEcho() returns error? {
 
 @test:Config {dependsOn: [testClientEcho]}
 function testInvalidNeworkInterface() returns error? {
-    Client|Error? socketClient = new ("localhost", 3000, localHost = "invalid");
+    Client|Error socketClient = new ("localhost", 3000, localHost = "invalid");
 
     if socketClient is Error {
         io:println(socketClient);
