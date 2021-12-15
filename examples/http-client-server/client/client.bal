@@ -71,7 +71,7 @@ function serializeRequest(Request req) returns byte[] {
         request = request + key + ": " + value + "\r\n";
     }
     string? body = req.body;
-    if (body is string) {
+    if body is string {
         request = request + "Content-Length: " + body.length().toString() + "\r\n\r\n" + body;
     }
     io:println(request);
