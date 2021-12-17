@@ -17,9 +17,8 @@
 import ballerina/test;
 import ballerina/io;
 
-@test:Config {dependsOn: [testSecureClientEcho], enable: false}
-function testSecureListenerWithSecureClient() returns @tainted error? {
-    io:println("-------------------------------------testSecureListenerWithSecureClient---------------------");
+@test:Config {dependsOn: [testSecureClientEcho]}
+function testSecureListenerWithSecureClient() returns error? {
     Client socketClient = check new ("localhost", PORT4, secureSocket = {
         cert: certPath,
         protocol: {
@@ -39,9 +38,8 @@ function testSecureListenerWithSecureClient() returns @tainted error? {
     check socketClient->close();
 }
 
-@test:Config {dependsOn: [testSecureListenerWithSecureClient], enable: false }
-function testSecureListenerWithClient() returns @tainted error? {
-    io:println("-------------------------------------testSecureListenerWithClient---------------------");
+@test:Config {dependsOn: [testSecureListenerWithSecureClient]}
+function testSecureListenerWithClient() returns error? {
     Client socketClient = check new ("localhost", PORT4);
 
     // This is not a secureClient since this is not a handshake msg,
@@ -49,7 +47,7 @@ function testSecureListenerWithClient() returns @tainted error? {
     check socketClient->writeBytes("msg".toBytes());
 
     Error|(readonly & byte[]) response = socketClient->readBytes();
-    if (response is readonly & byte[]) {
+    if response is readonly & byte[] {
         test:assertFail(msg = "Accessing secure server without secure client configuratoin, read should fail.");
     } else {
         io:println(response);
@@ -58,9 +56,8 @@ function testSecureListenerWithClient() returns @tainted error? {
     check socketClient->close();
 }
 
-@test:Config {dependsOn: [testSecureListenerWithClient], enable: false}
-function testSecureListenerWithUnsuportedClientProtocol() returns @tainted error? {
-    io:println("-------------------------------------testSecureListenerWithUnsuportedClientProtocol---------------------");
+@test:Config {dependsOn: [testSecureListenerWithClient]}
+function testSecureListenerWithUnsuportedClientProtocol() returns error? {
     Error|Client socketClient = new ("localhost", PORT4, secureSocket = {
         cert: certPath,
         protocol: {
@@ -70,16 +67,15 @@ function testSecureListenerWithUnsuportedClientProtocol() returns @tainted error
         ciphers: ["TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA"]
     });
 
-    if (socketClient is Client) {
+    if socketClient is Client {
         test:assertFail("Client initialization should fail, server doesn't support SSL protocol");
     } else {
         io:println(socketClient.message());
     }
 }
 
-@test:Config {dependsOn: [testSecureListenerWithUnsuportedClientProtocol], enable: false}
+@test:Config {dependsOn: [testSecureListenerWithUnsuportedClientProtocol]}
 isolated function testListenerWithInvalidCertFilePath() returns error? {
-    io:println("-------------------------------------testListenerWithInvalidCertFilePath---------------------");
     Listener server = check new Listener(9999, secureSocket = {
         key: {
             certFile: "invalid",
@@ -101,7 +97,7 @@ isolated function testListenerWithInvalidCertFilePath() returns error? {
     check server.attach(obj);
     error? res = server.start();
 
-    if (res is ()) {
+    if res is () {
         test:assertFail("Starting the listener should throw error since the provided key values are invalid");
     } else {
         io:print(res.message());
@@ -115,9 +111,8 @@ Service obj = service object {
     }
 };
 
-@test:Config {enable: false}
+@test:Config {}
 function testListenerWithEmptyCertFilePath() returns error? {
-    io:println("-------------------------------------testListenerWithEmptyCertFilePath---------------------");
     Listener server = check new Listener(9999, secureSocket = {
         key: {
             certFile: "",
@@ -127,16 +122,15 @@ function testListenerWithEmptyCertFilePath() returns error? {
 
     check server.attach(obj);
     error? res = server.start();
-    if (res is error) {
+    if res is error {
         test:assertEquals(res.message(), "Certificate file location must be provided for secure connection");
     } else {
         test:assertFail(msg = "Empty cert file provided, initialization should fail.");
     }
 }
 
-@test:Config {enable: false}
+@test:Config {}
 function testListenerWithEmptyKeyFile() returns error? {
-    io:println("-------------------------------------testListenerWithEmptyKeyFile---------------------");
     Listener server = check new Listener(9999, secureSocket = {
         key: {
             certFile: certPath,
@@ -146,16 +140,15 @@ function testListenerWithEmptyKeyFile() returns error? {
 
     check server.attach(obj);
     error? res = server.start();
-    if (res is error) {
+    if res is error {
         test:assertEquals(res.message(), "Private key file location must be provided for secure connection");
     } else {
         test:assertFail(msg = "Empty key file provided, initialization should fail.");
     }
 }
 
-@test:Config {enable: false}
+@test:Config {}
 function testListenerWithEmptyKeyStorePassword() returns error? {
-    io:println("-------------------------------------testListenerWithEmptyKeyStorePassword---------------------");
     Listener server = check new Listener(9999, secureSocket = {
         key: {
             path: keystore,
@@ -165,16 +158,15 @@ function testListenerWithEmptyKeyStorePassword() returns error? {
 
     check server.attach(obj);
     error? res = server.start();
-    if (res is error) {
+    if res is error {
         test:assertEquals(res.message(), "KeyStore password must be provided for secure connection");
     } else {
         test:assertFail(msg = "Empty password provided, initialization should fail.");
     }
 }
 
-@test:Config {enable: false}
+@test:Config {}
 function testListenerWithEmptyKeyStore() returns error? {
-    io:println("-------------------------------------testListenerWithEmptyKeyStore---------------------");
     Listener server = check new Listener(9999, secureSocket = {
         key: {
             path: "",
@@ -184,16 +176,15 @@ function testListenerWithEmptyKeyStore() returns error? {
 
     check server.attach(obj);
     error? res = server.start();
-    if (res is error) {
+    if res is error {
         test:assertEquals(res.message(), "KeyStore file location must be provided for secure connection");
     } else {
         test:assertFail(msg = "Empty Keystore path provided, initialization should fail.");
     }
 }
 
-@test:Config {enable: false}
+@test:Config {}
 function testListenerWithEmptyCiphers() returns error? {
-    io:println("-------------------------------------testListenerWithEmptyCiphers---------------------");
     Listener server = check new Listener(9999, secureSocket = {
         key: {
             path: keystore,
@@ -203,7 +194,7 @@ function testListenerWithEmptyCiphers() returns error? {
 
     check server.attach(obj);
     error? res = server.start();
-    if (res is error) {
+    if res is error {
         test:assertFail(msg = "Without Ciphers. Should work");
     }
 }

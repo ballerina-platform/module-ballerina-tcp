@@ -6,7 +6,7 @@ authors = ["Ballerina"]
 keywords = ["network", "socket", "service", "client"]
 repository = "https://github.com/ballerina-platform/module-ballerina-tcp"
 license = ["Apache-2.0"]
-distribution = "slbeta3"
+distribution = "slbeta6"
 
 [[platform.java11.dependency]]
 path = "../native/build/libs/tcp-native-@project.version@.jar"

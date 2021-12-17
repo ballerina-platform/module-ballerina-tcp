@@ -23,9 +23,8 @@ function setup() returns error? {
     check startEchoServer();
 }
 
-@test:Config {enable: false}
-function testClientEcho() returns @tainted error? {
-    io:println("-------------------------------------testClientEcho---------------------");
+@test:Config {}
+function testClientEcho() returns error? {
     Client socketClient = check new ("localhost", 3000);
 
     string msg = "Hello Ballerina Echo from client";
@@ -38,21 +37,19 @@ function testClientEcho() returns @tainted error? {
     check socketClient->close();
 }
 
-@test:Config {dependsOn: [testClientEcho], enable: false}
-function testInvalidNeworkInterface() returns @tainted error? {
-    io:println("-------------------------------------testInvalidNeworkInterface---------------------");
-    Client|Error? socketClient = new ("localhost", 3000, localHost = "invalid");
+@test:Config {dependsOn: [testClientEcho]}
+function testInvalidNeworkInterface() returns error? {
+    Client|Error socketClient = new ("localhost", 3000, localHost = "invalid");
 
-    if (socketClient is Error) {
+    if socketClient is Error {
         io:println(socketClient);
     } else {
         test:assertFail(msg = "Invalid network interface name provided, initializing client should result in an error");
     }
 }
 
-@test:Config {dependsOn: [testInvalidNeworkInterface], enable: false}
-function testClientReadTimeout() returns  @tainted error? {
-    io:println("-------------------------------------testClientReadTimeout---------------------");
+@test:Config {dependsOn: [testInvalidNeworkInterface]}
+function testClientReadTimeout() returns error? {
     Client socketClient = check new ("localhost", PORT2, timeout = 0.1);
 
     string msg = "Do not reply";
@@ -60,26 +57,19 @@ function testClientReadTimeout() returns  @tainted error? {
     check socketClient->writeBytes(msgByteArray);
 
     Error|(readonly & byte[]) res = socketClient->readBytes();
-    if (res is (readonly & byte[])) {
-        test:assertFail(msg = "Read timeout test failed");
-        io:println(res.length());
-    }
+    test:assertFalse(res is (readonly & byte[]), msg = "Read timeout test failed");
     // print expected timeout error
     io:println(res);
 
     check socketClient->close();
 }
 
-@test:Config {dependsOn: [testClientReadTimeout], enable: false}
-function testServerAlreadyClosed() returns  @tainted error? {
-    io:println("-------------------------------------testServerAlreadyClosed---------------------");
+@test:Config {dependsOn: [testClientReadTimeout]}
+function testServerAlreadyClosed() returns error? {
     Client socketClient = check new ("localhost", PORT3, timeout = 0.1);
 
     Error|(readonly & byte[]) res = socketClient->readBytes();
-    if (res is (readonly & byte[])) {
-        test:assertFail(msg = "Test for server already disconnected failed");
-        io:println(res.length());
-    }
+    test:assertFalse(res is (readonly & byte[]), msg = "Test for server already disconnected failed");
     // print expected error
     io:println(res);
 
@@ -88,7 +78,6 @@ function testServerAlreadyClosed() returns  @tainted error? {
 
 @test:AfterSuite {}
 function stopAll() returns error? {
-    io:println("--------------------Executing after suite client_tests-------------");
     check stopEchoServer();
 }
 

@@ -18,9 +18,8 @@ import ballerina/test;
 import ballerina/lang.runtime as runtime;
 import ballerina/io;
 
-@test:Config {dependsOn: [testServerAlreadyClosed], enable: false}
-function testListenerEcho() returns @tainted error? {
-    io:println("-------------------------------------testListenerEcho---------------------");
+@test:Config {dependsOn: [testServerAlreadyClosed]}
+function testListenerEcho() returns error? {
     Client socketClient = check new ("localhost", PORT1);
 
     string msg = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam sit amet egestas neque.";
@@ -32,9 +31,8 @@ function testListenerEcho() returns @tainted error? {
     check socketClient->close();
 }
 
-@test:Config {dependsOn: [testServerAlreadyClosed], enable: false}
-function testListenerSendingBigData() returns @tainted error? {
-    io:println("-------------------------------------testListenerSendingBigData---------------------");
+@test:Config {dependsOn: [testServerAlreadyClosed]}
+function testListenerSendingBigData() returns error? {
     Client socketClient = check new ("localhost", PORT5);
 
     string msg = "send the data";
@@ -43,7 +41,7 @@ function testListenerSendingBigData() returns @tainted error? {
     int totalSize = 0;
 
     readonly & byte[] response;
-    while (totalSize < BIG_DATA_SIZE) {
+    while totalSize < BIG_DATA_SIZE {
         response = check socketClient->readBytes();
         totalSize += response.length();
     }
@@ -53,19 +51,15 @@ function testListenerSendingBigData() returns @tainted error? {
     check socketClient->close();
 }
 
-@test:Config {enable: true}
-function testListenerDetach() returns @tainted error? {
-    io:println("-------------------------------------testListenerDetach---------------------");
+@test:Config {dependsOn: [testSecureListenerWithUnsuportedClientProtocol]}
+function testListenerDetach() returns error? {
     Client socketClient = check new ("localhost", PORT6);
-    io:println("-------------------------------------socketClient created---------------------");
+
     check socketClient->writeBytes("What service is this?".toBytes());
-    io:println("-------------------------------------writeBytes executed---------------------");
+
     readonly & byte[] receivedData = check socketClient->readBytes();
-    io:println("-------------------------------------readBytes executed---------------------");
     test:assertEquals(string:fromBytes(receivedData), "Hello", "Unexpected response");
-    io:println("-------------------------------------assertion executed---------------------");
     check socketClient->close();
-    io:println("-------------------------------------close executed---------------------");
 
     Service dummyService = service object {
         isolated remote function onConnect(Caller caller)  {
@@ -74,9 +68,7 @@ function testListenerDetach() returns @tainted error? {
     };
 
     check helloServer.gracefulStop();
-    io:println("-------------------------------------gracefulStop executed---------------------");
     check helloServer.detach(dummyService); // detach helloService from helloServer
-    io:println("-------------------------------------detach executed---------------------");
 
     Service obj = service object {
         isolated remote function onConnect(Caller caller) returns ConnectionService {
@@ -84,28 +76,20 @@ function testListenerDetach() returns @tainted error? {
             return new HiService();
         }
     };
-    io:println("-------------------------------------obj created---------------------");
     check helloServer.attach(obj); // attach hiService to helloServer
-    io:println("-------------------------------------attach executed---------------------");
     check helloServer.start();
-    io:println("-------------------------------------start executed---------------------");
 
     socketClient = check new ("localhost", PORT6);
-    io:println("-------------------------------------socketClient created---------------------");
-    //check socketClient->writeBytes("What service is this?".toBytes());
-    io:println("-------------------------------------writeBytes executed---------------------");
 
-    //receivedData = check socketClient->readBytes();
-    io:println("-------------------------------------readBytes executed---------------------");
-    //test:assertEquals(string:fromBytes(receivedData), "Hi", "Unexpected response");
-    io:println("-------------------------------------assertEquals executed---------------------");
-    //test:assertNotEquals(conId, "xx");
-    io:println("-------------------------------------assertNotEquals executed---------------------");
+    check socketClient->writeBytes("What service is this?".toBytes());
+
+    receivedData = check socketClient->readBytes();
+    test:assertEquals(string:fromBytes(receivedData), "Hi", "Unexpected response");
+    test:assertNotEquals(conId, "xx");
 }
 
-@test:Config {dependsOn: [testSecureListenerWithUnsuportedClientProtocol], enable: false}
-function testServiceOnErrorWhenDispatching() returns @tainted error? {
-    io:println("-------------------------------------testServiceOnErrorWhenDispatching---------------------");
+@test:Config {dependsOn: [testListenerDetach]}
+function testServiceOnErrorWhenDispatching() returns error? {
     Client socketClient = check new ("localhost", PORT8);
     check socketClient->writeBytes("What service is this?".toBytes());
     runtime:sleep(5);

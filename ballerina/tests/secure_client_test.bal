@@ -23,9 +23,8 @@ function setupServer() returns error? {
     check startSecureServer();
 }
 
-@test:Config {dependsOn: [testListenerEcho], enable: false}
-function testProtocolVersion() returns @tainted error? {
-    io:println("-------------------------------------testProtocolVersion---------------------");
+@test:Config {dependsOn: [testListenerEcho]}
+function testProtocolVersion() returns error? {
     Error|Client socketClient = new ("localhost", 9002, secureSocket = {
         cert: certPath,
         protocol: {
@@ -35,16 +34,12 @@ function testProtocolVersion() returns @tainted error? {
         ciphers: ["TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA"]
     });
 
-    if (socketClient is Client) {
-        test:assertFail(msg = "Server only support TLSv1.2 initialization should fail.");
-        check socketClient->close();
-    }
+    test:assertFalse(socketClient is Client, msg = "Server only support TLSv1.2 initialization should fail");
     io:println("SecureClient: ", socketClient);
 }
 
-@test:Config {dependsOn: [testProtocolVersion], enable: false}
-function testCiphers() returns @tainted error? {
-     io:println("-------------------------------------testCiphers---------------------");
+@test:Config {dependsOn: [testProtocolVersion]}
+function testCiphers() returns error? {
     Error|Client socketClient = new ("localhost", 9002, secureSocket = {
         cert: certPath,
         protocol: {
@@ -54,16 +49,12 @@ function testCiphers() returns @tainted error? {
         ciphers: ["TLS_RSA_WITH_AES_128_CBC_SHA"] // server only support TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA write should fail
     });
 
-    if (socketClient is Client) {
-        test:assertFail(msg = "Server only support TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA cipher initialization should fail.");
-        check socketClient->close();
-    }
+    test:assertFalse(socketClient is Client, msg = "Server only support TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA cipher initialization should fail");
     io:println("SecureClient: ", socketClient);
 }
 
-@test:Config {dependsOn: [testCiphers], enable: false}
-function testSecureClientEcho() returns @tainted error? {
-    io:println("-------------------------------------testSecureClientEcho---------------------");
+@test:Config {dependsOn: [testCiphers]}
+function testSecureClientEcho() returns error? {
     Client socketClient = check new ("localhost", 9002, secureSocket = {
         cert: certPath,
         protocol: {
@@ -83,9 +74,8 @@ function testSecureClientEcho() returns @tainted error? {
     check socketClient->close();
 }
 
-@test:Config {dependsOn: [testSecureClientEcho], enable: false}
-function testSecureClientWithTruststore() returns @tainted error? {
-    io:println("-------------------------------------testSecureClientWithTruststore---------------------");
+@test:Config {dependsOn: [testSecureClientEcho]}
+function testSecureClientWithTruststore() returns error? {
     Client socketClient = check new ("localhost", PORT7, secureSocket = {
         cert: {
             path: truststore,
@@ -110,9 +100,8 @@ function testSecureClientWithTruststore() returns @tainted error? {
     check socketClient->close();
 }
 
-@test:Config {dependsOn: [testSecureClientEcho], enable: false}
-function testSecureSocketConfigEnableFalse() returns @tainted error? {
-    io:println("-------------------------------------testSecureSocketConfigEnableFalse---------------------");
+@test:Config {dependsOn: [testSecureClientEcho]}
+function testSecureSocketConfigEnableFalse() returns error? {
     Client socketClient = check new ("localhost", PORT1, secureSocket = {
         enable: false,
         cert: {
@@ -136,9 +125,8 @@ function testSecureSocketConfigEnableFalse() returns @tainted error? {
    check socketClient->close();
 }
 
-@test:Config {dependsOn: [testSecureSocketConfigEnableFalse], enable: false}
-isolated function testSecureClientWithInvalidCertPath() returns @tainted error? {
-    io:println("-------------------------------------testSecureClientWithInvalidCertPath---------------------");
+@test:Config {dependsOn: [testSecureSocketConfigEnableFalse]}
+isolated function testSecureClientWithInvalidCertPath() returns error? {
     Error|Client socketClient = new ("localhost", 9002, secureSocket = {
         cert: {
             path: "invalid",
@@ -151,16 +139,15 @@ isolated function testSecureClientWithInvalidCertPath() returns @tainted error? 
         ciphers: ["TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA"]
     });
     
-    if (socketClient is Client) {
+    if socketClient is Client {
         test:assertFail(msg = "Invalid trustore path provided initialization should fail.");
     } else {
         io:println(socketClient.message());
     }
 }
 
-@test:Config {enable: false}
-isolated function testSecureClientWithEmtyTrustStore() returns @tainted error? {
-    io:println("-------------------------------------testSecureClientWithEmtyTrustStore---------------------");
+@test:Config {}
+isolated function testSecureClientWithEmtyTrustStore() returns error? {
     Error|Client socketClient = new ("localhost", 9002, secureSocket = {
         cert: {
             path: "",
@@ -168,16 +155,15 @@ isolated function testSecureClientWithEmtyTrustStore() returns @tainted error? {
         }
     });
 
-    if (socketClient is Client) {
+    if socketClient is Client {
         test:assertFail(msg = "Empty trustore path provided, initialization should fail.");
     } else {
         test:assertEquals(socketClient.message(), "TrustStore file location must be provided for secure connection");
     }
 }
 
-@test:Config {enable: false}
-function testSecureClientWithEmtyTrustStorePassword() returns @tainted error? {
-    io:println("-------------------------------------testSecureClientWithEmtyTrustStorePassword---------------------");
+@test:Config {}
+function testSecureClientWithEmtyTrustStorePassword() returns error? {
     Error|Client socketClient = new ("localhost", 9002, secureSocket = {
         cert: {
             path: truststore,
@@ -185,30 +171,28 @@ function testSecureClientWithEmtyTrustStorePassword() returns @tainted error? {
         }
     });
 
-    if (socketClient is Client) {
+    if socketClient is Client {
         test:assertFail(msg = "Empty trustore password provided, initialization should fail.");
     } else {
         test:assertEquals(socketClient.message(), "TrustStore password must be provided for secure connection");
     }
 }
 
-@test:Config {enable: false}
-function testSecureClientWithEmtyCert() returns @tainted error? {
-    io:println("-------------------------------------testSecureClientWithEmtyCert---------------------");
+@test:Config {}
+function testSecureClientWithEmtyCert() returns error? {
     Error|Client socketClient = new ("localhost", 9002, secureSocket = {
         cert: ""
     });
 
-    if (socketClient is Client) {
+    if socketClient is Client {
         test:assertFail(msg = "Empty trustore password provided, initialization should fail.");
     } else {
         test:assertEquals(socketClient.message(), "Certificate file location must be provided for secure connection");
     }
 }
 
-@test:Config {enable: false}
+@test:Config {}
 function testBasicSecureClient() returns error? {
-    io:println("-------------------------------------testBasicSecureClient---------------------");
     Client socketClient = check new ("localhost", 9002, secureSocket = {
         cert: certPath
     });
