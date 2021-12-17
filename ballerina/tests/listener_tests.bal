@@ -40,7 +40,7 @@ function testListenerSendingBigData() returns error? {
     check socketClient->writeBytes(msgByteArray);
     int totalSize = 0;
 
-    readonly & byte[] response;
+    readonly & byte[] response = [];
     while totalSize < BIG_DATA_SIZE {
         response = check socketClient->readBytes();
         totalSize += response.length();
