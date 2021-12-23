@@ -15,7 +15,7 @@ cloud that makes it easier to use, combine, and create network services.
 # Contents
 1. [Overview](#1-overview)
 2. [Listener](#2-listener)
-    * 2.1. [Listener Configurations](#21-listener-configurations)
+    * 2.1. [Configurations](#21-configurations)
     * 2.2. [Initialization](#22-initialization)
 3. [Service Types](#3-service-types)
     * 3.1. [Service](#31-service)
@@ -25,9 +25,9 @@ cloud that makes it easier to use, combine, and create network services.
             * [onError](#onerror)
             * [onClose](#onclose)
 4. [Client](#4-client)
-    * 4.1. [Client Configurations](#41-client-configurations)
+    * 4.1. [Configurations](#41-configurations)
     * 4.2. [Initialization](#42-initialization)
-    * 4.3. [Send and receive data using the Client](#43-send-and-receive-data-using-the-client)
+    * 4.3. [Send and receive data](#43-send-and-receive-data)
         * [writeBytes](#writebytes)
         * [readBytes](#readbytes)
         * [close](#close)
@@ -43,7 +43,7 @@ TCP is a protocol that enables applications to exchange messages over a network.
 
 The `tcp:Listener` is used to listen to the incoming socket request. It can be constructed with a port number and optionally providing other configurations. When initiating the listener it opens up the port and attaches the `tcp:service`. 
 
-### 2.1. [Listener Configurations](#21-listener-configurations)
+### 2.1. [Configurations](#21-configurations)
 
 When initializing the listener, following configurations can be provided,
 
@@ -160,7 +160,7 @@ remote function onClose() {
 
 The `tcp:Client` is used to connect to a socket server and interact with it. It can send the data to the server and retrieve the data from the server.
 
-### 4.1. [Client Configurations](#41-client-configurations)
+### 4.1. [Configurations](#41-configurations)
 
 When initializing the client, following configurations can be provided,
 
@@ -197,7 +197,7 @@ A client can be initialized by providing the `remoteHost` and the `remotePort` a
 public isolated function init(string remoteHost, int remotePort, *ClientConfiguration config) returns Error? {}
 ```
 
-### 4.3. [Send and receive data using the Client](#43-send-and-receive-data-using-the-client)
+### 4.3. [Send and receive data](#43-send-and-receive-data)
 
 #### [writeBytes](#writebytes)
 
