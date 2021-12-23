@@ -41,7 +41,7 @@ TCP is a protocol that enables applications to exchange messages over a network.
 
 ## 2. [Listener](#2-listener)
 
-The `tcp:Listener` is used to listen to the incoming socket request. It can be constructed with a port number and optionally providing other configurations. When initiating the listener it opens up the port and attaches the `tcp:service`. 
+The `tcp:Listener` is used to listen to the incoming socket request. It can be constructed with a port number and optionally providing other configurations. When initiating the listener it opens up the port and attaches the `tcp:Service`. 
 
 ### 2.1. [Configurations](#21-configurations)
 
