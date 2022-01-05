@@ -29,5 +29,6 @@ public class TcpCompilerPlugin extends CompilerPlugin {
     @Override
     public void init(CompilerPluginContext compilerPluginContext) {
         compilerPluginContext.addCodeAnalyzer(new TcpServiceAnalyzer());
+        compilerPluginContext.addCodeAction(new AddTcpCodeTemplate());
     }
 }

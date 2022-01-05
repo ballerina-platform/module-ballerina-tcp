@@ -32,6 +32,7 @@ dependencies {
     testImplementation group: 'org.ballerinalang', name: 'ballerina-tools-api', version: "${ballerinaLangVersion}"
     testImplementation group: 'org.ballerinalang', name: 'ballerina-parser', version: "${ballerinaLangVersion}"
     testImplementation group: 'org.testng', name: 'testng', version: "${testngVersion}"
+    testImplementation group: 'com.google.code.gson', name: 'gson', version: "${gsonVersion}"
     implementation project(":tcp-compiler-plugin")
 
 }
@@ -56,7 +57,7 @@ spotbugsTest {
         html.enabled true
         text.enabled = true
     }
-    def excludeFile = file("${rootDir}/spotbugs-exclude.xml")
+    def excludeFile = file("${project.projectDir}/spotbugs-exclude.xml")
     if (excludeFile.exists()) {
         excludeFilter = excludeFile
     }

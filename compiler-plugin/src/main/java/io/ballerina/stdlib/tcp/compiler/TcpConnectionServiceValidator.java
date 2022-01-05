@@ -53,6 +53,7 @@ public class TcpConnectionServiceValidator {
     public static final String TCP_103 = "TCP_103";
     public static final String TCP_104 = "TCP_104";
     public static final String TCP_105 = "TCP_105";
+    public static final String TCP_106 = "TCP_106";
 
     // Message formats for reporting error diagnostics
     public static final String SERVICE_DOES_NOT_CONTAIN_ON_BYTES_FUNCTION
@@ -72,6 +73,8 @@ public class TcpConnectionServiceValidator {
             = "Provided {0} parameters, `{1}` can have only {2} parameters";
     public static final String PROVIDED_0_PARAMETERS_ON_CLOSE_FUNCTION_CANNOT_HAVE_ANY_PARAMETERS
             = "Provided {0} parameters, `onClose` function cannot have any parameters";
+    public static final String TEMPLATE_CODE_GENERATION_HINT
+            = "Template generation for empty service";
 
     // expected parameters and return types
     public static final String READONLY_INTERSECTION = "readonly & ";
