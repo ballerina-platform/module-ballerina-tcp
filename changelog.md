@@ -5,8 +5,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
-## Changed
+- [Add resource code snippet generation code action for tooling](https://github.com/ballerina-platform/ballerina-standard-library/issues/2034)
 
+## [swan-lake-beta5] - 2021-12-01
+
+## Changed
 - [Mark TCP Service type as distinct](https://github.com/ballerina-platform/ballerina-standard-library/issues/2398)
 
 ### Added
