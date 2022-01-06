@@ -52,7 +52,9 @@ public class TcpServiceValidator {
 
     public void validate() {
         ServiceDeclarationNode serviceDeclarationNode = (ServiceDeclarationNode) ctx.node();
-        if (serviceDeclarationNode.members().isEmpty()) {
+        boolean hasRemoteService = serviceDeclarationNode.members().stream().anyMatch(child -> child.kind() ==
+                SyntaxKind.OBJECT_METHOD_DEFINITION || child.kind() == SyntaxKind.RESOURCE_ACCESSOR_DEFINITION);
+        if (serviceDeclarationNode.members().isEmpty() || !hasRemoteService) {
             DiagnosticInfo diagnosticInfo = new DiagnosticInfo(TCP_106, TEMPLATE_CODE_GENERATION_HINT,
                     DiagnosticSeverity.INTERNAL);
             ctx.reportDiagnostic(DiagnosticFactory.createDiagnostic(diagnosticInfo, serviceDeclarationNode.location()));

@@ -19,6 +19,7 @@
 package io.ballerina.stdlib.tcp.compiler;
 
 import io.ballerina.compiler.syntax.tree.ModulePartNode;
+import io.ballerina.compiler.syntax.tree.Node;
 import io.ballerina.compiler.syntax.tree.NonTerminalNode;
 import io.ballerina.compiler.syntax.tree.ServiceDeclarationNode;
 import io.ballerina.compiler.syntax.tree.SyntaxTree;
@@ -96,10 +97,17 @@ public class AddTcpCodeTemplate implements CodeAction {
         ServiceDeclarationNode serviceDeclarationNode = (ServiceDeclarationNode) node;
 
         List<TextEdit> textEdits = new ArrayList<>();
-
-        TextRange resourceTextRange = TextRange.from(serviceDeclarationNode.openBraceToken().textRange().endOffset(),
-                serviceDeclarationNode.closeBraceToken().textRange().startOffset() -
-                        serviceDeclarationNode.openBraceToken().textRange().endOffset());
+        TextRange resourceTextRange;
+        if (serviceDeclarationNode.members().isEmpty()) {
+            resourceTextRange = TextRange.from(serviceDeclarationNode.openBraceToken().textRange().endOffset(),
+                    serviceDeclarationNode.closeBraceToken().textRange().startOffset() -
+                            serviceDeclarationNode.openBraceToken().textRange().endOffset());
+        } else {
+            Node lastMember = serviceDeclarationNode.members().get(serviceDeclarationNode.members().size() - 1);
+            resourceTextRange = TextRange.from(lastMember.textRange().endOffset(),
+                    serviceDeclarationNode.closeBraceToken().textRange().startOffset() -
+                            lastMember.textRange().endOffset());
+        }
         TextRange insertWsServiceTextRange = TextRange.from(serviceDeclarationNode.closeBraceToken().textRange()
                 .endOffset(), 0);
         textEdits.add(TextEdit.from(resourceTextRange,
