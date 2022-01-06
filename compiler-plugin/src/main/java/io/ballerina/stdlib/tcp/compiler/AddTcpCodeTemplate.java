@@ -50,7 +50,7 @@ public class AddTcpCodeTemplate implements CodeAction {
     public static final String LS = System.lineSeparator();
     public static final String RESOURCE_TEXT = LS + "\tremote function onConnect(tcp:Caller caller) returns " +
             "tcp:ConnectionService " +
-            "{" + LS + "\t\treturn new TcpService();" + LS + "\t}";
+            "{" + LS + "\t\treturn new TcpService();" + LS + "\t}" + LS;
     public static final String SERVICE_TEXT = LS + LS + "service class TcpService {" + LS +
             "\t*tcp:ConnectionService;" + LS + LS +
             "\tremote function onBytes(tcp:Caller caller, readonly & byte[] data) " +
@@ -98,10 +98,12 @@ public class AddTcpCodeTemplate implements CodeAction {
         List<TextEdit> textEdits = new ArrayList<>();
 
         TextRange resourceTextRange = TextRange.from(serviceDeclarationNode.openBraceToken().textRange().endOffset(),
-                0);
+                serviceDeclarationNode.closeBraceToken().textRange().startOffset() -
+                        serviceDeclarationNode.openBraceToken().textRange().endOffset());
         TextRange insertWsServiceTextRange = TextRange.from(serviceDeclarationNode.closeBraceToken().textRange()
                 .endOffset(), 0);
-        textEdits.add(TextEdit.from(resourceTextRange, RESOURCE_TEXT));
+        textEdits.add(TextEdit.from(resourceTextRange,
+                serviceDeclarationNode.members().size() > 0 ? RESOURCE_TEXT + LS : RESOURCE_TEXT));
         textEdits.add(TextEdit.from(insertWsServiceTextRange, SERVICE_TEXT));
         TextDocumentChange change = TextDocumentChange.from(textEdits.toArray(new TextEdit[0]));
         return Collections.singletonList(new DocumentEdit(codeActionExecutionContext.fileUri(),
