@@ -58,7 +58,7 @@ public class CodeSnippetGenerationCodeActionTest extends AbstractCodeActionTest 
 
     private CodeActionInfo getExpectedCodeAction() {
         LineRange lineRange = LineRange.from("service.bal", LinePosition.from(2, 0),
-                LinePosition.from(2, 36));
+                LinePosition.from(3, 1));
         CodeActionArgument locationArg = CodeActionArgument.from(NODE_LOCATION, lineRange);
         CodeActionInfo codeAction = CodeActionInfo.from("Insert service template", List.of(locationArg));
         codeAction.setProviderName("TCP_106/ballerina/tcp/ADD_SERVICE_CODE_SNIPPET");

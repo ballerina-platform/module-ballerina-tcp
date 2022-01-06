@@ -1,3 +1,4 @@
 import ballerina/tcp;
 
-service on new tcp:Listener(3000) {}
+service on new tcp:Listener(3000) {
+}
