@@ -50,7 +50,7 @@ public class AddTcpCodeTemplate implements CodeAction {
     public static final String LS = System.lineSeparator();
     public static final String RESOURCE_TEXT = LS + "\tremote function onConnect(tcp:Caller caller) returns " +
             "tcp:ConnectionService " +
-            "{" + LS + "\t\treturn new TcpService();" + LS + "\t}" + LS;
+            "{" + LS + "\t\treturn new TcpService();" + LS + "\t}";
     public static final String SERVICE_TEXT = LS + LS + "service class TcpService {" + LS +
             "\t*tcp:ConnectionService;" + LS + LS +
             "\tremote function onBytes(tcp:Caller caller, readonly & byte[] data) " +
