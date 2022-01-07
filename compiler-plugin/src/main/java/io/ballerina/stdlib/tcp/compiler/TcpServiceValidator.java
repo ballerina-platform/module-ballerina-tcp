@@ -34,6 +34,9 @@ import io.ballerina.tools.diagnostics.DiagnosticFactory;
 import io.ballerina.tools.diagnostics.DiagnosticInfo;
 import io.ballerina.tools.diagnostics.DiagnosticSeverity;
 
+import static io.ballerina.stdlib.tcp.compiler.TcpConnectionServiceValidator.TCP_106;
+import static io.ballerina.stdlib.tcp.compiler.TcpConnectionServiceValidator.TEMPLATE_CODE_GENERATION_HINT;
+
 /**
  * Class to Validate TCP services.
  */
@@ -49,6 +52,13 @@ public class TcpServiceValidator {
 
     public void validate() {
         ServiceDeclarationNode serviceDeclarationNode = (ServiceDeclarationNode) ctx.node();
+        boolean hasRemoteService = serviceDeclarationNode.members().stream().anyMatch(child -> child.kind() ==
+                SyntaxKind.OBJECT_METHOD_DEFINITION || child.kind() == SyntaxKind.RESOURCE_ACCESSOR_DEFINITION);
+        if (serviceDeclarationNode.members().isEmpty() || !hasRemoteService) {
+            DiagnosticInfo diagnosticInfo = new DiagnosticInfo(TCP_106, TEMPLATE_CODE_GENERATION_HINT,
+                    DiagnosticSeverity.INTERNAL);
+            ctx.reportDiagnostic(DiagnosticFactory.createDiagnostic(diagnosticInfo, serviceDeclarationNode.location()));
+        }
         serviceDeclarationNode.members().stream()
                 .filter(child -> child.kind() == SyntaxKind.OBJECT_METHOD_DEFINITION
                         || child.kind() == SyntaxKind.RESOURCE_ACCESSOR_DEFINITION).forEach(node -> {
