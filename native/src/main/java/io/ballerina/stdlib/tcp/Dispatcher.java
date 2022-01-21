@@ -91,7 +91,7 @@ public class Dispatcher {
             int paramTag = param.getTag();
             switch (paramTag) {
                 case TypeTags.INTERSECTION_TAG:
-                    bValues[index++] = ValueCreator.createArrayValue(byteContent);
+                    bValues[index++] = ValueCreator.createReadonlyArrayValue(byteContent);
                     bValues[index++] = true;
                     break;
                 case TypeTags.OBJECT_TYPE_TAG:
