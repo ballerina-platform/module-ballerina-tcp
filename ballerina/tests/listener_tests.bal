@@ -15,7 +15,6 @@
 // under the License.
 
 import ballerina/test;
-import ballerina/lang.runtime as runtime;
 import ballerina/io;
 
 @test:Config {dependsOn: [testServerAlreadyClosed]}
@@ -86,12 +85,4 @@ function testListenerDetach() returns error? {
     receivedData = check socketClient->readBytes();
     test:assertEquals(string:fromBytes(receivedData), "Hi", "Unexpected response");
     test:assertNotEquals(conId, "xx");
-}
-
-@test:Config {dependsOn: [testListenerDetach]}
-function testServiceOnErrorWhenDispatching() returns error? {
-    Client socketClient = check new ("localhost", PORT8);
-    check socketClient->writeBytes("What service is this?".toBytes());
-    runtime:sleep(5);
-    test:assertEquals(onErrorInvoked, true);
 }

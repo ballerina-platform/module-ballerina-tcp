@@ -14,8 +14,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
-import ballerina/io;
 import ballerina/test;
+import ballerina/lang.runtime as runtime;
 
 boolean isReadOnly = false;
 
@@ -32,7 +32,7 @@ service class TestReadOnlyService {
     remote function onBytes(Caller caller, readonly & byte[] data) returns Error? {
         byte[] bb = data;
         isReadOnly = bb is readonly & byte[];
-        io:println("Echo: ", string:fromBytes(data));
+        byte _ = bb.pop();
         return caller->writeBytes(data);
     }
 }
@@ -43,9 +43,8 @@ function testReadOnlyData() returns error? {
     string msg = "Test ReadOnly";
     byte[] msgByteArray = msg.toBytes();
     check socketClient->writeBytes(msgByteArray);
-    readonly & byte[] res = check socketClient->readBytes();
+    runtime:sleep(2);
     test:assertTrue(isReadOnly);
-    test:assertEquals('string:fromBytes(res), msg);
 
     check socketClient->close();
 }

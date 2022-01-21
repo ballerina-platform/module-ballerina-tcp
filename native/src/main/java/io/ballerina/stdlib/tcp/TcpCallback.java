@@ -66,12 +66,6 @@ public class TcpCallback implements Callback {
 
     @Override
     public void notifyFailure(BError bError) {
-        if (!isOnConnectInvoked) {
-            Dispatcher.invokeOnError(tcpService, bError.getMessage());
-        }
-
-        if (log.isDebugEnabled()) {
-            log.debug(String.format("Method dispatch failed: %s", bError.getMessage()));
-        }
+        bError.printStackTrace();
     }
 }
