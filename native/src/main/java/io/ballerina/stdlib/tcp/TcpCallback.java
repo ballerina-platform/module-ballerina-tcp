@@ -60,6 +60,8 @@ public class TcpCallback implements Callback {
         } else if (isOnConnectInvoked) {
             this.tcpService.setConnectionService((BObject) object);
             TcpListener.resumeRead(channel);
+        } else if (object instanceof BError) {
+            ((BError) object).printStackTrace();
         }
         log.debug("Method successfully dispatched.");
     }
