@@ -20,7 +20,7 @@ import ballerina/lang.runtime as runtime;
 service on new Listener(3011) {
 
     remote function onConnect(Caller caller) returns ConnectionService {
-        return new TestReadOnlyService();
+        return new TestReturnErrorService();
     }
 }
 
