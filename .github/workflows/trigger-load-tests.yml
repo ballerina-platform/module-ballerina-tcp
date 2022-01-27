@@ -1,4 +1,4 @@
-name: Trigger Load Tests
+name: Trigger load tests
 
 on:
   workflow_dispatch:
@@ -12,6 +12,8 @@ on:
         description: 'Cluster name'
         default: 'tcp-perf-cluster-test'
         required: false
+  schedule:
+    - cron: '0 0 * * *'
 
 jobs:
   invokeLoadTests:
@@ -19,6 +21,14 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+      - name: Process cluster name
+        id: processClusterName
+        run: |
+          clusterName="${{github.event.inputs.clusterName}}"
+          if [ "$clusterName" = "" ]; then
+            clusterName="tcp-perf-cluster-test"
+          fi
+          printf "::set-output name=clusterName::%s" $clusterName
       - name: Get latest ballerina runtime artifact
         id: setRuntimeUrl
         shell: bash
@@ -33,4 +43,4 @@ jobs:
           repo: ballerina-platform/ballerina-performance-cloud
           ref: refs/heads/main
           token: ${{ secrets.BALLERINA_BOT_TOKEN }}
-          inputs: '{ "repo-name": "module-ballerina-tcp", "tests": "${{ github.event.inputs.tests }}", "zipURL": ${{ steps.setRuntimeUrl.outputs.runtimeUrl}}, "clusterName": "${{ github.event.inputs.clusterName }}", "dispatchType": "tcp-load-test" }'
+          inputs: '{ "repo-name": "module-ballerina-tcp", "tests": "${{ steps.formatTestNames.outputs.testNames }}", "zipURL": ${{ steps.setRuntimeUrl.outputs.runtimeUrl}}, "clusterName": "${{ steps.processClusterName.outputs.clusterName }}", "dispatchType": "tcp-load-test" }'
