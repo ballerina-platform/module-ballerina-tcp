@@ -22,7 +22,7 @@ import ballerina/crypto;
 # + cert - Configurations associated with `crypto:TrustStore` or single certificate file that the client trusts
 # + protocol - SSL/TLS protocol related options
 # + ciphers - List of ciphers to be used
-# eg: TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256, TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA
+# E.g., `TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256`, `TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA`
 # + handshakeTimeout - SSL handshake time out
 # + sessionTimeout - SSL session time out
 public type ClientSecureSocket record {|
