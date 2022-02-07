@@ -42,7 +42,7 @@ public type ClientSecureSocket record {|
 # + key - Configurations associated with `crypto:KeyStore` or combination of certificate and (PKCS8) private key of the server
 # + protocol - SSL/TLS protocol related options
 # + ciphers - List of ciphers to be used
-# eg: TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256, TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA
+# E.g., `TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256`, `TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA`
 # + handshakeTimeout - SSL handshake time out
 # + sessionTimeout - SSL session time out
 public type ListenerSecureSocket record {|
