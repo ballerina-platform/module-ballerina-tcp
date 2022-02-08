@@ -50,8 +50,7 @@ public isolated client class Client {
     # (readonly & byte[])|tcp:Error result = socketClient->readBytes();
     # ```
     #
-    # + return - The `readonly & byte[]` or else a `tcp:Error` if the data
-    #            cannot be read from the remote host
+    # + return - The `readonly & byte[]` or else a `tcp:Error` if the data cannot be read from the remote host
     remote function readBytes() returns (readonly & byte[])|Error = @java:Method {
         name: "externReadBytes",
         'class: "io.ballerina.stdlib.tcp.nativeclient.Client"
@@ -81,9 +80,9 @@ public isolated client class Client {
 # 
 # + localHost - Local binding of the interface
 # + timeout - The socket reading timeout value to be used in seconds. If this is not set, the default value
-#             of 300 seconds(5 minutes) will be used
+# of 300 seconds(5 minutes) will be used
 # + writeTimeout - The socket write timeout value to be used in seconds. If this is not set, the default value
-#             of 300 seconds(5 minutes) will be used
+# of 300 seconds(5 minutes) will be used
 # + secureSocket - The `secureSocket` configuration
 public type ClientConfiguration record {|
     string localHost?;
