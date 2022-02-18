@@ -3,7 +3,7 @@
 _Owners_: @shafreenAnfar @bhashinee  
 _Reviewers_: @shafreenAnfar  
 _Created_: 2021/12/20  
-_Updated_: 2022/02/07  
+_Updated_: 2022/02/18  
 _Edition_: Swan Lake  
 _Issue_: [#2171](https://github.com/ballerina-platform/ballerina-standard-library/issues/2171)
 
@@ -11,11 +11,11 @@ _Issue_: [#2171](https://github.com/ballerina-platform/ballerina-standard-librar
 
 This is the specification for the TCP standard library of [Ballerina language](https://ballerina.io/), which provides TCP client-server functionalities.
 
-The TCP library specification has evolved and may continue to evolve in the future. Released versions of the specification can be found under the relevant GitHub tag.
+The TCP library specification has evolved and may continue to evolve in the future. The released versions of the specification can be found under the relevant GitHub tag.
 
-If you have any feedback or suggestions about the library, start a discussion via a [GitHub issue](https://github.com/ballerina-platform/ballerina-standard-library/issues) or in the [Slack channel](https://ballerina.io/community/). Based on the outcome of the discussion, specification and implementation can be updated. Community feedback is always welcome. Any accepted proposal which affects the specification is stored under `/docs/proposals`. Proposals under discussion can be found with the label `type/proposal` in GitHub.
+If you have any feedback or suggestions about the library, start a discussion via a [GitHub issue](https://github.com/ballerina-platform/ballerina-standard-library/issues) or in the [Slack channel](https://ballerina.io/community/). Based on the outcome of the discussion, the specification and implementation can be updated. Community feedback is always welcome. Any accepted proposal, which affects the specification is stored under `/docs/proposals`. Proposals under discussion can be found with the label `type/proposal` in GitHub.
 
-Conforming implementation of the specification is released and included in the distribution. Any deviation from the specification is considered a bug.
+The conforming implementation of the specification is released and included in the distribution. Any deviation from the specification is considered a bug.
 
 # Contents
 1. [Overview](#1-overview)
