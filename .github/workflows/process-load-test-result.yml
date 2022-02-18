@@ -15,9 +15,7 @@ jobs:
         run: |
           git config --global user.email "ballerina-bot@ballerina.org"
           git config --global user.name "ballerina-bot"
-          branch_name="load-test-results"
           git pull
-          git checkout -b $branch_name
           git checkout -b "load-test-results"
           echo '${{ toJson(github.event.client_payload.results) }}' | jq -c '.[]' |
           while read -r result; do
@@ -34,7 +32,6 @@ jobs:
               printf "::set-output name=hasFailed::true"
             fi
           done
-          git push origin "${branch_name}"
         env:
           GITHUB_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}
       - name: Push results
