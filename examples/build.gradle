@@ -42,7 +42,7 @@ task testExamples {
     doLast {
         def moduleVersion = "${project.version}".replace("-SNAPSHOT", "")
         examples.each { example ->
-            def dependenciesTomlFile = new File("${project.projectDir}/resources/Dependencies.toml")
+            def dependenciesTomlFile = new File("${project.projectDir}/_resources/Dependencies.toml")
             def dependenciesTomlFileInExample = new File("${project.projectDir}/${example}/Dependencies.toml")
             def newDependenciesTomlText = dependenciesTomlFile.text.replace("@project.version@", moduleVersion)
             dependenciesTomlFileInExample.text = newDependenciesTomlText
