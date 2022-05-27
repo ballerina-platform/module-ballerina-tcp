@@ -38,6 +38,7 @@ jobs:
           format: 'table'
           timeout: '10m0s'
           exit-code: '1'
+
       - name: Ballerina Central Push
         if: ${{ github.event.inputs.environment == 'CENTRAL' }}
         env:
@@ -60,14 +61,14 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}
         run: |
           ./gradlew clean build -PpublishToCentral=true
-          - name: Ballerina Central Stage Push
-            if: ${{ github.event.inputs.environment == 'STAGE CENTRAL' }}
-            env:
-              BALLERINA_DEV_CENTRAL: false
-              BALLERINA_STAGE_CENTRAL: true
-              BALLERINA_CENTRAL_ACCESS_TOKEN: ${{ secrets.BALLERINA_CENTRAL_STAGE_ACCESS_TOKEN }}
-              packageUser: ${{ secrets.BALLERINA_BOT_USERNAME }}
-              packagePAT: ${{ secrets.BALLERINA_BOT_TOKEN }}
-              GITHUB_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}
-            run: |
-              ./gradlew clean build -PpublishToCentral=true
+      - name: Ballerina Central Stage Push
+        if: ${{ github.event.inputs.environment == 'STAGE CENTRAL' }}
+        env:
+          BALLERINA_DEV_CENTRAL: false
+          BALLERINA_STAGE_CENTRAL: true
+          BALLERINA_CENTRAL_ACCESS_TOKEN: ${{ secrets.BALLERINA_CENTRAL_STAGE_ACCESS_TOKEN }}
+          packageUser: ${{ secrets.BALLERINA_BOT_USERNAME }}
+          packagePAT: ${{ secrets.BALLERINA_BOT_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}
+        run: |
+          ./gradlew clean build -PpublishToCentral=true
