@@ -6,7 +6,7 @@ _Created_: 2021/12/20
 _Updated_: 2022/02/18  
 _Edition_: Swan Lake  
 
-# Introduction
+## Introduction
 
 This is the specification for the TCP standard library of [Ballerina language](https://ballerina.io/), which provides TCP client-server functionalities.
 
@@ -16,7 +16,7 @@ If you have any feedback or suggestions about the library, start a discussion vi
 
 The conforming implementation of the specification is released and included in the distribution. Any deviation from the specification is considered a bug.
 
-# Contents
+## Contents
 1. [Overview](#1-overview)
 2. [Listener](#2-listener)
     * 2.1. [Configurations](#21-configurations)
