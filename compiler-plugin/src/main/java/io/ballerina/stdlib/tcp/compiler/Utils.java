@@ -48,7 +48,7 @@ public class Utils {
                 .filter(qualifier -> qualifier == Qualifier.REMOTE).count() == 1;
     }
 
-    public static void reportDiagnostics(SyntaxNodeAnalysisContext ctx, PluginConstants.CompilationErrors error,
+    public static void reportDiagnostics(SyntaxNodeAnalysisContext ctx, CompilationErrors error,
                                          Location location, Object... args) {
         String errorMessage = error.getError();
         String diagnosticCode = error.getErrorCode();

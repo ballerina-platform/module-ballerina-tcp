@@ -86,7 +86,7 @@ public class TcpServiceValidator {
     }
 
     private void reportInvalidFunction(FunctionDefinitionNode functionDefinitionNode) {
-        Utils.reportDiagnostics(ctx, PluginConstants.CompilationErrors.FUNCTION_0_NOT_ACCEPTED_BY_THE_SERVICE,
+        Utils.reportDiagnostics(ctx, CompilationErrors.FUNCTION_0_NOT_ACCEPTED_BY_THE_SERVICE,
                 functionDefinitionNode.location(), functionDefinitionNode.functionName().toString());
     }
 }

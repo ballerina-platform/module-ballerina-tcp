@@ -49,7 +49,7 @@ public class CompilerPluginTest {
         DiagnosticResult diagnosticResult = compilation.diagnosticResult();
         Assert.assertEquals(diagnosticResult.errors().size(), 2);
         for (Diagnostic diagnostic : diagnosticResult.errors()) {
-            assertDiagnostic(diagnostic, PluginConstants.CompilationErrors.FUNCTION_0_NOT_ACCEPTED_BY_THE_SERVICE);
+            assertDiagnostic(diagnostic, CompilationErrors.FUNCTION_0_NOT_ACCEPTED_BY_THE_SERVICE);
         }
     }
 
@@ -60,7 +60,7 @@ public class CompilerPluginTest {
         DiagnosticResult diagnosticResult = compilation.diagnosticResult();
         Assert.assertEquals(diagnosticResult.diagnostics().size(), 1);
         Diagnostic diagnostic = (Diagnostic) diagnosticResult.diagnostics().toArray()[0];
-        assertDiagnostic(diagnostic, PluginConstants.CompilationErrors.SERVICE_DOES_NOT_CONTAIN_ON_BYTES_FUNCTION);
+        assertDiagnostic(diagnostic, CompilationErrors.SERVICE_DOES_NOT_CONTAIN_ON_BYTES_FUNCTION);
     }
 
     @Test
@@ -70,7 +70,7 @@ public class CompilerPluginTest {
         DiagnosticResult diagnosticResult = compilation.diagnosticResult();
         Assert.assertEquals(diagnosticResult.diagnostics().size(), 3);
         for (Diagnostic diagnostic : diagnosticResult.diagnostics()) {
-            assertDiagnostic(diagnostic, PluginConstants.CompilationErrors
+            assertDiagnostic(diagnostic, CompilationErrors
                     .REMOTE_KEYWORD_EXPECTED_IN_0_FUNCTION_SIGNATURE);
         }
     }
@@ -82,7 +82,7 @@ public class CompilerPluginTest {
         DiagnosticResult diagnosticResult = compilation.diagnosticResult();
         Assert.assertEquals(diagnosticResult.diagnostics().size(), 2);
         for (Diagnostic diagnostic : diagnosticResult.diagnostics()) {
-        assertDiagnostic(diagnostic, PluginConstants.CompilationErrors
+        assertDiagnostic(diagnostic, CompilationErrors
                 .NO_PARAMETER_PROVIDED_FOR_0_FUNCTION_EXPECTS_1_AS_A_PARAMETER);
         }
     }
@@ -94,7 +94,7 @@ public class CompilerPluginTest {
         DiagnosticResult diagnosticResult = compilation.diagnosticResult();
         Assert.assertEquals(diagnosticResult.diagnostics().size(), 1);
         Diagnostic diagnostic = (Diagnostic) diagnosticResult.diagnostics().toArray()[0];
-        assertDiagnostic(diagnostic, PluginConstants.CompilationErrors.INVALID_PARAMETER_0_PROVIDED_FOR_1_FUNCTION);
+        assertDiagnostic(diagnostic, CompilationErrors.INVALID_PARAMETER_0_PROVIDED_FOR_1_FUNCTION);
     }
 
     @Test
@@ -104,7 +104,7 @@ public class CompilerPluginTest {
         DiagnosticResult diagnosticResult = compilation.diagnosticResult();
         Assert.assertEquals(diagnosticResult.diagnostics().size(), 1);
         Diagnostic diagnostic = (Diagnostic) diagnosticResult.diagnostics().toArray()[0];
-        assertDiagnostic(diagnostic, PluginConstants.CompilationErrors
+        assertDiagnostic(diagnostic, CompilationErrors
                 .INVALID_PARAMETER_0_PROVIDED_FOR_1_FUNCTION_EXPECTS_2);
     }
 
@@ -115,7 +115,7 @@ public class CompilerPluginTest {
         DiagnosticResult diagnosticResult = compilation.diagnosticResult();
         Assert.assertEquals(diagnosticResult.diagnostics().size(), 1);
         Diagnostic diagnostic = (Diagnostic) diagnosticResult.diagnostics().toArray()[0];
-        assertDiagnostic(diagnostic, PluginConstants.CompilationErrors
+        assertDiagnostic(diagnostic, CompilationErrors
                 .INVALID_PARAMETER_0_PROVIDED_FOR_1_FUNCTION_EXPECTS_2);
     }
 
@@ -139,7 +139,7 @@ public class CompilerPluginTest {
         DiagnosticResult diagnosticResult = compilation.diagnosticResult();
         Assert.assertEquals(diagnosticResult.diagnostics().size(), 1);
         Diagnostic diagnostic = (Diagnostic) diagnosticResult.diagnostics().toArray()[0];
-        assertDiagnostic(diagnostic, PluginConstants.CompilationErrors
+        assertDiagnostic(diagnostic, CompilationErrors
                 .INVALID_PARAMETER_0_PROVIDED_FOR_1_FUNCTION_EXPECTS_2);
     }
 
@@ -158,7 +158,7 @@ public class CompilerPluginTest {
         DiagnosticResult diagnosticResult = compilation.diagnosticResult();
         Assert.assertEquals(diagnosticResult.diagnostics().size(), 3);
         for (Diagnostic diagnostic : diagnosticResult.diagnostics()) {
-            assertDiagnostic(diagnostic, PluginConstants.CompilationErrors
+            assertDiagnostic(diagnostic, CompilationErrors
                     .INVALID_RETURN_TYPE_0_FUNCTION_1_RETURN_TYPE_SHOULD_BE_A_SUBTYPE_OF_2);
         }
     }
@@ -170,7 +170,7 @@ public class CompilerPluginTest {
         DiagnosticResult diagnosticResult = compilation.diagnosticResult();
         Assert.assertEquals(diagnosticResult.diagnostics().size(), 2);
         for (Diagnostic diagnostic : diagnosticResult.diagnostics()) {
-            assertDiagnostic(diagnostic, PluginConstants.CompilationErrors.FUNCTION_0_NOT_ACCEPTED_BY_THE_SERVICE);
+            assertDiagnostic(diagnostic, CompilationErrors.FUNCTION_0_NOT_ACCEPTED_BY_THE_SERVICE);
         }
     }
 
@@ -181,7 +181,7 @@ public class CompilerPluginTest {
         DiagnosticResult diagnosticResult = compilation.diagnosticResult();
         Assert.assertEquals(diagnosticResult.diagnostics().size(), 2);
         for (Diagnostic diagnostic : diagnosticResult.diagnostics()) {
-            assertDiagnostic(diagnostic, PluginConstants.CompilationErrors
+            assertDiagnostic(diagnostic, CompilationErrors
                     .PROVIDED_0_PARAMETERS_1_CAN_HAVE_ONLY_2_PARAMETERS);
         }
 
@@ -190,7 +190,7 @@ public class CompilerPluginTest {
         diagnosticResult = compilation.diagnosticResult();
         Assert.assertEquals(diagnosticResult.diagnostics().size(), 1);
         Diagnostic diagnostic = (Diagnostic) diagnosticResult.diagnostics().toArray()[0];
-        assertDiagnostic(diagnostic, PluginConstants.CompilationErrors
+        assertDiagnostic(diagnostic, CompilationErrors
                 .PROVIDED_0_PARAMETERS_ON_CLOSE_FUNCTION_CANNOT_HAVE_ANY_PARAMETERS);
     }
 
@@ -213,7 +213,7 @@ public class CompilerPluginTest {
         return ProjectEnvironmentBuilder.getBuilder(environment);
     }
 
-    private void assertDiagnostic(Diagnostic diagnostic, PluginConstants.CompilationErrors error) {
+    private void assertDiagnostic(Diagnostic diagnostic, CompilationErrors error) {
         Assert.assertEquals(diagnostic.diagnosticInfo().code(), error.getErrorCode());
         Assert.assertEquals(diagnostic.diagnosticInfo().messageFormat(),
                 error.getError());

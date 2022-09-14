@@ -84,7 +84,7 @@ public class TcpConnectionServiceValidator {
     }
 
     private void reportInvalidFunction(MethodSymbol methodSymbol) {
-        Utils.reportDiagnostics(ctx, PluginConstants.CompilationErrors.FUNCTION_0_NOT_ACCEPTED_BY_THE_SERVICE,
+        Utils.reportDiagnostics(ctx, CompilationErrors.FUNCTION_0_NOT_ACCEPTED_BY_THE_SERVICE,
                 methodSymbol.getLocation().get(), methodSymbol.getName().get());
     }
 
@@ -104,7 +104,7 @@ public class TcpConnectionServiceValidator {
     private void checkOnBytesFunctionExistence() {
         if (onBytesFunctionSymbol == null) {
             // ConnectionService should contain onBytes method
-            Utils.reportDiagnostics(ctx, PluginConstants.CompilationErrors
+            Utils.reportDiagnostics(ctx, CompilationErrors
                     .SERVICE_DOES_NOT_CONTAIN_ON_BYTES_FUNCTION, ctx.node().location());
         }
     }
@@ -112,7 +112,7 @@ public class TcpConnectionServiceValidator {
     private void hasRemoteKeyword(MethodSymbol methodSymbol, String functionName) {
         boolean hasRemoteKeyword = Utils.hasRemoteKeyword(methodSymbol);
         if (!hasRemoteKeyword) {
-            Utils.reportDiagnostics(ctx, PluginConstants.CompilationErrors
+            Utils.reportDiagnostics(ctx, CompilationErrors
                     .REMOTE_KEYWORD_EXPECTED_IN_0_FUNCTION_SIGNATURE, methodSymbol.getLocation().get(), functionName);
         }
     }
@@ -122,7 +122,7 @@ public class TcpConnectionServiceValidator {
         if (parameterSymbols.isEmpty()) {
             String expectedParameter = functionName.equals(Constants.ON_BYTES) ?
                     READONLY_INTERSECTION + BYTE_ARRAY : MODULE_PREFIX + ERROR;
-            Utils.reportDiagnostics(ctx, PluginConstants.CompilationErrors
+            Utils.reportDiagnostics(ctx, CompilationErrors
                     .NO_PARAMETER_PROVIDED_FOR_0_FUNCTION_EXPECTS_1_AS_A_PARAMETER,
                     methodSymbol.getLocation().get(), functionName, expectedParameter);
             return true;
@@ -144,12 +144,12 @@ public class TcpConnectionServiceValidator {
                 if (functionName.equals(Constants.ON_BYTES)
                         && ((typeSymbol.typeKind() == TypeDescKind.INTERSECTION && !hasByteArray)
                         || (typeSymbol.typeKind() == TypeDescKind.TYPE_REFERENCE && !hasCaller))) {
-                    Utils.reportDiagnostics(ctx, PluginConstants.CompilationErrors
+                    Utils.reportDiagnostics(ctx, CompilationErrors
                             .INVALID_PARAMETER_0_PROVIDED_FOR_1_FUNCTION, parameterSymbol.getLocation().get(),
                             parameterSymbol.signature(), functionName);
                 } else if (functionName.equals(Constants.ON_ERROR)
                         && (typeSymbol.typeKind() != TypeDescKind.TYPE_REFERENCE || !hasError)) {
-                    Utils.reportDiagnostics(ctx, PluginConstants.CompilationErrors
+                    Utils.reportDiagnostics(ctx, CompilationErrors
                             .INVALID_PARAMETER_0_PROVIDED_FOR_1_FUNCTION_EXPECTS_2,
                             parameterSymbol.getLocation().get(), parameterSymbol.signature(),
                             functionName, MODULE_PREFIX + ERROR);
@@ -157,12 +157,12 @@ public class TcpConnectionServiceValidator {
                         && typeSymbol.typeKind() != TypeDescKind.INTERSECTION
                         && typeSymbol.typeKind() != TypeDescKind.ERROR) {
                     if (functionName.equals(Constants.ON_BYTES) && hasByteArray) {
-                        Utils.reportDiagnostics(ctx, PluginConstants.CompilationErrors
+                        Utils.reportDiagnostics(ctx, CompilationErrors
                                 .INVALID_PARAMETER_0_PROVIDED_FOR_1_FUNCTION_EXPECTS_2,
                                 parameterSymbol.getLocation().get(), parameterSymbol.signature(),
                                 functionName, READONLY_INTERSECTION + BYTE_ARRAY);
                     } else {
-                        Utils.reportDiagnostics(ctx, PluginConstants.CompilationErrors
+                        Utils.reportDiagnostics(ctx, CompilationErrors
                                 .INVALID_PARAMETER_0_PROVIDED_FOR_1_FUNCTION, parameterSymbol.getLocation().get(),
                                 parameterSymbol.signature(), functionName);
                     }
@@ -174,17 +174,17 @@ public class TcpConnectionServiceValidator {
     private boolean hasValidParameterCount(int parameterCount, String functionName) {
         DiagnosticInfo diagnosticInfo;
         if (functionName.equals(Constants.ON_BYTES) && parameterCount > 2) {
-            Utils.reportDiagnostics(ctx, PluginConstants.CompilationErrors
+            Utils.reportDiagnostics(ctx, CompilationErrors
                     .PROVIDED_0_PARAMETERS_1_CAN_HAVE_ONLY_2_PARAMETERS, onBytesFunctionSymbol.getLocation().get(),
                     parameterCount, functionName, 2);
             return false;
         } else if (functionName.equals(Constants.ON_ERROR) && parameterCount > 1) {
-            Utils.reportDiagnostics(ctx, PluginConstants.CompilationErrors
+            Utils.reportDiagnostics(ctx, CompilationErrors
                     .PROVIDED_0_PARAMETERS_1_CAN_HAVE_ONLY_2_PARAMETERS, onErrorFunctionSymbol.getLocation().get(),
                     parameterCount, functionName, 1);
             return false;
         } else if (functionName.equals(Constants.ON_CLOSE) && parameterCount > 0) {
-            Utils.reportDiagnostics(ctx, PluginConstants.CompilationErrors
+            Utils.reportDiagnostics(ctx, CompilationErrors
                     .PROVIDED_0_PARAMETERS_ON_CLOSE_FUNCTION_CANNOT_HAVE_ANY_PARAMETERS,
                     onCloseFunctionSymbol.getLocation().get(), parameterCount, functionName, 2);
             return false;
@@ -251,12 +251,12 @@ public class TcpConnectionServiceValidator {
                 returnTypeSymbol.getLocation().get() : methodSymbol.getLocation().get();
         if ((hasInvalidUnionTypeDesc || !isUnionTypeDesc)) {
             if (functionName.equals(Constants.ON_BYTES)) {
-                Utils.reportDiagnostics(ctx, PluginConstants.CompilationErrors
+                Utils.reportDiagnostics(ctx, CompilationErrors
                                 .INVALID_RETURN_TYPE_0_FUNCTION_1_RETURN_TYPE_SHOULD_BE_A_SUBTYPE_OF_2,
                         returnTypeSymbolLocation, returnTypeSymbol.signature(), functionName,
                         BYTE_ARRAY + "|" + MODULE_PREFIX + ERROR + OPTIONAL);
             } else {
-                Utils.reportDiagnostics(ctx, PluginConstants.CompilationErrors
+                Utils.reportDiagnostics(ctx, CompilationErrors
                         .INVALID_RETURN_TYPE_0_FUNCTION_1_RETURN_TYPE_SHOULD_BE_A_SUBTYPE_OF_2,
                         returnTypeSymbolLocation, returnTypeSymbol.signature(), functionName,
                         MODULE_PREFIX + ERROR + "|" + NIL);
