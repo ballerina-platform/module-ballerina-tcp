@@ -22,6 +22,12 @@ import io.ballerina.compiler.api.symbols.MethodSymbol;
 import io.ballerina.compiler.api.symbols.Qualifier;
 import io.ballerina.compiler.syntax.tree.FunctionDefinitionNode;
 import io.ballerina.compiler.syntax.tree.SyntaxKind;
+import io.ballerina.projects.plugins.SyntaxNodeAnalysisContext;
+import io.ballerina.tools.diagnostics.Diagnostic;
+import io.ballerina.tools.diagnostics.DiagnosticFactory;
+import io.ballerina.tools.diagnostics.DiagnosticInfo;
+import io.ballerina.tools.diagnostics.DiagnosticSeverity;
+import io.ballerina.tools.diagnostics.Location;
 
 /**
  * Compiler-plugin utility class.
@@ -40,5 +46,14 @@ public class Utils {
     public static boolean hasRemoteKeyword(MethodSymbol methodSymbol) {
         return methodSymbol.qualifiers().stream()
                 .filter(qualifier -> qualifier == Qualifier.REMOTE).count() == 1;
+    }
+
+    public static void reportDiagnostics(SyntaxNodeAnalysisContext ctx, CompilationErrors error,
+                                         Location location, Object... args) {
+        String errorMessage = error.getError();
+        String diagnosticCode = error.getErrorCode();
+        DiagnosticInfo diagnosticInfo = new DiagnosticInfo(diagnosticCode, errorMessage, DiagnosticSeverity.ERROR);
+        Diagnostic diagnostic = DiagnosticFactory.createDiagnostic(diagnosticInfo, location, args);
+        ctx.reportDiagnostic(diagnostic);
     }
 }

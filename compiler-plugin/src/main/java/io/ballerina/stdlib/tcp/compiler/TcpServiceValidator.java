@@ -34,18 +34,14 @@ import io.ballerina.tools.diagnostics.DiagnosticFactory;
 import io.ballerina.tools.diagnostics.DiagnosticInfo;
 import io.ballerina.tools.diagnostics.DiagnosticSeverity;
 
-import static io.ballerina.stdlib.tcp.compiler.TcpConnectionServiceValidator.TCP_106;
-import static io.ballerina.stdlib.tcp.compiler.TcpConnectionServiceValidator.TEMPLATE_CODE_GENERATION_HINT;
+import static io.ballerina.stdlib.tcp.compiler.PluginConstants.TCP_106;
+import static io.ballerina.stdlib.tcp.compiler.PluginConstants.TEMPLATE_CODE_GENERATION_HINT;
 
 /**
  * Class to Validate TCP services.
  */
 public class TcpServiceValidator {
     private SyntaxNodeAnalysisContext ctx;
-
-    public static final String TCP_103 = "TCP_103";
-    public static final String FUNCTION_0_NOT_ACCEPTED_BY_THE_SERVICE = "Function `{0}` not accepted by the service";
-
     public TcpServiceValidator(SyntaxNodeAnalysisContext syntaxNodeAnalysisContext) {
         ctx = syntaxNodeAnalysisContext;
     }
@@ -90,9 +86,7 @@ public class TcpServiceValidator {
     }
 
     private void reportInvalidFunction(FunctionDefinitionNode functionDefinitionNode) {
-        DiagnosticInfo diagnosticInfo = new DiagnosticInfo(TCP_103, FUNCTION_0_NOT_ACCEPTED_BY_THE_SERVICE,
-                DiagnosticSeverity.ERROR);
-        ctx.reportDiagnostic(DiagnosticFactory.createDiagnostic(diagnosticInfo,
-                functionDefinitionNode.location(), functionDefinitionNode.functionName().toString()));
+        Utils.reportDiagnostics(ctx, CompilationErrors.FUNCTION_0_NOT_ACCEPTED_BY_THE_SERVICE,
+                functionDefinitionNode.location(), functionDefinitionNode.functionName().toString());
     }
 }

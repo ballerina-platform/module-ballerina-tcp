@@ -41,7 +41,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static io.ballerina.stdlib.tcp.compiler.TcpConnectionServiceValidator.TCP_106;
+import static io.ballerina.stdlib.tcp.compiler.PluginConstants.TCP_106;
 
 /**
  * Code action to add resource code snippet.

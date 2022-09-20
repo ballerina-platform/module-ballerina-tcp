@@ -49,9 +49,7 @@ public class CompilerPluginTest {
         DiagnosticResult diagnosticResult = compilation.diagnosticResult();
         Assert.assertEquals(diagnosticResult.errors().size(), 2);
         for (Diagnostic diagnostic : diagnosticResult.errors()) {
-            Assert.assertEquals(diagnostic.diagnosticInfo().messageFormat(),
-                    TcpServiceValidator.FUNCTION_0_NOT_ACCEPTED_BY_THE_SERVICE);
-            Assert.assertEquals(diagnostic.diagnosticInfo().code(), TcpServiceValidator.TCP_103);
+            assertDiagnostic(diagnostic, CompilationErrors.FUNCTION_0_NOT_ACCEPTED_BY_THE_SERVICE);
         }
     }
 
@@ -62,9 +60,7 @@ public class CompilerPluginTest {
         DiagnosticResult diagnosticResult = compilation.diagnosticResult();
         Assert.assertEquals(diagnosticResult.diagnostics().size(), 1);
         Diagnostic diagnostic = (Diagnostic) diagnosticResult.diagnostics().toArray()[0];
-        Assert.assertEquals(diagnostic.diagnosticInfo().messageFormat(),
-                TcpConnectionServiceValidator.SERVICE_DOES_NOT_CONTAIN_ON_BYTES_FUNCTION);
-        Assert.assertEquals(diagnostic.diagnosticInfo().code(), TcpConnectionServiceValidator.TCP_102);
+        assertDiagnostic(diagnostic, CompilationErrors.SERVICE_DOES_NOT_CONTAIN_ON_BYTES_FUNCTION);
     }
 
     @Test
@@ -74,9 +70,8 @@ public class CompilerPluginTest {
         DiagnosticResult diagnosticResult = compilation.diagnosticResult();
         Assert.assertEquals(diagnosticResult.diagnostics().size(), 3);
         for (Diagnostic diagnostic : diagnosticResult.diagnostics()) {
-            Assert.assertEquals(diagnostic.diagnosticInfo().messageFormat(),
-                    TcpConnectionServiceValidator.REMOTE_KEYWORD_EXPECTED_IN_0_FUNCTION_SIGNATURE);
-            Assert.assertEquals(diagnostic.diagnosticInfo().code(), TcpConnectionServiceValidator.TCP_101);
+            assertDiagnostic(diagnostic, CompilationErrors
+                    .REMOTE_KEYWORD_EXPECTED_IN_0_FUNCTION_SIGNATURE);
         }
     }
 
@@ -87,9 +82,8 @@ public class CompilerPluginTest {
         DiagnosticResult diagnosticResult = compilation.diagnosticResult();
         Assert.assertEquals(diagnosticResult.diagnostics().size(), 2);
         for (Diagnostic diagnostic : diagnosticResult.diagnostics()) {
-            Assert.assertEquals(diagnostic.diagnosticInfo().messageFormat(),
-                    TcpConnectionServiceValidator.NO_PARAMETER_PROVIDED_FOR_0_FUNCTION_EXPECTS_1_AS_A_PARAMETER);
-            Assert.assertEquals(diagnostic.diagnosticInfo().code(), TcpConnectionServiceValidator.TCP_104);
+        assertDiagnostic(diagnostic, CompilationErrors
+                .NO_PARAMETER_PROVIDED_FOR_0_FUNCTION_EXPECTS_1_AS_A_PARAMETER);
         }
     }
 
@@ -100,9 +94,7 @@ public class CompilerPluginTest {
         DiagnosticResult diagnosticResult = compilation.diagnosticResult();
         Assert.assertEquals(diagnosticResult.diagnostics().size(), 1);
         Diagnostic diagnostic = (Diagnostic) diagnosticResult.diagnostics().toArray()[0];
-        Assert.assertEquals(diagnostic.diagnosticInfo().messageFormat(),
-                TcpConnectionServiceValidator.INVALID_PARAMETER_0_PROVIDED_FOR_1_FUNCTION);
-        Assert.assertEquals(diagnostic.diagnosticInfo().code(), TcpConnectionServiceValidator.TCP_104);
+        assertDiagnostic(diagnostic, CompilationErrors.INVALID_PARAMETER_0_PROVIDED_FOR_1_FUNCTION);
     }
 
     @Test
@@ -112,8 +104,8 @@ public class CompilerPluginTest {
         DiagnosticResult diagnosticResult = compilation.diagnosticResult();
         Assert.assertEquals(diagnosticResult.diagnostics().size(), 1);
         Diagnostic diagnostic = (Diagnostic) diagnosticResult.diagnostics().toArray()[0];
-        Assert.assertEquals(diagnostic.diagnosticInfo().messageFormat(),
-                TcpConnectionServiceValidator.INVALID_PARAMETER_0_PROVIDED_FOR_1_FUNCTION_EXPECTS_2);
+        assertDiagnostic(diagnostic, CompilationErrors
+                .INVALID_PARAMETER_0_PROVIDED_FOR_1_FUNCTION_EXPECTS_2);
     }
 
     @Test(description = "test onBytes function with byte[] parameter, without readonly intersection")
@@ -123,9 +115,8 @@ public class CompilerPluginTest {
         DiagnosticResult diagnosticResult = compilation.diagnosticResult();
         Assert.assertEquals(diagnosticResult.diagnostics().size(), 1);
         Diagnostic diagnostic = (Diagnostic) diagnosticResult.diagnostics().toArray()[0];
-        Assert.assertEquals(diagnostic.diagnosticInfo().messageFormat(),
-                TcpConnectionServiceValidator.INVALID_PARAMETER_0_PROVIDED_FOR_1_FUNCTION_EXPECTS_2);
-        Assert.assertEquals(diagnostic.diagnosticInfo().code(), TcpConnectionServiceValidator.TCP_104);
+        assertDiagnostic(diagnostic, CompilationErrors
+                .INVALID_PARAMETER_0_PROVIDED_FOR_1_FUNCTION_EXPECTS_2);
     }
 
     @Test
@@ -148,9 +139,8 @@ public class CompilerPluginTest {
         DiagnosticResult diagnosticResult = compilation.diagnosticResult();
         Assert.assertEquals(diagnosticResult.diagnostics().size(), 1);
         Diagnostic diagnostic = (Diagnostic) diagnosticResult.diagnostics().toArray()[0];
-        Assert.assertEquals(diagnostic.diagnosticInfo().messageFormat(),
-                TcpConnectionServiceValidator.INVALID_PARAMETER_0_PROVIDED_FOR_1_FUNCTION_EXPECTS_2);
-        Assert.assertEquals(diagnostic.diagnosticInfo().code(), TcpConnectionServiceValidator.TCP_104);
+        assertDiagnostic(diagnostic, CompilationErrors
+                .INVALID_PARAMETER_0_PROVIDED_FOR_1_FUNCTION_EXPECTS_2);
     }
 
    @Test
@@ -168,10 +158,8 @@ public class CompilerPluginTest {
         DiagnosticResult diagnosticResult = compilation.diagnosticResult();
         Assert.assertEquals(diagnosticResult.diagnostics().size(), 3);
         for (Diagnostic diagnostic : diagnosticResult.diagnostics()) {
-            Assert.assertEquals(diagnostic.diagnosticInfo().messageFormat(),
-                    TcpConnectionServiceValidator
-                            .INVALID_RETURN_TYPE_0_FUNCTION_1_RETURN_TYPE_SHOULD_BE_A_SUBTYPE_OF_2);
-            Assert.assertEquals(diagnostic.diagnosticInfo().code(), TcpConnectionServiceValidator.TCP_105);
+            assertDiagnostic(diagnostic, CompilationErrors
+                    .INVALID_RETURN_TYPE_0_FUNCTION_1_RETURN_TYPE_SHOULD_BE_A_SUBTYPE_OF_2);
         }
     }
 
@@ -182,9 +170,7 @@ public class CompilerPluginTest {
         DiagnosticResult diagnosticResult = compilation.diagnosticResult();
         Assert.assertEquals(diagnosticResult.diagnostics().size(), 2);
         for (Diagnostic diagnostic : diagnosticResult.diagnostics()) {
-            Assert.assertEquals(diagnostic.diagnosticInfo().messageFormat(),
-                    TcpConnectionServiceValidator.FUNCTION_0_NOT_ACCEPTED_BY_THE_SERVICE);
-            Assert.assertEquals(diagnostic.diagnosticInfo().code(), TcpConnectionServiceValidator.TCP_103);
+            assertDiagnostic(diagnostic, CompilationErrors.FUNCTION_0_NOT_ACCEPTED_BY_THE_SERVICE);
         }
     }
 
@@ -195,9 +181,8 @@ public class CompilerPluginTest {
         DiagnosticResult diagnosticResult = compilation.diagnosticResult();
         Assert.assertEquals(diagnosticResult.diagnostics().size(), 2);
         for (Diagnostic diagnostic : diagnosticResult.diagnostics()) {
-            Assert.assertEquals(diagnostic.diagnosticInfo().messageFormat(),
-                    TcpConnectionServiceValidator.PROVIDED_0_PARAMETERS_1_CAN_HAVE_ONLY_2_PARAMETERS);
-            Assert.assertEquals(diagnostic.diagnosticInfo().code(), TcpConnectionServiceValidator.TCP_104);
+            assertDiagnostic(diagnostic, CompilationErrors
+                    .PROVIDED_0_PARAMETERS_1_CAN_HAVE_ONLY_2_PARAMETERS);
         }
 
         currentPackage = loadPackage("sample_package_14");
@@ -205,9 +190,8 @@ public class CompilerPluginTest {
         diagnosticResult = compilation.diagnosticResult();
         Assert.assertEquals(diagnosticResult.diagnostics().size(), 1);
         Diagnostic diagnostic = (Diagnostic) diagnosticResult.diagnostics().toArray()[0];
-        Assert.assertEquals(diagnostic.diagnosticInfo().messageFormat(),
-                TcpConnectionServiceValidator.PROVIDED_0_PARAMETERS_ON_CLOSE_FUNCTION_CANNOT_HAVE_ANY_PARAMETERS);
-        Assert.assertEquals(diagnostic.diagnosticInfo().code(), TcpConnectionServiceValidator.TCP_104);
+        assertDiagnostic(diagnostic, CompilationErrors
+                .PROVIDED_0_PARAMETERS_ON_CLOSE_FUNCTION_CANNOT_HAVE_ANY_PARAMETERS);
     }
 
     @Test
@@ -227,5 +211,11 @@ public class CompilerPluginTest {
     private static ProjectEnvironmentBuilder getEnvironmentBuilder() {
         Environment environment = EnvironmentBuilder.getBuilder().setBallerinaHome(DISTRIBUTION_PATH).build();
         return ProjectEnvironmentBuilder.getBuilder(environment);
+    }
+
+    private void assertDiagnostic(Diagnostic diagnostic, CompilationErrors error) {
+        Assert.assertEquals(diagnostic.diagnosticInfo().code(), error.getErrorCode());
+        Assert.assertEquals(diagnostic.diagnosticInfo().messageFormat(),
+                error.getError());
     }
 }
