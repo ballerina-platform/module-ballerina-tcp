@@ -1,34 +1,5 @@
 [
   {
-    "name":"io.ballerina.stdlib.tcp.TcpClient$1",
-    "queriedMethods":[{"name":"exceptionCaught","parameterTypes":["io.netty.channel.ChannelHandlerContext","java.lang.Throwable"] }]
-  },
-  {
-    "name":"io.ballerina.stdlib.tcp.TcpListener$1"
-  },
-  {
-    "name":"io.ballerina.stdlib.tcp.TcpListener$2",
-    "queriedMethods":[{"name":"exceptionCaught","parameterTypes":["io.netty.channel.ChannelHandlerContext","java.lang.Throwable"] }]
-  },
-  {
-    "name":"io.ballerina.stdlib.tcp.TcpListenerHandler",
-    "queriedMethods":[
-      {"name":"channelActive","parameterTypes":["io.netty.channel.ChannelHandlerContext"] },
-      {"name":"channelInactive","parameterTypes":["io.netty.channel.ChannelHandlerContext"] },
-      {"name":"channelWritabilityChanged","parameterTypes":["io.netty.channel.ChannelHandlerContext"] },
-      {"name":"exceptionCaught","parameterTypes":["io.netty.channel.ChannelHandlerContext","java.lang.Throwable"] }
-    ]
-  },
-  {
-    "name":"io.ballerina.stdlib.tcp.TcpClientHandler",
-    "queriedMethods":[
-      {"name":"channelInactive","parameterTypes":["io.netty.channel.ChannelHandlerContext"] },
-      {"name":"channelWritabilityChanged","parameterTypes":["io.netty.channel.ChannelHandlerContext"] },
-      {"name":"exceptionCaught","parameterTypes":["io.netty.channel.ChannelHandlerContext","java.lang.Throwable"] },
-      {"name":"userEventTriggered","parameterTypes":["io.netty.channel.ChannelHandlerContext","java.lang.Object"] }
-    ]
-  },
-  {
     "name":"io.netty.bootstrap.ServerBootstrap$1"
   },
   {
