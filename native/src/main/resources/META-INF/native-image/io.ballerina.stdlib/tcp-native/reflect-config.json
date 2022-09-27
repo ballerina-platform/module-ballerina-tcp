@@ -4,12 +4,6 @@
     "queriedMethods":[{"name":"exceptionCaught","parameterTypes":["io.netty.channel.ChannelHandlerContext","java.lang.Throwable"] }]
   },
   {
-    "name":"[Lio.ballerina.runtime.api.types.ResourceMethodType;"
-  },
-  {
-    "name":"[Lio.ballerina.runtime.internal.types.BMethodType;"
-  },
-  {
     "name":"io.ballerina.stdlib.tcp.TcpListener$1"
   },
   {
