@@ -2,10 +2,11 @@ Ballerina TCP Library
 ===================
 
   [![Build](https://github.com/ballerina-platform/module-ballerina-tcp/actions/workflows/build-timestamped-master.yml/badge.svg)](https://github.com/ballerina-platform/module-ballerina-socket/actions/workflows/build-timestamped-master.yml)
+  [![codecov](https://codecov.io/gh/ballerina-platform/module-ballerina-tcp/branch/master/graph/badge.svg)](https://codecov.io/gh/ballerina-platform/module-ballerina-tcp) 
   [![Trivy](https://github.com/ballerina-platform/module-ballerina-tcp/actions/workflows/trivy-scan.yml/badge.svg)](https://github.com/ballerina-platform/module-ballerina-tcp/actions/workflows/trivy-scan.yml)
+  [![GraalVM Check](https://img.shields.io/github/workflow/status/ballerina-platform/module-ballerina-tcp/Build%20with%20bal%20test%20native?label=GraalVM%20Check)](https://github.com/ballerina-platform/module-ballerina-tcp/actions/workflows/build-with-bal-test-native.yml)
   [![GitHub Last Commit](https://img.shields.io/github/last-commit/ballerina-platform/module-ballerina-tcp.svg)](https://github.com/ballerina-platform/module-ballerina-socket/commits/master)
-  [![Github issues](https://img.shields.io/github/issues/ballerina-platform/ballerina-standard-library/module/tcp.svg?label=Open%20Issues)](https://github.com/ballerina-platform/ballerina-standard-library/labels/module%2Fsocket)
-  [![codecov](https://codecov.io/gh/ballerina-platform/module-ballerina-tcp/branch/master/graph/badge.svg)](https://codecov.io/gh/ballerina-platform/module-ballerina-tcp)  
+  [![Github issues](https://img.shields.io/github/issues/ballerina-platform/ballerina-standard-library/module/tcp.svg?label=Open%20Issues)](https://github.com/ballerina-platform/ballerina-standard-library/labels/module%2Fsocket) 
 
 This library provides a client-server implementation for sending/receiving messages to/from another application process (local or remote) for connection-oriented protocols. 
 
