@@ -22,8 +22,10 @@ import io.ballerina.runtime.api.PredefinedTypes;
 import io.ballerina.runtime.api.TypeTags;
 import io.ballerina.runtime.api.creators.ValueCreator;
 import io.ballerina.runtime.api.types.MethodType;
+import io.ballerina.runtime.api.types.ObjectType;
 import io.ballerina.runtime.api.types.Type;
 import io.ballerina.runtime.api.utils.StringUtils;
+import io.ballerina.runtime.api.utils.TypeUtils;
 import io.ballerina.runtime.api.values.BError;
 import io.ballerina.runtime.api.values.BObject;
 import io.netty.buffer.ByteBuf;
@@ -63,7 +65,9 @@ public class Dispatcher {
             return;
         }
         try {
-            MethodType methodType = Arrays.stream(tcpService.getConnectionService().getType().getMethods())
+            ObjectType objectType =
+                    (ObjectType) TypeUtils.getReferredType(tcpService.getConnectionService().getType());
+            MethodType methodType = Arrays.stream(objectType.getMethods())
                     .filter(m -> m.getName().equals(Constants.ON_ERROR)).findFirst().orElse(null);
             if (methodType != null) {
                 Object[] params = getOnErrorSignature(message);
@@ -123,7 +127,9 @@ public class Dispatcher {
     }
 
     public static void invokeRead(TcpService tcpService, ByteBuf buffer, Channel channel) {
-        for (MethodType method : tcpService.getConnectionService().getType().getMethods()) {
+        ObjectType objectType =
+                (ObjectType) TypeUtils.getReferredType(tcpService.getConnectionService().getType());
+        for (MethodType method : objectType.getMethods()) {
             switch (method.getName()) {
                 case Constants.ON_BYTES:
                     Dispatcher.invokeOnBytes(tcpService, buffer, channel, method.getType().getParameterTypes());
@@ -160,7 +166,9 @@ public class Dispatcher {
             return;
         }
         try {
-            MethodType methodType = Arrays.stream(tcpService.getConnectionService().getType().getMethods())
+            ObjectType objectType =
+                    (ObjectType) TypeUtils.getReferredType(tcpService.getConnectionService().getType());
+            MethodType methodType = Arrays.stream(objectType.getMethods())
                     .filter(m -> m.getName().equals(Constants.ON_CLOSE)).findFirst().orElse(null);
             if (methodType != null) {
                 Object[] params = {};
@@ -179,7 +187,8 @@ public class Dispatcher {
     }
 
     private static boolean isIsolated(BObject serviceObj, String remoteMethod) {
-        return serviceObj.getType().isIsolated() && serviceObj.getType().isIsolated(remoteMethod);
+        ObjectType objectType = (ObjectType) TypeUtils.getReferredType(serviceObj.getType());
+        return objectType.isIsolated() && objectType.isIsolated(remoteMethod);
     }
 
     private Dispatcher() {}
