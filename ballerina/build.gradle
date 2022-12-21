@@ -87,6 +87,9 @@ dependencies {
     externalJars(group: 'io.netty', name: 'netty-codec', version: "${nettyVersion}") {
         transitive = false
     }
+    externalJars(group: 'io.netty', name: 'netty-transport-native-unix-common', version: "${nettyVersion}") {
+        transitive = false
+    }
 }
 
 task updateTomlFiles {
