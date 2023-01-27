@@ -90,15 +90,33 @@ dependencies {
     externalJars(group: 'io.netty', name: 'netty-transport-native-unix-common', version: "${nettyVersion}") {
         transitive = false
     }
+    externalJars(group: 'io.netty', name: 'netty-codec-socks', version: "${nettyVersion}") {
+        transitive = false
+    }
+    externalJars(group: 'net.jpountz.lz4', name: 'lz4', version: "${lz4Version}") {
+        transitive = false
+    }
+    externalJars(group: 'org.jboss.marshalling', name: 'jboss-marshalling', version: "${marshallingVersion}") {
+        transitive = false
+    }
+    externalJars(group: 'com.google.protobuf', name: 'protobuf-java', version: "${protobufVersion}") {
+        transitive = false
+    }
 }
 
 task updateTomlFiles {
     doLast {
         def nettyVersion = project.nettyVersion
+        def stdlibDependentLz4Version = project.lz4Version
+        def stdlibDependentMarshallingVersion = project.marshallingVersion
+        def stdlibDependentProtobufVersion = project.protobufVersion
 
         def newConfig = ballerinaTomlFilePlaceHolder.text.replace("@project.version@", project.version)
         newConfig = newConfig.replace("@toml.version@", tomlVersion)
         newConfig = newConfig.replace("@netty.version@", nettyVersion)
+        newConfig = newConfig.replace("@lz4.version@", stdlibDependentLz4Version)
+        newConfig = newConfig.replace("@marshalling.version@", stdlibDependentMarshallingVersion)
+        newConfig = newConfig.replace("@protobuf.version@", stdlibDependentProtobufVersion)
         ballerinaTomlFile.text = newConfig
 
         def newPluginConfig = compilerPluginTomlFilePlaceHolder.text.replace("@project.version@", project.version)
