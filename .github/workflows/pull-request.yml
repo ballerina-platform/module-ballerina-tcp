@@ -62,13 +62,6 @@ jobs:
       - name: Generate CodeCov Report Try 4
         if: steps.uploadReport3.outcome == 'failure'
         uses: codecov/codecov-action@v2
-        with:
-            name: Code Coverage JSON
-            path: tcp-ballerina/target/report/test_results.json
-            if-no-files-found: ignore
-      - name: Generate CodeCov Report
-        if: github.event_name == 'pull_request'
-        uses: codecov/codecov-action@v2
         
   windows-build:
     name: Build on Windows
