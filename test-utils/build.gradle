@@ -24,6 +24,7 @@ description = 'Ballerina - TCP Java Utils'
 dependencies {
     implementation group: 'io.netty', name: 'netty-handler', version: "${nettyVersion}"
     implementation group: 'io.netty', name: 'netty-buffer', version: "${nettyVersion}"
+    implementation group: 'io.netty', name: 'netty-transport-native-unix-common', version: "${nettyVersion}"
     implementation group: 'io.netty', name: 'netty-transport', version: "${nettyVersion}"
     implementation group: 'io.netty', name: 'netty-common', version: "${nettyVersion}"
     implementation group: 'org.ballerinalang', name: 'ballerina-lang', version: "${ballerinaLangVersion}"
