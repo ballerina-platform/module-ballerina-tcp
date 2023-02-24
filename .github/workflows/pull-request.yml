@@ -8,7 +8,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout Repository
+        uses: actions/checkout@v2
       - name: Set up JDK 11
         uses: actions/setup-java@v2
         with:
@@ -18,57 +19,26 @@ jobs:
         env:
           packageUser: ${{ github.actor }}
           packagePAT: ${{ secrets.GITHUB_TOKEN }}
-        run: ./gradlew build --scan --no-daemon
-      - name: Archive Error Log
+        run: ./gradlew build --scan
+      - name: Archive Code Coverage JSON
         uses: actions/upload-artifact@v2
-        if: failure()
         with:
-            name: Ballerina Internal Log
-            path: tcp-ballerina/ballerina-internal.log
-            if-no-files-found: ignore
-      - name: Generate CodeCov Report Try 1
+          name: Code Coverage JSON
+          path: tcp-ballerina/target/report/test_results.json
+          if-no-files-found: ignore
+      - name: Generate CodeCov Report
         if: github.event_name == 'pull_request'
-        id: uploadReport1
         uses: codecov/codecov-action@v2
-        continue-on-error: true
         with:
-          fail_ci_if_error: true
-      - name: Wait after upload failure
-        if: steps.uploadReport1.outcome == 'failure'
-        run: |
-          sleep 300s
-      - name: Generate CodeCov Report Try 2
-        if: steps.uploadReport1.outcome == 'failure'
-        id: uploadReport2
-        uses: codecov/codecov-action@v2
-        continue-on-error: true
-        with:
-          fail_ci_if_error: true
-      - name: Wait after upload failure
-        if: steps.uploadReport2.outcome == 'failure'
-        run: |
-          sleep 300s
-      - name: Generate CodeCov Report Try 3
-        if: steps.uploadReport2.outcome == 'failure'
-        id: uploadReport3
-        uses: codecov/codecov-action@v2
-        continue-on-error: true
-        with:
-          fail_ci_if_error: true
-      - name: Wait after upload failure
-        if: steps.uploadReport3.outcome == 'failure'
-        run: |
-          sleep 300s
-      - name: Generate CodeCov Report Try 4
-        if: steps.uploadReport3.outcome == 'failure'
-        uses: codecov/codecov-action@v2
-        
+          token: ${{ secrets.CODECOV_TOKEN }}
+
   windows-build:
     name: Build on Windows
     runs-on: windows-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout Repository
+        uses: actions/checkout@v2
       - name: Set up JDK 11
         uses: actions/setup-java@v2
         with:
@@ -78,4 +48,4 @@ jobs:
         env:
           packageUser: ${{ github.actor }}
           packagePAT: ${{ secrets.GITHUB_TOKEN }}
-        run: ./gradlew.bat build --scan --no-daemon
+        run: ./gradlew.bat build --scan
