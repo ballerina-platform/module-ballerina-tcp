@@ -25,7 +25,7 @@ function setupServer() returns error? {
 
 @test:Config {dependsOn: [testListenerEcho]}
 function testProtocolVersion() returns error? {
-    Error|Client socketClient = new ("localhost", 9002, secureSocket = {
+    Error|Client socketClient = new ("localhost", 9022, secureSocket = {
         cert: certPath,
         protocol: {
             name: TLS,
@@ -40,7 +40,7 @@ function testProtocolVersion() returns error? {
 
 @test:Config {dependsOn: [testProtocolVersion]}
 function testCiphers() returns error? {
-    Error|Client socketClient = new ("localhost", 9002, secureSocket = {
+    Error|Client socketClient = new ("localhost", 9022, secureSocket = {
         cert: certPath,
         protocol: {
             name: TLS,
@@ -55,7 +55,7 @@ function testCiphers() returns error? {
 
 @test:Config {dependsOn: [testCiphers]}
 function testSecureClientEcho() returns error? {
-    Client socketClient = check new ("localhost", 9002, secureSocket = {
+    Client socketClient = check new ("localhost", 9022, secureSocket = {
         cert: certPath,
         protocol: {
             name: TLS,
@@ -127,7 +127,7 @@ function testSecureSocketConfigEnableFalse() returns error? {
 
 @test:Config {dependsOn: [testSecureSocketConfigEnableFalse]}
 isolated function testSecureClientWithInvalidCertPath() returns error? {
-    Error|Client socketClient = new ("localhost", 9002, secureSocket = {
+    Error|Client socketClient = new ("localhost", 9022, secureSocket = {
         cert: {
             path: "invalid",
             password:"ballerina"
@@ -148,7 +148,7 @@ isolated function testSecureClientWithInvalidCertPath() returns error? {
 
 @test:Config {}
 isolated function testSecureClientWithEmtyTrustStore() returns error? {
-    Error|Client socketClient = new ("localhost", 9002, secureSocket = {
+    Error|Client socketClient = new ("localhost", 9022, secureSocket = {
         cert: {
             path: "",
             password: "ballerina"
@@ -164,7 +164,7 @@ isolated function testSecureClientWithEmtyTrustStore() returns error? {
 
 @test:Config {}
 function testSecureClientWithEmtyTrustStorePassword() returns error? {
-    Error|Client socketClient = new ("localhost", 9002, secureSocket = {
+    Error|Client socketClient = new ("localhost", 9022, secureSocket = {
         cert: {
             path: truststore,
             password:""
@@ -180,7 +180,7 @@ function testSecureClientWithEmtyTrustStorePassword() returns error? {
 
 @test:Config {}
 function testSecureClientWithEmtyCert() returns error? {
-    Error|Client socketClient = new ("localhost", 9002, secureSocket = {
+    Error|Client socketClient = new ("localhost", 9022, secureSocket = {
         cert: ""
     });
 
@@ -193,7 +193,7 @@ function testSecureClientWithEmtyCert() returns error? {
 
 @test:Config {}
 function testBasicSecureClient() returns error? {
-    Client socketClient = check new ("localhost", 9002, secureSocket = {
+    Client socketClient = check new ("localhost", 9022, secureSocket = {
         cert: certPath
     });
 

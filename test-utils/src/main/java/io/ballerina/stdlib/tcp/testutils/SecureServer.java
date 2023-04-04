@@ -16,7 +16,7 @@ import java.io.File;
 import java.net.InetSocketAddress;
 
 public class SecureServer implements Runnable {
-    private static int PORT = 9002;
+    private static int PORT = 9022;
     private static EventLoopGroup group;
 
     public static Object stop() {
