@@ -1,5 +1,12 @@
 # HTTP Echo Server
 
+[![Star on Github](https://img.shields.io/badge/-Star%20on%20Github-blue?style=social&logo=github)](https://github.com/ballerina-platform/module-ballerina-tcp)
+
+_Authors_: @shafreenAnfar @Bhashinee   
+_Reviewers_: @shafreenAnfar   
+_Created_: 2021/10/07   
+_Updated_: 2021/10/28 
+
 ## Overview
 
 This application shows how to use the Ballerina TCP package to implement a simple HTTP echo server and a client.
