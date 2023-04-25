@@ -2,10 +2,10 @@
 
 [![Star on Github](https://img.shields.io/badge/-Star%20on%20Github-blue?style=social&logo=github)](https://github.com/ballerina-platform/module-ballerina-tcp)
 
-Authors: @shafreenAnfar @Bhashinee
-Reviewers: @shafreenAnfar
-Created: 2021/10/07
-Updated: 2021/10/28
+_Authors_: @shafreenAnfar @Bhashinee   
+_Reviewers_: @shafreenAnfar   
+_Created_: 2021/10/07   
+_Updated_: 2021/10/28 
 
 ## Overview
 
