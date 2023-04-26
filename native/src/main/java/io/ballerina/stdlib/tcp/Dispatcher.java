@@ -66,7 +66,7 @@ public class Dispatcher {
         }
         try {
             ObjectType objectType =
-                    (ObjectType) TypeUtils.getReferredType(tcpService.getConnectionService().getType());
+                    (ObjectType) TypeUtils.getReferredType(TypeUtils.getType(tcpService.getConnectionService()));
             MethodType methodType = Arrays.stream(objectType.getMethods())
                     .filter(m -> m.getName().equals(Constants.ON_ERROR)).findFirst().orElse(null);
             if (methodType != null) {
@@ -128,7 +128,7 @@ public class Dispatcher {
 
     public static void invokeRead(TcpService tcpService, ByteBuf buffer, Channel channel) {
         ObjectType objectType =
-                (ObjectType) TypeUtils.getReferredType(tcpService.getConnectionService().getType());
+                (ObjectType) TypeUtils.getReferredType(TypeUtils.getType(tcpService.getConnectionService()));
         for (MethodType method : objectType.getMethods()) {
             switch (method.getName()) {
                 case Constants.ON_BYTES:
@@ -167,7 +167,7 @@ public class Dispatcher {
         }
         try {
             ObjectType objectType =
-                    (ObjectType) TypeUtils.getReferredType(tcpService.getConnectionService().getType());
+                    (ObjectType) TypeUtils.getReferredType(TypeUtils.getType(tcpService.getConnectionService()));
             MethodType methodType = Arrays.stream(objectType.getMethods())
                     .filter(m -> m.getName().equals(Constants.ON_CLOSE)).findFirst().orElse(null);
             if (methodType != null) {
@@ -187,7 +187,7 @@ public class Dispatcher {
     }
 
     private static boolean isIsolated(BObject serviceObj, String remoteMethod) {
-        ObjectType objectType = (ObjectType) TypeUtils.getReferredType(serviceObj.getType());
+        ObjectType objectType = (ObjectType) TypeUtils.getReferredType(TypeUtils.getType(serviceObj));
         return objectType.isIsolated() && objectType.isIsolated(remoteMethod);
     }
 
