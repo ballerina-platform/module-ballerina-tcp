@@ -14,13 +14,20 @@
 // specific language governing permissions and limitations
 // under the License.
 
-import ballerina/test;
 import ballerina/jballerina.java;
 import ballerina/io;
+import ballerina/lang.runtime;
+import ballerina/test;
 
 @test:BeforeSuite
 function setupServer() returns error? {
     check startSecureServer();
+}
+
+@test:BeforeSuite
+function waitForServerWarmUp() returns error? {
+    // Wait SecureServer and EchoServer to start
+    runtime:sleep(5);
 }
 
 @test:Config {dependsOn: [testListenerEcho]}
