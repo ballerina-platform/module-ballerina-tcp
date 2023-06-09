@@ -14,13 +14,36 @@
 // specific language governing permissions and limitations
 // under the License.
 
-import ballerina/test;
-import ballerina/jballerina.java;
 import ballerina/io;
+import ballerina/jballerina.java;
+import ballerina/lang.runtime;
+import ballerina/test;
 
 @test:BeforeSuite
 function setupServer() returns error? {
     check startSecureServer();
+}
+
+@test:BeforeSuite
+function waitForServerWarmUp() returns error? {
+    // Wait SecureServer and EchoServer to start
+    runtime:sleep(5);
+    check pingServers();
+}
+
+function pingServers() returns error? {
+    do {
+        // ping EchoServer
+        Client _ = check new ("localhost", 3000);
+        // ping SecureServer
+        Client _ = check new ("localhost", 9002,
+            secureSocket = {
+                cert: certPath
+            }
+        );
+    } on fail error e {
+        return error("Server Warmup Timeout", e);
+    }
 }
 
 @test:Config {dependsOn: [testListenerEcho]}
@@ -68,8 +91,8 @@ function testSecureClientEcho() returns error? {
     byte[] msgByteArray = msg.toBytes();
     check socketClient->writeBytes(msgByteArray);
 
-   readonly & byte[] receivedData = check socketClient->readBytes();
-   test:assertEquals('string:fromBytes(receivedData), msg, "Found unexpected output");
+    readonly & byte[] receivedData = check socketClient->readBytes();
+    test:assertEquals('string:fromBytes(receivedData), msg, "Found unexpected output");
 
     check socketClient->close();
 }
@@ -79,7 +102,7 @@ function testSecureClientWithTruststore() returns error? {
     Client socketClient = check new ("localhost", PORT7, secureSocket = {
         cert: {
             path: truststore,
-            password:"ballerina"
+            password: "ballerina"
         },
         protocol: {
             name: TLS,
@@ -94,8 +117,8 @@ function testSecureClientWithTruststore() returns error? {
     byte[] msgByteArray = msg.toBytes();
     check socketClient->writeBytes(msgByteArray);
 
-   readonly & byte[] receivedData = check socketClient->readBytes();
-   test:assertEquals('string:fromBytes(receivedData), msg, "Found unexpected output");
+    readonly & byte[] receivedData = check socketClient->readBytes();
+    test:assertEquals('string:fromBytes(receivedData), msg, "Found unexpected output");
 
     check socketClient->close();
 }
@@ -106,7 +129,7 @@ function testSecureSocketConfigEnableFalse() returns error? {
         enable: false,
         cert: {
             path: truststore,
-            password:"ballerina"
+            password: "ballerina"
         },
         protocol: {
             name: TLS,
@@ -119,10 +142,10 @@ function testSecureSocketConfigEnableFalse() returns error? {
     byte[] msgByteArray = msg.toBytes();
     check socketClient->writeBytes(msgByteArray);
 
-   readonly & byte[] receivedData = check socketClient->readBytes();
-   test:assertEquals('string:fromBytes(receivedData), msg, "Found unexpected output");
+    readonly & byte[] receivedData = check socketClient->readBytes();
+    test:assertEquals('string:fromBytes(receivedData), msg, "Found unexpected output");
 
-   check socketClient->close();
+    check socketClient->close();
 }
 
 @test:Config {dependsOn: [testSecureSocketConfigEnableFalse]}
@@ -130,7 +153,7 @@ isolated function testSecureClientWithInvalidCertPath() returns error? {
     Error|Client socketClient = new ("localhost", 9002, secureSocket = {
         cert: {
             path: "invalid",
-            password:"ballerina"
+            password: "ballerina"
         },
         protocol: {
             name: TLS,
@@ -138,7 +161,7 @@ isolated function testSecureClientWithInvalidCertPath() returns error? {
         },
         ciphers: ["TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA"]
     });
-    
+
     if socketClient is Client {
         test:assertFail(msg = "Invalid trustore path provided initialization should fail.");
     } else {
@@ -167,7 +190,7 @@ function testSecureClientWithEmtyTrustStorePassword() returns error? {
     Error|Client socketClient = new ("localhost", 9002, secureSocket = {
         cert: {
             path: truststore,
-            password:""
+            password: ""
         }
     });
 
@@ -201,8 +224,8 @@ function testBasicSecureClient() returns error? {
     byte[] msgByteArray = msg.toBytes();
     check socketClient->writeBytes(msgByteArray);
 
-   readonly & byte[] receivedData = check socketClient->readBytes();
-   test:assertEquals('string:fromBytes(receivedData), msg, "Found unexpected output");
+    readonly & byte[] receivedData = check socketClient->readBytes();
+    test:assertEquals('string:fromBytes(receivedData), msg, "Found unexpected output");
 
     check socketClient->close();
 }
