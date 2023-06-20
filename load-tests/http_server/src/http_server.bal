@@ -14,10 +14,10 @@
 // specific language governing permissions and limitations
 // under the License.
 
-import ballerina/lang.'int as ints;
-import ballerina/tcp;
-import ballerina/regex;
 import ballerina/io;
+import ballerina/lang.'int as ints;
+import ballerina/lang.regexp;
+import ballerina/tcp;
 
 enum stateMachine {
     WAITING, RECEIVING_BODY, RECEIVED_BODY
@@ -107,12 +107,12 @@ service class EchoHttpService {
     }
 
     isolated function parseInitialChunk(string req) returns error? {
-        string[] headerAndBodyArr = regex:split(req, "\r\n\r\n");
-        string[] headerArr = regex:split(headerAndBodyArr[0], "\r\n");
+        string[] headerAndBodyArr = regexp:split(re`\r\n\r\n`, req);
+        string[] headerArr = regexp:split(re`\r\n`, headerAndBodyArr[0]);
         self.httpVersion = headerArr[0].substring(headerArr[0].length() - 8, headerArr[0].length());
         string[] filtered = headerArr.filter(i => !(i.startsWith("Host")) && !(i.startsWith("POST")));
         foreach string header in filtered {
-            string[] keyValue = regex:split(header, ":");
+            string[] keyValue = regexp:split(re`:`, header);
             self.headersMap[keyValue[0]] = keyValue[1];
         }
         string contLenHeader = self.headersMap.get("Content-Length");
