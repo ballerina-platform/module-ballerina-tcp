@@ -27,4 +27,74 @@
             <Bug pattern="UPM_UNCALLED_PRIVATE_METHOD" />
         </Or>
     </Match>
+
+    <Match>
+        <Class name="io.ballerina.stdlib.tcp.SSLHandlerFactory"/>
+        <Field name="sslConfig"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+    <Match>
+        <Class name="io.ballerina.stdlib.tcp.SslHandshakeClientEventHandler"/>
+        <Field name="tcpClientHandler"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+    <Match>
+        <Class name="io.ballerina.stdlib.tcp.SslHandshakeListenerEventHandler"/>
+        <Field name="tcpListenerHandler"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+    <Match>
+        <Class name="io.ballerina.stdlib.tcp.TcpCallback"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+    <Match>
+        <Class name="io.ballerina.stdlib.tcp.TcpClientHandler"/>
+        <Method name="getWriteFlowControllers"/>
+        <Bug pattern="EI_EXPOSE_REP"/>
+    </Match>
+    <Match>
+        <Class name="io.ballerina.stdlib.tcp.TcpClientHandler"/>
+        <Method name="setWriteFutureCompleted"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+    <Match>
+        <Class name="io.ballerina.stdlib.tcp.TcpListenerHandler"/>
+        <Method name="getWriteFlowControllers"/>
+        <Bug pattern="EI_EXPOSE_REP"/>
+    </Match>
+    <Match>
+        <Class name="io.ballerina.stdlib.tcp.TcpListenerHandler"/>
+        <Field name="tcpService"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+    <Match>
+        <Class name="io.ballerina.stdlib.tcp.TcpService"/>
+        <Method name="getConnectionService"/>
+        <Bug pattern="EI_EXPOSE_REP"/>
+    </Match>
+    <Match>
+        <Class name="io.ballerina.stdlib.tcp.TcpService"/>
+        <Method name="getService"/>
+        <Bug pattern="EI_EXPOSE_REP"/>
+    </Match>
+    <Match>
+        <Class name="io.ballerina.stdlib.tcp.TcpService"/>
+        <Field name="service"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+    <Match>
+        <Class name="io.ballerina.stdlib.tcp.TcpService"/>
+        <Method name="setConnectionService"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+    <Match>
+        <Class name="io.ballerina.stdlib.tcp.WriteFlowController"/>
+        <Field name="sendBuffer"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+    <Match>
+        <Class name="io.ballerina.stdlib.tcp.WriteFlowControllerService"/>
+        <Field name="tcpService"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
 </FindBugsFilter>
