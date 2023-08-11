@@ -16,4 +16,19 @@
   ~ under the License.
   -->
 <FindBugsFilter>
+    <Match>
+        <Class name="io.ballerina.stdlib.tcp.compiler.ConnectionServiceClassVisitor"/>
+        <Method name="getClassDefinitionNode"/>
+        <Bug pattern="EI_EXPOSE_REP"/>
+    </Match>
+    <Match>
+        <Class name="io.ballerina.stdlib.tcp.compiler.ConnectionServiceClassVisitor"/>
+        <Method name="visit"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+    <Match>
+        <Class name="io.ballerina.stdlib.tcp.compiler.ReturnStatementNodeVisitor"/>
+        <Method name="getReturnStatementNodes"/>
+        <Bug pattern="EI_EXPOSE_REP"/>
+    </Match>
 </FindBugsFilter>
