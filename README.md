@@ -60,6 +60,7 @@ service on new tcp:Listener(3000) {
 }
 
 service class EchoService {
+    *tcp:ConnectionService;
 
     remote function onBytes(readonly & byte[] data) returns byte[]|tcp:Error? {
         // echo back the data to the client
