@@ -1,4 +1,4 @@
-name: Pull Request
+name: PR Build
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
