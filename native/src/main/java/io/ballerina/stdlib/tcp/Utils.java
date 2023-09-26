@@ -40,7 +40,7 @@ import java.io.File;
 public class Utils {
 
     /**
-     * tcp standard library package ID.
+     * The `tcp` Ballerina library package ID.
      */
     private static Module tcpModule = null;
 
