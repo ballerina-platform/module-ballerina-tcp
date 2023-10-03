@@ -39,9 +39,6 @@ import java.io.File;
  */
 public class Utils {
 
-    /**
-     * The `tcp` Ballerina library package ID.
-     */
     private static Module tcpModule = null;
 
     private Utils() {
