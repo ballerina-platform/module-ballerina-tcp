@@ -39,9 +39,6 @@ import java.io.File;
  */
 public class Utils {
 
-    /**
-     * tcp standard library package ID.
-     */
     private static Module tcpModule = null;
 
     private Utils() {
