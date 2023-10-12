@@ -8,7 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Fixed
 - [Address netty vulnerability: CVE-2023-4586](https://github.com/ballerina-platform/ballerina-standard-library/issues/4908)
 
-## [2.3.1] - 2023-06-01
+## [1.7.1] - 2023-06-01
 
 - This version maintains the latest dependency versions.
 
