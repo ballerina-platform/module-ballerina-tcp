@@ -10,7 +10,7 @@ distribution-version = "2201.5.0"
 [[package]]
 org = "ballerina"
 name = "crypto"
-version = "2.3.1"
+version = "2.3.2"
 dependencies = [
 	{org = "ballerina", name = "jballerina.java"},
 	{org = "ballerina", name = "time"}
@@ -64,7 +64,7 @@ dependencies = [
 [[package]]
 org = "ballerina"
 name = "tcp"
-version = "1.7.2"
+version = "1.7.3"
 dependencies = [
 	{org = "ballerina", name = "crypto"},
 	{org = "ballerina", name = "io"},
