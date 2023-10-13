@@ -13,10 +13,10 @@ distribution = "2201.3.0"
 groupId = "io.ballerina.stdlib"
 artifactId = "tcp-native"
 version = "1.5.1"
-path = "../native/build/libs/tcp-native-1.5.1-SNAPSHOT.jar"
+path = "../native/build/libs/tcp-native-1.5.1.jar"
 
 [[platform.java11.dependency]]
-path = "../test-utils/build/libs/tcp-test-utils-1.5.1-SNAPSHOT.jar"
+path = "../test-utils/build/libs/tcp-test-utils-1.5.1.jar"
 scope = "testOnly"
 
 [[platform.java11.dependency]]
