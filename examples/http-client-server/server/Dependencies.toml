@@ -1,4 +1,0 @@
-[[dependency]]
-org = "ballerina"
-name = "tcp"
-version = "1.8.1"
