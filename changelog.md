@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [1.7.3] - 2023-10-13
+
 ### Fixed
 - [Address netty vulnerability: CVE-2023-4586](https://github.com/ballerina-platform/ballerina-standard-library/issues/4908)
 
