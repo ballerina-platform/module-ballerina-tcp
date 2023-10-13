@@ -1,7 +1,7 @@
 [package]
 org = "ballerina"
 name = "tcp"
-version = "1.5.1"
+version = "1.5.2"
 authors = ["Ballerina"]
 keywords = ["network", "socket", "service", "client"]
 repository = "https://github.com/ballerina-platform/module-ballerina-tcp"
@@ -12,11 +12,11 @@ distribution = "2201.3.0"
 [[platform.java11.dependency]]
 groupId = "io.ballerina.stdlib"
 artifactId = "tcp-native"
-version = "1.5.1"
-path = "../native/build/libs/tcp-native-1.5.1-SNAPSHOT.jar"
+version = "1.5.2"
+path = "../native/build/libs/tcp-native-1.5.2-SNAPSHOT.jar"
 
 [[platform.java11.dependency]]
-path = "../test-utils/build/libs/tcp-test-utils-1.5.1-SNAPSHOT.jar"
+path = "../test-utils/build/libs/tcp-test-utils-1.5.2-SNAPSHOT.jar"
 scope = "testOnly"
 
 [[platform.java11.dependency]]
