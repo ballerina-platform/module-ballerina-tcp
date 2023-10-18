@@ -6,7 +6,10 @@ import org.slf4j.LoggerFactory;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class TestUtils {
+public final class TestUtils {
+
+    private TestUtils() {}
+
     private static final Logger log = LoggerFactory.getLogger(TestUtils.class);
     private static Server echoServer;
     private static SecureServer secureServer;

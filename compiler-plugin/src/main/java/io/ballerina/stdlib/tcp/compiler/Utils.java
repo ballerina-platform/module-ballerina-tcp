@@ -32,7 +32,9 @@ import io.ballerina.tools.diagnostics.Location;
 /**
  * Compiler-plugin utility class.
  */
-public class Utils {
+public final class Utils {
+
+    private Utils() {}
 
     public static boolean equals(String actual, String expected) {
         return actual.compareTo(expected) == 0;
