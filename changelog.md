@@ -5,6 +5,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Fixed
+- [Address netty vulnerability: CVE-2023-4586](https://github.com/ballerina-platform/ballerina-standard-library/issues/4908)
+
+## [1.2.0] - 2022-01-28
+
 - [Add resource code snippet generation code action for tooling](https://github.com/ballerina-platform/ballerina-standard-library/issues/2034)
 
 ## [swan-lake-beta5] - 2021-12-01

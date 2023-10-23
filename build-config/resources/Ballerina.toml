@@ -36,3 +36,6 @@ path = "./lib/netty-resolver-@netty.version@.jar"
 
 [[platform.java11.dependency]]
 path = "./lib/netty-codec-@netty.version@.jar"
+
+[[platform.java11.dependency]]
+path = "./lib/netty-transport-native-unix-common-@netty.version@.jar"
