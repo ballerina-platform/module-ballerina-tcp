@@ -16,7 +16,7 @@
 
 import ballerina/io;
 import ballerina/lang.'int as ints;
-import ballerina/regex;
+import ballerina/lang.regexp;
 import ballerina/tcp;
 
 enum Method {
@@ -87,10 +87,10 @@ function receiveResponse(tcp:Client socketClient) returns error? {
     string responseString = check string:fromBytes(receivedData);
     string? payload = ();
     if responseString.startsWith("HTTP/1.1 200") {
-        string[] respArr = regex:split(responseString, "\r\n\r\n");
-        string[] respHeaders = regex:split(respArr[0], "\r\n");
+        string[] respArr = regexp:split(re`\r\n\r\n`, responseString);
+        string[] respHeaders = regexp:split(re`\r\n`, respArr[0]);
         string contLenHeader = respHeaders.filter(i => (i.startsWith("Content-Length")))[0];
-        int contLen = check ints:fromString(regex:split(contLenHeader, ":")[1].trim());
+        int contLen = check ints:fromString(regexp:split(re`:`, contLenHeader)[1].trim());
         if contLen > 0 {
             payload = respArr[1];
             int remainingBytes = contLen - (<string>payload).length();
@@ -112,11 +112,11 @@ function receiveResponse(tcp:Client socketClient) returns error? {
 }
 
 function createResponseRecord(string resp, string? body) {
-    string[] respArr = regex:split(resp, "\r\n");
+    string[] respArr = regexp:split(re`\r\n`, resp);
     map<string> headersMap = {};
     string[] filtered = respArr.filter(i => !(i.startsWith("HTTP")) && i.includes(":", 0));
     foreach string header in filtered {
-        string[] keyValue = regex:split(header, ":");
+        string[] keyValue = regexp:split(re`:`, header);
         headersMap[keyValue[0]] = keyValue[1];
     }
     string status = respArr[0].substring(9, respArr[0].length());

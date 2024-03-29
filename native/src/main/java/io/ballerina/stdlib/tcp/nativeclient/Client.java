@@ -39,7 +39,9 @@ import java.net.InetSocketAddress;
  *
  * @since 1.1.0
  */
-public class Client {
+public final class Client {
+
+    private Client() {}
 
     private static final Logger log = LoggerFactory.getLogger(Client.class);
 
