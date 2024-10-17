@@ -18,13 +18,13 @@
 
 package io.ballerina.stdlib.tcp;
 
-import io.ballerina.runtime.api.Future;
 import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BString;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 
 import java.net.InetSocketAddress;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * {@link TcpFactory} creates {@link TcpClient}.
@@ -48,12 +48,13 @@ public class TcpFactory {
         return tcpFactory;
     }
 
-    public TcpClient createTcpClient(InetSocketAddress localAddress, InetSocketAddress remoteAddress, Future callback,
-                                     BMap<BString, Object> secureSocket) {
+    public TcpClient createTcpClient(InetSocketAddress localAddress, InetSocketAddress remoteAddress,
+                                     CompletableFuture<Object> callback, BMap<BString, Object> secureSocket) {
         return new TcpClient(localAddress, remoteAddress, workerGroup, callback, secureSocket);
     }
 
-    public TcpListener createTcpListener(InetSocketAddress localAddress, Future callback, TcpService tcpService,
+    public TcpListener createTcpListener(InetSocketAddress localAddress,
+                                         CompletableFuture<Object> callback, TcpService tcpService,
                                          BMap<BString, Object> secureSocket) {
         return new TcpListener(localAddress, bossGroup, workerGroup, callback, tcpService,
                 secureSocket);

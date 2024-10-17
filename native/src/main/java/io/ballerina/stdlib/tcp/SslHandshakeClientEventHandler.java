@@ -18,7 +18,6 @@
 
 package io.ballerina.stdlib.tcp;
 
-import io.ballerina.runtime.api.Future;
 import io.ballerina.stdlib.tcp.nativeclient.Client;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -29,15 +28,17 @@ import io.netty.handler.ssl.SslHandshakeCompletionEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.concurrent.CompletableFuture;
+
 /**
  * Class to handle SSL handshake event of TCP Client.
  */
 public class SslHandshakeClientEventHandler extends ChannelInboundHandlerAdapter {
     private TcpClientHandler tcpClientHandler;
-    private Future balClientInitCallback;
+    private CompletableFuture<Object> balClientInitCallback;
     private static final Logger log = LoggerFactory.getLogger(Client.class);
 
-    public SslHandshakeClientEventHandler(TcpClientHandler handler, Future callback) {
+    public SslHandshakeClientEventHandler(TcpClientHandler handler, CompletableFuture<Object> callback) {
         tcpClientHandler = handler;
         this.balClientInitCallback = callback;
     }

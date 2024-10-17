@@ -18,13 +18,13 @@
 
  package io.ballerina.stdlib.tcp;
 
-import io.ballerina.runtime.api.Future;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 
 import java.util.LinkedList;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -32,10 +32,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class WriteFlowController {
     protected ByteBuf sendBuffer;
-    private Future balWriteCallback;
+    private CompletableFuture<Object> balWriteCallback;
     private AtomicBoolean futureCompleted;
 
-    WriteFlowController(ByteBuf buffer, Future callback, AtomicBoolean futureCompleted) {
+    WriteFlowController(ByteBuf buffer, CompletableFuture<Object> callback, AtomicBoolean futureCompleted) {
         this.balWriteCallback = callback;
         this.sendBuffer = buffer;
         this.futureCompleted = futureCompleted;
