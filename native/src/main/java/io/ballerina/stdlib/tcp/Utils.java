@@ -31,6 +31,7 @@ import io.ballerina.runtime.api.values.BString;
 import io.netty.buffer.ByteBuf;
 
 import java.io.File;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Represents the util functions of Socket operations.
@@ -187,5 +188,13 @@ public class Utils {
 
     public static Module getModule() {
         return tcpModule;
+    }
+
+    public static Object getResult(CompletableFuture<Object> balFuture) {
+        try {
+            return balFuture.get();
+        } catch (Throwable t) {
+            return ErrorCreator.createError(t);
+        }
     }
 }

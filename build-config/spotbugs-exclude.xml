@@ -35,16 +35,11 @@
     </Match>
     <Match>
         <Class name="io.ballerina.stdlib.tcp.SslHandshakeClientEventHandler"/>
-        <Field name="tcpClientHandler"/>
         <Bug pattern="EI_EXPOSE_REP2"/>
     </Match>
     <Match>
         <Class name="io.ballerina.stdlib.tcp.SslHandshakeListenerEventHandler"/>
         <Field name="tcpListenerHandler"/>
-        <Bug pattern="EI_EXPOSE_REP2"/>
-    </Match>
-    <Match>
-        <Class name="io.ballerina.stdlib.tcp.TcpCallback"/>
         <Bug pattern="EI_EXPOSE_REP2"/>
     </Match>
     <Match>
@@ -54,7 +49,6 @@
     </Match>
     <Match>
         <Class name="io.ballerina.stdlib.tcp.TcpClientHandler"/>
-        <Method name="setWriteFutureCompleted"/>
         <Bug pattern="EI_EXPOSE_REP2"/>
     </Match>
     <Match>
@@ -96,5 +90,13 @@
         <Class name="io.ballerina.stdlib.tcp.WriteFlowControllerService"/>
         <Field name="tcpService"/>
         <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+    <Match>
+        <Class name="io.ballerina.stdlib.tcp.SSLConfig"/>
+        <Bug pattern="URF_UNREAD_FIELD, UUF_UNUSED_FIELD"/>
+    </Match>
+    <Match>
+        <Class name="io.ballerina.stdlib.tcp.TcpFactory"/>
+        <Bug pattern="SING_SINGLETON_GETTER_NOT_SYNCHRONIZED"/>
     </Match>
 </FindBugsFilter>

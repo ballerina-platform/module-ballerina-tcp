@@ -18,7 +18,6 @@
 
 package io.ballerina.stdlib.tcp;
 
-import io.ballerina.runtime.api.Future;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -26,6 +25,7 @@ import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
 
 import java.util.LinkedList;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -33,7 +33,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class TcpClientHandler extends SimpleChannelInboundHandler<ByteBuf> {
 
-    private Future callback;
+    private CompletableFuture<Object> callback;
     private AtomicBoolean writeFutureCompleted = new AtomicBoolean(false);
     private boolean isCloseTriggered = false;
     private LinkedList<WriteFlowController> writeFlowControllers = new LinkedList<>();
@@ -94,7 +94,7 @@ public class TcpClientHandler extends SimpleChannelInboundHandler<ByteBuf> {
         }
     }
 
-    public void setCallback(Future callback) {
+    public void setCallback(CompletableFuture<Object> callback) {
         this.callback = callback;
     }
 

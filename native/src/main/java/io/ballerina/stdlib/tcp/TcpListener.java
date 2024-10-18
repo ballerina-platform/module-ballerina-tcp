@@ -18,7 +18,6 @@
 
 package io.ballerina.stdlib.tcp;
 
-import io.ballerina.runtime.api.Future;
 import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BString;
 import io.netty.bootstrap.ServerBootstrap;
@@ -35,6 +34,7 @@ import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslHandler;
 
 import java.net.InetSocketAddress;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -49,7 +49,7 @@ public class TcpListener {
     private SslContext sslContext;
 
     public TcpListener(InetSocketAddress localAddress, EventLoopGroup bossGroup, EventLoopGroup workerGroup,
-                       Future callback, TcpService tcpService, BMap<BString, Object> secureSocket) {
+                       CompletableFuture<Object> callback, TcpService tcpService, BMap<BString, Object> secureSocket) {
         this.bossGroup = bossGroup;
         this.workerGroup = workerGroup;
         AtomicBoolean isCallbackCompleted = new AtomicBoolean(false);
@@ -115,7 +115,7 @@ public class TcpListener {
     }
 
     // Invoke when the caller call writeBytes
-    public static void send(byte[] bytes, Channel channel, Future callback, TcpService tcpService) {
+    public static void send(byte[] bytes, Channel channel, CompletableFuture<Object> callback, TcpService tcpService) {
         if (!tcpService.getIsCallerClosed() && channel.isActive()) {
             WriteFlowController writeFlowController = new WriteFlowController(Unpooled.wrappedBuffer(bytes), callback,
                     new AtomicBoolean(false));
@@ -157,7 +157,7 @@ public class TcpListener {
     }
 
     // Close caller
-    public static void close(Channel channel, Future callback) {
+    public static void close(Channel channel, CompletableFuture<Object> callback) {
         if (channel != null) {
             channel.close().addListener((ChannelFutureListener) future -> {
                 if (future.isSuccess()) {
@@ -170,7 +170,7 @@ public class TcpListener {
     }
 
     // Shutdown the server
-    public void close(Future callback) {
+    public void close(CompletableFuture<Object> callback) {
         if (channel != null) {
             channel.close().addListener((ChannelFutureListener) future -> {
                 if (future.isSuccess()) {
