@@ -17,13 +17,15 @@
  */
 
 package io.ballerina.stdlib.tcp;
-import io.ballerina.runtime.api.TypeTags;
+
+import io.ballerina.runtime.api.concurrent.StrandMetadata;
 import io.ballerina.runtime.api.creators.ErrorCreator;
 import io.ballerina.runtime.api.creators.ValueCreator;
 import io.ballerina.runtime.api.types.MethodType;
 import io.ballerina.runtime.api.types.ObjectType;
 import io.ballerina.runtime.api.types.Parameter;
 import io.ballerina.runtime.api.types.Type;
+import io.ballerina.runtime.api.types.TypeTags;
 import io.ballerina.runtime.api.utils.StringUtils;
 import io.ballerina.runtime.api.utils.TypeUtils;
 import io.ballerina.runtime.api.values.BArray;
@@ -141,15 +143,8 @@ public class Dispatcher {
                                         boolean isOnConnectInvoked, Object[] params) {
         Thread.startVirtualThread(() -> {
             try {
-                Object result;
-                if (isIsolated(balService, methodName)) {
-                    result = tcpService.getRuntime()
-                            .startIsolatedWorker(balService, methodName, null, null, null, params)
-                            .get();
-                } else {
-                    result = tcpService.getRuntime().startNonIsolatedWorker(balService, methodName, null, null, null,
-                            params).get();
-                }
+                Object result = tcpService.getRuntime().callMethod(balService, methodName,
+                        new StrandMetadata(isIsolated(balService, methodName), null), params);
                 handleResult(result, channel, tcpService, isOnConnectInvoked);
             } catch (BError error) {
                 handleError(error);
