@@ -19,7 +19,6 @@
 package io.ballerina.stdlib.tcp.nativelistener;
 
 import io.ballerina.runtime.api.Environment;
-import io.ballerina.runtime.api.Future;
 import io.ballerina.runtime.api.values.BArray;
 import io.ballerina.runtime.api.values.BObject;
 import io.ballerina.stdlib.tcp.Constants;
@@ -29,33 +28,40 @@ import io.ballerina.stdlib.tcp.TcpService;
 import io.ballerina.stdlib.tcp.Utils;
 import io.netty.channel.Channel;
 
+import java.util.concurrent.CompletableFuture;
+
+import static io.ballerina.stdlib.tcp.Utils.getResult;
+
 /**
  * Native implementation of TCP caller.
  */
 public class Caller {
 
     public static Object externWriteBytes(Environment env, BObject caller, BArray data) {
-        final Future callback = env.markAsync();
-        byte[] byteContent = data.getBytes();
-        Channel channel = (Channel) caller.getNativeData(Constants.CHANNEL);
-        TcpService tcpService = (TcpService) caller.getNativeData(Constants.SERVICE);
-        TcpListener.send(byteContent, channel, callback, tcpService);
-        return null;
+        final CompletableFuture<Object> callback = new CompletableFuture<>();
+        return env.yieldAndRun(() -> {
+            byte[] byteContent = data.getBytes();
+            Channel channel = (Channel) caller.getNativeData(Constants.CHANNEL);
+            TcpService tcpService = (TcpService) caller.getNativeData(Constants.SERVICE);
+            TcpListener.send(byteContent, channel, callback, tcpService);
+            return getResult(callback);
+        });
     }
 
     public static Object externClose(Environment env, BObject caller) {
-        final Future callback = env.markAsync();
-
-        Channel channel = (Channel) caller.getNativeData(Constants.CHANNEL);
-        TcpService tcpService = (TcpService) caller.getNativeData(Constants.SERVICE);
-        tcpService.setIsCallerClosed(true);
-        try {
-            TcpListener.close(channel, callback);
-            Dispatcher.invokeOnClose(tcpService);
-        } catch (Exception e) {
-            callback.complete(Utils.createTcpError(e.getMessage()));
-        }
-        return null;
+        final CompletableFuture<Object> callback = new CompletableFuture<>();
+        return env.yieldAndRun(() -> {
+            Channel channel = (Channel) caller.getNativeData(Constants.CHANNEL);
+            TcpService tcpService = (TcpService) caller.getNativeData(Constants.SERVICE);
+            tcpService.setIsCallerClosed(true);
+            try {
+                TcpListener.close(channel, callback);
+                Dispatcher.invokeOnClose(tcpService);
+            } catch (Exception e) {
+                callback.complete(Utils.createTcpError(e.getMessage()));
+            }
+            return getResult(callback);
+        });
     }
 
     private Caller() {}

@@ -19,7 +19,6 @@
 package io.ballerina.stdlib.tcp.nativelistener;
 
 import io.ballerina.runtime.api.Environment;
-import io.ballerina.runtime.api.Future;
 import io.ballerina.runtime.api.utils.StringUtils;
 import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BObject;
@@ -33,6 +32,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
+import java.util.concurrent.CompletableFuture;
+
+import static io.ballerina.stdlib.tcp.Utils.getResult;
 
 /**
  * Native function implementations of the TCP Listener.
@@ -52,28 +54,25 @@ public class Listener {
     }
 
     public static Object externStart(Environment env, BObject listener) {
-        Future balFuture = env.markAsync();
-
-        BMap<BString, Object> config = (BMap<BString, Object>) listener.getNativeData(Constants.LISTENER_CONFIG);
-        BString localHost = config.getStringValue(StringUtils.fromString(Constants.CONFIG_LOCALHOST));
-
-        int localPort = (int) listener.getNativeData(Constants.LOCAL_PORT);
-        InetSocketAddress localAddress;
-        if (localHost == null) {
-            localAddress = new InetSocketAddress(localPort);
-        } else {
-            String hostname = localHost.getValue();
-            localAddress = new InetSocketAddress(hostname, localPort);
-        }
-
-        BMap<BString, Object> secureSocket = (BMap<BString, Object>) config.getMapValue(Constants.SECURE_SOCKET);
-
-        TcpService tcpService = (TcpService) listener.getNativeData(Constants.SERVICE);
-        TcpListener tcpListener = TcpFactory.getInstance()
-                .createTcpListener(localAddress, balFuture, tcpService, secureSocket);
-        listener.addNativeData(Constants.LISTENER, tcpListener);
-
-        return null;
+        final CompletableFuture<Object> balFuture = new CompletableFuture<>();
+        return env.yieldAndRun(() -> {
+            BMap<BString, Object> config = (BMap<BString, Object>) listener.getNativeData(Constants.LISTENER_CONFIG);
+            BString localHost = config.getStringValue(StringUtils.fromString(Constants.CONFIG_LOCALHOST));
+            int localPort = (int) listener.getNativeData(Constants.LOCAL_PORT);
+            InetSocketAddress localAddress;
+            if (localHost == null) {
+                localAddress = new InetSocketAddress(localPort);
+            } else {
+                String hostname = localHost.getValue();
+                localAddress = new InetSocketAddress(hostname, localPort);
+            }
+            BMap<BString, Object> secureSocket = (BMap<BString, Object>) config.getMapValue(Constants.SECURE_SOCKET);
+            TcpService tcpService = (TcpService) listener.getNativeData(Constants.SERVICE);
+            TcpListener tcpListener = TcpFactory.getInstance()
+                    .createTcpListener(localAddress, balFuture, tcpService, secureSocket);
+            listener.addNativeData(Constants.LISTENER, tcpListener);
+            return getResult(balFuture);
+        });
     }
 
     public static Object externDetach(BObject listener) {
@@ -88,16 +87,16 @@ public class Listener {
     }
 
     public static Object externGracefulStop(Environment env, BObject listener) {
-        Future balFuture = env.markAsync();
-
-        TcpListener tcpListener = (TcpListener) listener.getNativeData(Constants.LISTENER);
-        if (tcpListener != null) {
-            tcpListener.close(balFuture);
-        } else {
-            balFuture.complete(Utils.createTcpError("Unable to initialize the tcp listener."));
-        }
-
-        return null;
+        final CompletableFuture<Object> balFuture = new CompletableFuture<>();
+        return env.yieldAndRun(() -> {
+            TcpListener tcpListener = (TcpListener) listener.getNativeData(Constants.LISTENER);
+            if (tcpListener != null) {
+                tcpListener.close(balFuture);
+            } else {
+                balFuture.complete(Utils.createTcpError("Unable to initialize the tcp listener."));
+            }
+            return getResult(balFuture);
+        });
     }
 
     private Listener() {}
