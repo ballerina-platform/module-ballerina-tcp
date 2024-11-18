@@ -193,6 +193,9 @@ public class Utils {
     public static Object getResult(CompletableFuture<Object> balFuture) {
         try {
             return balFuture.get();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw ErrorCreator.createError(e);
         } catch (Throwable t) {
             return ErrorCreator.createError(t);
         }
