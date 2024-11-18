@@ -18,14 +18,17 @@
 
 package io.ballerina.stdlib.tcp;
 
-import io.ballerina.runtime.api.PredefinedTypes;
-import io.ballerina.runtime.api.TypeTags;
+import io.ballerina.runtime.api.concurrent.StrandMetadata;
+import io.ballerina.runtime.api.creators.ErrorCreator;
 import io.ballerina.runtime.api.creators.ValueCreator;
 import io.ballerina.runtime.api.types.MethodType;
 import io.ballerina.runtime.api.types.ObjectType;
+import io.ballerina.runtime.api.types.Parameter;
 import io.ballerina.runtime.api.types.Type;
+import io.ballerina.runtime.api.types.TypeTags;
 import io.ballerina.runtime.api.utils.StringUtils;
 import io.ballerina.runtime.api.utils.TypeUtils;
+import io.ballerina.runtime.api.values.BArray;
 import io.ballerina.runtime.api.values.BError;
 import io.ballerina.runtime.api.values.BObject;
 import io.netty.buffer.ByteBuf;
@@ -47,14 +50,7 @@ public class Dispatcher {
         try {
             Object[] params = getOnBytesSignature(buffer, channel, tcpService, parameterTypes);
             BObject connService = tcpService.getConnectionService();
-            if (isIsolated(connService, Constants.ON_BYTES)) {
-                tcpService.getRuntime().invokeMethodAsyncConcurrently(connService, Constants.ON_BYTES, null,
-                        null, new TcpCallback(tcpService, false, channel), null, PredefinedTypes.TYPE_ANY, params);
-            } else {
-                tcpService.getRuntime().invokeMethodAsyncSequentially(connService, Constants.ON_BYTES, null,
-                        null, new TcpCallback(tcpService, false, channel), null,
-                        PredefinedTypes.TYPE_ANY, params);
-            }
+            invokeAsyncCall(connService, Constants.ON_BYTES, tcpService, channel, false, params);
         } catch (BError e) {
             Dispatcher.invokeOnError(tcpService, e.getMessage());
         }
@@ -72,13 +68,7 @@ public class Dispatcher {
             if (methodType != null) {
                 Object[] params = getOnErrorSignature(message);
                 BObject connService = tcpService.getConnectionService();
-                if (isIsolated(connService, Constants.ON_ERROR)) {
-                    tcpService.getRuntime().invokeMethodAsyncConcurrently(connService, Constants.ON_ERROR,
-                            null, null, new TcpCallback(tcpService), null, PredefinedTypes.TYPE_ANY, params);
-                } else {
-                    tcpService.getRuntime().invokeMethodAsyncSequentially(connService, Constants.ON_ERROR,
-                            null, null, new TcpCallback(tcpService), null, PredefinedTypes.TYPE_ANY, params);
-                }
+                invokeAsyncCall(connService, Constants.ON_ERROR, tcpService, null, false, params);
             }
         } catch (Throwable t) {
             log.error("Error while executing onError function", t);
@@ -89,18 +79,16 @@ public class Dispatcher {
                                                 Type[] parameterTypes) {
         byte[] byteContent = new byte[buffer.readableBytes()];
         buffer.readBytes(byteContent);
-        Object[] bValues = new Object[parameterTypes.length * 2];
+        Object[] bValues = new Object[parameterTypes.length];
         int index = 0;
         for (Type param : parameterTypes) {
             int paramTag = param.getTag();
             switch (paramTag) {
                 case TypeTags.INTERSECTION_TAG:
                     bValues[index++] = ValueCreator.createReadonlyArrayValue(byteContent);
-                    bValues[index++] = true;
                     break;
                 case TypeTags.OBJECT_TYPE_TAG:
                     bValues[index++] = createClient(channel, tcpService);
-                    bValues[index++] = true;
                     break;
                 default:
                     break;
@@ -110,7 +98,7 @@ public class Dispatcher {
     }
 
     private static Object[] getOnErrorSignature(String message) {
-        return new Object[]{Utils.createTcpError(message), true};
+        return new Object[]{Utils.createTcpError(message)};
     }
 
     private static BObject createClient(Channel channel, TcpService tcpService) {
@@ -130,12 +118,13 @@ public class Dispatcher {
         ObjectType objectType =
                 (ObjectType) TypeUtils.getReferredType(TypeUtils.getType(tcpService.getConnectionService()));
         for (MethodType method : objectType.getMethods()) {
-            switch (method.getName()) {
-                case Constants.ON_BYTES:
-                    Dispatcher.invokeOnBytes(tcpService, buffer, channel, method.getType().getParameterTypes());
-                    break;
-                default:
-                    break;
+            if (method.getName().equals(Constants.ON_BYTES)) {
+                Parameter[] parameters = method.getType().getParameters();
+                Type[] parameterTypes = new Type[parameters.length];
+                for (int i = 0; i < parameters.length; i++) {
+                    parameterTypes[i] = parameters[i].type;
+                }
+                Dispatcher.invokeOnBytes(tcpService, buffer, channel, parameterTypes);
             }
         }
     }
@@ -144,21 +133,49 @@ public class Dispatcher {
         try {
             Object[] params = getOnConnectSignature(channel, tcpService);
             BObject balService = tcpService.getService();
-            if (isIsolated(balService, Constants.ON_CONNECT)) {
-                tcpService.getRuntime().invokeMethodAsyncConcurrently(balService, Constants.ON_CONNECT,
-                        null, null, new TcpCallback(tcpService, true, channel), null, PredefinedTypes.TYPE_ANY, params);
-            } else {
-                tcpService.getRuntime().invokeMethodAsyncSequentially(balService, Constants.ON_CONNECT,
-                        null, null, new TcpCallback(tcpService, true, channel), null, PredefinedTypes.TYPE_ANY, params);
-            }
+            invokeAsyncCall(balService, Constants.ON_CONNECT, tcpService, channel, true, params);
         } catch (BError e) {
             Dispatcher.invokeOnError(tcpService, e.getMessage());
         }
     }
 
+    private static void invokeAsyncCall(BObject balService, String methodName, TcpService tcpService, Channel channel,
+                                        boolean isOnConnectInvoked, Object[] params) {
+        Thread.startVirtualThread(() -> {
+            try {
+                Object result = tcpService.getRuntime().callMethod(balService, methodName,
+                        new StrandMetadata(isIsolated(balService, methodName), null), params);
+                handleResult(result, channel, tcpService, isOnConnectInvoked);
+            } catch (BError error) {
+                handleError(error);
+            } catch (Throwable throwable) {
+                handleError(ErrorCreator.createError(throwable));
+            }
+        });
+    }
+
+    private static void handleResult(Object result, Channel channel, TcpService tcpService ,
+                                     boolean isOnConnectInvoked) {
+        if (result instanceof BArray) {
+            // call writeBytes if the service returns byte[]
+            byte[] byteContent = ((BArray) result).getBytes();
+            TcpListener.send(byteContent, channel, tcpService);
+        } else if (isOnConnectInvoked) {
+            tcpService.setConnectionService((BObject) result);
+            TcpListener.resumeRead(channel);
+        } else if (result instanceof BError) {
+            ((BError) result).printStackTrace();
+        }
+        log.debug("Method successfully dispatched.");
+    }
+
+    private static void handleError(BError bError) {
+        bError.printStackTrace();
+    }
+
     private static Object[] getOnConnectSignature(Channel channel, TcpService tcpService) {
         BObject caller = createClient(channel, tcpService);
-        return new Object[]{caller, true};
+        return new Object[]{caller};
     }
 
     public static void invokeOnClose(TcpService tcpService) {
@@ -173,13 +190,7 @@ public class Dispatcher {
             if (methodType != null) {
                 Object[] params = {};
                 BObject balService = tcpService.getConnectionService();
-                if (isIsolated(balService, Constants.ON_CLOSE)) {
-                    tcpService.getRuntime().invokeMethodAsyncConcurrently(balService, Constants.ON_CLOSE,
-                            null, null, new TcpCallback(), null, PredefinedTypes.TYPE_ANY, params);
-                } else {
-                    tcpService.getRuntime().invokeMethodAsyncSequentially(balService, Constants.ON_CLOSE,
-                            null, null, new TcpCallback(), null, PredefinedTypes.TYPE_ANY, params);
-                }
+                invokeAsyncCall(balService, Constants.ON_CLOSE, tcpService, null, false, params);
             }
         } catch (BError e) {
             Dispatcher.invokeOnError(tcpService, e.getMessage());

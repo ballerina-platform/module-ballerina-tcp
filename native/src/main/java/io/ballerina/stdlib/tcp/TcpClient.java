@@ -18,7 +18,6 @@
 
 package io.ballerina.stdlib.tcp;
 
-import io.ballerina.runtime.api.Future;
 import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BString;
 import io.netty.bootstrap.Bootstrap;
@@ -35,6 +34,7 @@ import io.netty.handler.ssl.SslHandler;
 import io.netty.handler.timeout.IdleStateHandler;
 
 import java.net.InetSocketAddress;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -46,7 +46,7 @@ public class TcpClient {
     private Channel channel;
 
     public TcpClient(InetSocketAddress localAddress, InetSocketAddress remoteAddress, EventLoopGroup group,
-                     Future callback, BMap<BString, Object> secureSocket) {
+                     CompletableFuture<Object> callback, BMap<BString, Object> secureSocket) {
         AtomicBoolean isCallbackCompleted = new AtomicBoolean(false);
         Bootstrap clientBootstrap = new Bootstrap();
         clientBootstrap.group(group)
@@ -89,7 +89,7 @@ public class TcpClient {
     }
 
     private void setSSLHandler(SocketChannel channel, BMap<BString, Object> secureSocket,
-                               TcpClientHandler tcpClientHandler, Future callback) throws Exception {
+                               TcpClientHandler tcpClientHandler, CompletableFuture<Object> callback) throws Exception {
         SSLConfig sslConfig = Utils.setSslConfig(secureSocket, new SSLConfig(), false);
 
         SSLHandlerFactory sslHandlerFactory = new SSLHandlerFactory(sslConfig);
@@ -101,7 +101,7 @@ public class TcpClient {
                 new SslHandshakeClientEventHandler(tcpClientHandler, callback));
     }
 
-    public void writeData(byte[] bytes, Future callback, double writeTimeoutInSec) {
+    public void writeData(byte[] bytes, CompletableFuture<Object> callback, double writeTimeoutInSec) {
         AtomicBoolean futureCompleted = new AtomicBoolean(false);
         long writeTimeoutInNano = (long) (writeTimeoutInSec * 1_000_000_000);
         if (channel.isActive()) {
@@ -121,7 +121,7 @@ public class TcpClient {
         }
     }
 
-    public void readData(double readTimeoutInSec, Future callback) {
+    public void readData(double readTimeoutInSec, CompletableFuture<Object> callback) {
         long readTimeoutInNano = (long) (readTimeoutInSec * 1_000_000_000);
         if (channel.isActive()) {
             channel.pipeline().addFirst(Constants.READ_TIMEOUT_HANDLER, new IdleStateHandler(readTimeoutInNano, 0, 0,
@@ -134,7 +134,7 @@ public class TcpClient {
         }
     }
 
-    public void close(Future callback) {
+    public void close(CompletableFuture<Object> callback) {
         // If channel disconnected already then handler value is null
         TcpClientHandler handler = (TcpClientHandler) channel.pipeline().get(Constants.CLIENT_HANDLER);
         if (handler != null) {
