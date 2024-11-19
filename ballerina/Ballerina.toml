@@ -18,7 +18,7 @@ artifactId = "tcp-native"
 version = "1.11.2"
 path = "../native/build/libs/tcp-native-1.11.2-SNAPSHOT.jar"
 
-[[platform.java17.dependency]]
+[[platform.java21.dependency]]
 path = "../test-utils/build/libs/tcp-test-utils-1.11.2-SNAPSHOT.jar"
 scope = "testOnly"
 
