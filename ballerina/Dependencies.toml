@@ -5,12 +5,12 @@
 
 [ballerina]
 dependencies-toml-version = "2"
-distribution-version = "2201.11.0-20241112-214900-6b80ab87"
+distribution-version = "2201.11.0-20241121-075100-c4c87cbc"
 
 [[package]]
 org = "ballerina"
 name = "crypto"
-version = "2.7.3"
+version = "2.8.0"
 dependencies = [
 	{org = "ballerina", name = "jballerina.java"},
 	{org = "ballerina", name = "time"}
@@ -22,7 +22,7 @@ modules = [
 [[package]]
 org = "ballerina"
 name = "io"
-version = "1.6.2"
+version = "1.7.0"
 scope = "testOnly"
 dependencies = [
 	{org = "ballerina", name = "jballerina.java"},
