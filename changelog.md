@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ## [Unreleased]
 
 ### Fixed
+- [Update netty version](https://github.com/ballerina-platform/ballerina-library/issues/7358)
+
+## [1.10.1] - 2024-09-28
+
+### Fixed
 - [Address CVE-2024-7254 Protobuf Vulnerability](https://github.com/ballerina-platform/ballerina-library/issues/7013#event-14332816771)
 
 ## [1.10.0] - 2024-05-03
