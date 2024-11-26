@@ -5,7 +5,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
-## [1.10.1] - 2024-09-28
+## [1.10.2] - 2024-11-26
 
 ### Fixed
 - [Update netty version](https://github.com/ballerina-platform/ballerina-library/issues/7358)
