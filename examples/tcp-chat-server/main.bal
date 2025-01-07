@@ -5,13 +5,16 @@ import ballerina/lang.'string;
 service on new tcp:Listener(3000) {
     private map<tcp:Caller> clients = {};
     private int clientCount = 0;
-    // private int messageCount = 0;
 
     remote function onConnect(tcp:Caller caller) returns tcp:ConnectionService|tcp:Error {
         self.clientCount += 1;
         string clientId = self.clientCount.toString();
         self.clients[clientId] = caller;
         io:println("Client connected: ", clientId);
+
+        // Send welcome message when a client connects
+        string welcomeMsg = string `Welcome to the chat room, Client ${clientId}!` + "\r\n" + "Type your message: " + "\r\n";
+        check caller->writeBytes(welcomeMsg.toBytes());
         
         return new ChatConnectionService(clientId, self.clients);
     }
@@ -25,7 +28,7 @@ service class ChatConnectionService {
 
     public function init(string clientId, map<tcp:Caller> clients) {
         self.clientId = clientId;
-        self.clients = clients;
+        self.clients = clients;     
     }
 
     remote function onBytes(readonly & byte[] data) returns tcp:Error? {
@@ -42,8 +45,7 @@ service class ChatConnectionService {
 
             foreach var msg in messages.slice(0, messages.length() - 1) {
                 if msg.trim() != "" {
-                    // string broadcastMsg = string `Client ${self.clientId}: ${msg}` + "\r\n";
-                    string broadcastMsg = string `New message: ${msg}` + "\r\n";
+                    string broadcastMsg = string `Message Recieved: ${msg}` + "\r\nType your message: \r\n";
                     foreach var caller in self.clients {
                         check caller->writeBytes(broadcastMsg.toBytes());
                     }
