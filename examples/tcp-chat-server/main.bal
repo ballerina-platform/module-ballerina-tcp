@@ -2,33 +2,45 @@ import ballerina/io;
 import ballerina/tcp;
 import ballerina/lang.'string;
 
-service on new tcp:Listener(3000) {
-    private map<tcp:Caller> clients = {};
-    private int clientCount = 0;
+type ChatServer service object {
+    map<tcp:Caller> clients;
+    public int messageCount;
+    remote function onConnect(tcp:Caller caller) returns tcp:ConnectionService|tcp:Error;
+};
+
+service class ChatServerImpl {
+    *ChatServer;
+    map<tcp:Caller> clients = {};
+    public int messageCount = 0;
 
     remote function onConnect(tcp:Caller caller) returns tcp:ConnectionService|tcp:Error {
-        self.clientCount += 1;
-        string clientId = self.clientCount.toString();
-        self.clients[clientId] = caller;
-        io:println("Client connected: ", clientId);
-
-        // Send welcome message when a client connects
-        string welcomeMsg = string `Welcome to the chat room, Client ${clientId}!` + "\r\n" + "Type your message: " + "\r\n";
+        self.clients[caller.id] = caller;
+        io:println("New client connected");
+        string welcomeMsg = "Welcome!,\r\nSend your first message: \r\n";
         check caller->writeBytes(welcomeMsg.toBytes());
-        
-        return new ChatConnectionService(clientId, self.clients);
+        return new ChatConnectionService(caller.id, self.clients, self);
+    }
+}
+
+service on new tcp:Listener(3000) {
+    private final ChatServerImpl chatServer = new;
+
+    remote function onConnect(tcp:Caller caller) returns tcp:ConnectionService|tcp:Error {
+        return self.chatServer->onConnect(caller);
     }
 }
 
 service class ChatConnectionService {
     *tcp:ConnectionService;
-    private final string clientId;
+    private final string callerId;
     private final map<tcp:Caller> clients;
+    private final ChatServerImpl parent;
     private string messageBuffer = "";
 
-    public function init(string clientId, map<tcp:Caller> clients) {
-        self.clientId = clientId;
-        self.clients = clients;     
+    public function init(string callerId, map<tcp:Caller> clients, ChatServerImpl parent) {
+        self.callerId = callerId;
+        self.clients = clients;
+        self.parent = parent;
     }
 
     remote function onBytes(readonly & byte[] data) returns tcp:Error? {
@@ -37,7 +49,6 @@ service class ChatConnectionService {
             return;
         }
 
-        // Append to buffer and check for newline
         self.messageBuffer += message;
         if self.messageBuffer.includes("\n") {
             string[] messages = re`\r?\n`.split(self.messageBuffer);
@@ -45,7 +56,8 @@ service class ChatConnectionService {
 
             foreach var msg in messages.slice(0, messages.length() - 1) {
                 if msg.trim() != "" {
-                    string broadcastMsg = string `Message Recieved: ${msg}` + "\r\nType your message: \r\n";
+                    self.parent.messageCount += 1;
+                    string broadcastMsg = string `Message #${self.parent.messageCount}: ${msg}` + "\r\nNew message:\r\n";
                     foreach var caller in self.clients {
                         check caller->writeBytes(broadcastMsg.toBytes());
                     }
@@ -59,7 +71,7 @@ service class ChatConnectionService {
     }
 
     remote function onClose() {
-        _ = self.clients.remove(self.clientId);
-        io:println("Client disconnected: ", self.clientId);
+        _ = self.clients.remove(self.callerId);
+        io:println("Client disconnected");
     }
 }
