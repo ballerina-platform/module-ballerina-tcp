@@ -1,6 +1,6 @@
 import ballerina/io;
-import ballerina/tcp;
 import ballerina/lang.'string;
+import ballerina/tcp;
 
 type ChatServer service object {
     map<tcp:Caller> clients;
@@ -51,7 +51,7 @@ service class ChatConnectionService {
 
         self.messageBuffer += message;
         if self.messageBuffer.includes("\n") {
-            string[] messages = re`\r?\n`.split(self.messageBuffer);
+            string[] messages = re `\r?\n`.split(self.messageBuffer);
             self.messageBuffer = messages[messages.length() - 1];
 
             foreach string msg in messages.slice(0, messages.length() - 1) {
