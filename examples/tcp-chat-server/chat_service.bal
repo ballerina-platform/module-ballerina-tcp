@@ -14,8 +14,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
-import ballerina/io;
 import ballerina/lang.'string;
+import ballerina/log;
 import ballerina/tcp;
 
 type ChatServer service object {
@@ -31,7 +31,7 @@ service class ChatServerImpl {
 
     remote function onConnect(tcp:Caller caller) returns tcp:ConnectionService|tcp:Error {
         self.clients[caller.id] = caller;
-        io:println("New client connected");
+        log:printInfo("New client connected");
         string welcomeMsg = "Welcome!,\r\nSend your first message: \r\n";
         check caller->writeBytes(welcomeMsg.toBytes());
         return new ChatConnectionService(caller.id, self.clients, self);
@@ -83,11 +83,11 @@ service class ChatConnectionService {
     }
 
     remote function onError(tcp:Error err) {
-        io:println("Error occurred: ", err.message());
+        log:printError("Error occurred", err);
     }
 
     remote function onClose() {
         _ = self.clients.remove(self.callerId);
-        io:println("Client disconnected");
+        log:printInfo("Client disconnected");
     }
 }
