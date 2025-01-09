@@ -54,11 +54,11 @@ service class ChatConnectionService {
             string[] messages = re`\r?\n`.split(self.messageBuffer);
             self.messageBuffer = messages[messages.length() - 1];
 
-            foreach var msg in messages.slice(0, messages.length() - 1) {
+            foreach string msg in messages.slice(0, messages.length() - 1) {
                 if msg.trim() != "" {
                     self.parent.messageCount += 1;
                     string broadcastMsg = string `Message #${self.parent.messageCount}: ${msg}` + "\r\nNew message:\r\n";
-                    foreach var caller in self.clients {
+                    foreach tcp:Caller caller in self.clients {
                         check caller->writeBytes(broadcastMsg.toBytes());
                     }
                 }
