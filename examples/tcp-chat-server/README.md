@@ -4,7 +4,7 @@
 
 ## Overview
 
-A simple TCP chat server implementation in Ballerina that allows multiple clients to connect and exchange messages. Each message is broadcast to all connected clients with a sequential message number.
+A simple TCP chat server implementation in Ballerina that allows multiple clients to connect and exchange messages. Each message is broadcasted to all the connected clients with a sequential message number.
 
 ## Features
 
