@@ -11,7 +11,7 @@ A simple TCP chat server implementation in Ballerina that allows multiple client
 - Supports multiple concurrent client connections
 - Broadcasts messages to all connected clients
 - Sequential message numbering
-- Handles client disconnections gracefully
+- Gracefully handles the client closures
 - Welcome message for new clients
 
 ## Run the Server
@@ -23,7 +23,7 @@ $ bal run
 
 ## Connect as Client
 
-You can connect using either telnet or netcat:
+You can connect using either [`telnet`](https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/telnet) or [`netcat`](https://netcat.sourceforge.net/):
 
 ```sh
 # Using telnet
