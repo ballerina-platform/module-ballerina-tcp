@@ -25,7 +25,7 @@ description = 'Ballerina - TCP Java Utils'
 
 dependencies {
     checkstyle project(':checkstyle')
-    checkstyle "com.puppycrawl.tools:checkstyle:${puppycrawlCheckstyleVersion}"
+    checkstyle "com.puppycrawl.tools:checkstyle:${checkstylePluginVersion}"
 
     implementation group: 'io.netty', name: 'netty-handler', version: "${nettyVersion}"
     implementation group: 'io.netty', name: 'netty-buffer', version: "${nettyVersion}"
