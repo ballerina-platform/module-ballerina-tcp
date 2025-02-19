@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ## [1.12.2] - 2025-02-19
 
 ### Changed
-- Make following methods isolated; TCPClient#writeBytes, TCPClient#readBytes
+- [Mark `writeBytes` and `readBytes` methods in the client as `isolated`](https://github.com/ballerina-platform/ballerina-library/issues/7609)
 
 ## [1.12.1] - 2025-02-11
 
