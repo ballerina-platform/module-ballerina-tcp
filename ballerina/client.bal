@@ -38,7 +38,7 @@ public isolated client class Client {
     #
     # + data - The data that need to be sent to the connected remote host
     # + return - `()` or else a `tcp:Error` if the given data cannot be sent
-    remote function writeBytes(byte[] data) returns Error? = @java:Method {
+    isolated remote function writeBytes(byte[] data) returns Error? = @java:Method {
         name: "externWriteBytes",
         'class: "io.ballerina.stdlib.tcp.nativeclient.Client"
     } external;
@@ -51,7 +51,7 @@ public isolated client class Client {
     # ```
     #
     # + return - The `readonly & byte[]` or else a `tcp:Error` if the data cannot be read from the remote host
-    remote function readBytes() returns (readonly & byte[])|Error = @java:Method {
+    isolated remote function readBytes() returns (readonly & byte[])|Error = @java:Method {
         name: "externReadBytes",
         'class: "io.ballerina.stdlib.tcp.nativeclient.Client"
     } external;
