@@ -8,7 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Fixed
 
 - [Address `CVE-2026-33870` and `CVE-2026-33871` Netty vulnerability in Standard Libraries](https://github.com/ballerina-platform/ballerina-library/issues/8738)
-- [Surface a clear error when the SSL keystore/truststore file is invalid](https://github.com/wso2/product-integrator/issues/1181)
+- [Surface a clear error when the SSL keystore/truststore file is invalid](https://github.com/ballerina-platform/ballerina-library/issues/8766)
 
 ## [1.13.3] - 2026-01-09
 
