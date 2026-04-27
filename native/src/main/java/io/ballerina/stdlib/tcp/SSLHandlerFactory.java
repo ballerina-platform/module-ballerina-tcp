@@ -124,26 +124,30 @@ public class SSLHandlerFactory {
         }
     }
 
-    public SslContext createContextForClient() throws IOException, NoSuchAlgorithmException, KeyStoreException {
-        SslProvider provider = SslProvider.JDK;
-        SslContextBuilder sslContextBuilder;
-        if (sslConfig.getClientTrustCertificates() != null) {
-            sslContextBuilder = clientContextBuilderWithCerts(provider);
-        } else {
-            initializeTrustManagerFactory();
-            sslContextBuilder = clientContextBuilderWithKs(provider);
+    public SslContext createContextForClient() throws IOException {
+        try {
+            SslProvider provider = SslProvider.JDK;
+            SslContextBuilder sslContextBuilder;
+            if (sslConfig.getClientTrustCertificates() != null) {
+                sslContextBuilder = clientContextBuilderWithCerts(provider);
+            } else {
+                initializeTrustManagerFactory();
+                sslContextBuilder = clientContextBuilderWithKs(provider);
+            }
+            String[] ciphers = this.sslConfig.getCipherSuites();
+            if (ciphers != null) {
+                setCiphers(sslContextBuilder, Arrays.asList(ciphers));
+            }
+            setSslProtocol(sslContextBuilder);
+            SslContext sslContext = sslContextBuilder.build();
+            int sessionTimeout = sslConfig.getSessionTimeOut();
+            if (sessionTimeout > 0) {
+                sslContext.sessionContext().setSessionTimeout(sessionTimeout);
+            }
+            return sslContext;
+        } catch (IOException | NoSuchAlgorithmException | KeyStoreException e) {
+            throw new IOException("Failed to initialize the SSL context: " + describe(e), e);
         }
-        String[] ciphers = this.sslConfig.getCipherSuites();
-        if (ciphers != null) {
-            setCiphers(sslContextBuilder, Arrays.asList(ciphers));
-        }
-        setSslProtocol(sslContextBuilder);
-        SslContext sslContext = sslContextBuilder.build();
-        int sessionTimeout = sslConfig.getSessionTimeOut();
-        if (sessionTimeout > 0) {
-            sslContext.sessionContext().setSessionTimeout(sessionTimeout);
-        }
-        return sslContext;
     }
 
     private void initializeTrustManagerFactory() throws IOException, NoSuchAlgorithmException, KeyStoreException {
@@ -152,27 +156,30 @@ public class SSLHandlerFactory {
         tmf.init(tks);
     }
 
-    public SslContext createContextForServer() throws IOException, NoSuchAlgorithmException, UnrecoverableKeyException,
-            KeyStoreException {
-        SslProvider provider = SslProvider.JDK;
-        SslContextBuilder sslContextBuilder;
-        if (sslConfig.getServerCertificates() != null) {
-            sslContextBuilder = serverContextBuilderWithCerts(provider);
-        } else {
-            initializeKeyManagerFactory();
-            sslContextBuilder = serverContextBuilderWithKs(provider);
+    public SslContext createContextForServer() throws IOException {
+        try {
+            SslProvider provider = SslProvider.JDK;
+            SslContextBuilder sslContextBuilder;
+            if (sslConfig.getServerCertificates() != null) {
+                sslContextBuilder = serverContextBuilderWithCerts(provider);
+            } else {
+                initializeKeyManagerFactory();
+                sslContextBuilder = serverContextBuilderWithKs(provider);
+            }
+            String[] ciphers = this.sslConfig.getCipherSuites();
+            if (ciphers != null) {
+                setCiphers(sslContextBuilder, Arrays.asList(ciphers));
+            }
+            setSslProtocol(sslContextBuilder);
+            SslContext sslContext = sslContextBuilder.build();
+            int sessionTimeout = sslConfig.getSessionTimeOut();
+            if (sessionTimeout > 0) {
+                sslContext.sessionContext().setSessionTimeout(sessionTimeout);
+            }
+            return sslContext;
+        } catch (IOException | NoSuchAlgorithmException | UnrecoverableKeyException | KeyStoreException e) {
+            throw new IOException("Failed to initialize the SSL context: " + describe(e), e);
         }
-        String[] ciphers = this.sslConfig.getCipherSuites();
-        if (ciphers != null) {
-            setCiphers(sslContextBuilder, Arrays.asList(ciphers));
-        }
-        setSslProtocol(sslContextBuilder);
-        SslContext sslContext = sslContextBuilder.build();
-        int sessionTimeout = sslConfig.getSessionTimeOut();
-        if (sessionTimeout > 0) {
-            sslContext.sessionContext().setSessionTimeout(sessionTimeout);
-        }
-        return sslContext;
     }
 
     private void initializeKeyManagerFactory() throws IOException, NoSuchAlgorithmException, KeyStoreException,
@@ -183,5 +190,9 @@ public class SSLHandlerFactory {
         kmf.init(ks, sslConfig.getCertPass() != null ?
                 sslConfig.getCertPass().toCharArray() :
                 sslConfig.getKeyStorePass().toCharArray());
+    }
+
+    private static String describe(Throwable t) {
+        return t.getMessage() != null ? t.getMessage() : t.getClass().getSimpleName();
     }
 }
