@@ -198,3 +198,26 @@ function testListenerWithEmptyCiphers() returns error? {
         test:assertFail(msg = "Without Ciphers. Should work");
     }
 }
+
+// Regression: a non-PKCS12 file at `key.path` used to leak the underlying
+// ASN.1 parser message (e.g. "Tag number over 30 is not supported") or NPE
+// when the parser threw an exception with a null message. The error must now
+// be wrapped with a "Failed to initialize the SSL context" prefix.
+@test:Config {}
+function testListenerWithMalformedKeystore() returns error? {
+    Listener server = check new Listener(9999, secureSocket = {
+        key: {
+            path: certPath,
+            password: "ballerina"
+        }
+    });
+
+    check server.attach(obj);
+    error? res = server.start();
+    if res is error {
+        test:assertTrue(res.message().startsWith("Failed to initialize the SSL context"),
+                msg = "Expected wrapped SSL init error, got: " + res.message());
+    } else {
+        test:assertFail(msg = "Malformed keystore should fail to initialize.");
+    }
+}
