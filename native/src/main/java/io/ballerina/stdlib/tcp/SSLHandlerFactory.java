@@ -124,7 +124,7 @@ public class SSLHandlerFactory {
         }
     }
 
-    public SslContext createContextForClient() throws IOException, NoSuchAlgorithmException, KeyStoreException {
+    public SslContext createContextForClient() throws IOException {
         try {
             SslProvider provider = SslProvider.JDK;
             SslContextBuilder sslContextBuilder;
@@ -156,8 +156,7 @@ public class SSLHandlerFactory {
         tmf.init(tks);
     }
 
-    public SslContext createContextForServer() throws IOException, NoSuchAlgorithmException, UnrecoverableKeyException,
-            KeyStoreException {
+    public SslContext createContextForServer() throws IOException {
         try {
             SslProvider provider = SslProvider.JDK;
             SslContextBuilder sslContextBuilder;
