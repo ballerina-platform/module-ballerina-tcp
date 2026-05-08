@@ -3,7 +3,9 @@ This file contains all the notable changes done to the Ballerina TCP package thr
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.13.4] - 2026-04-07
+
+- [Update Netty version to 4.1.133-Final](https://github.com/ballerina-platform/ballerina-library/issues/8785)
 
 ### Fixed
 
