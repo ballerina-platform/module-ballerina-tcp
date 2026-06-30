@@ -187,6 +187,9 @@ publishing {
 
 task patchBallerinaScripts(type: PatchBallerinaScriptsTask) {
     dependsOn 'unpackJballerinaTools'
+    outputs.upToDateWhen { !tasks.named('unpackJballerinaTools').get().didWork }
+    jballerinaToolsBinPath = layout.buildDirectory.dir("jballerina-tools-${project.ballerinaLangVersion}/bin").get().asFile.absolutePath
+    ballerinaRuntimeBinPath = "${rootProject.projectDir.absolutePath}/target/ballerina-runtime/bin"
 }
 
 updateTomlFiles.dependsOn copyStdlibs
