@@ -7,82 +7,82 @@ keywords = ["network", "socket", "service", "client"]
 repository = "https://github.com/ballerina-platform/module-ballerina-tcp"
 icon = "icon.png"
 license = ["Apache-2.0"]
-distribution = "2201.14.0"
+distribution = "2201.12.0"
 
-[platform.java25]
+[platform.java21]
 graalvmCompatible = true
 
-[[platform.java25.dependency]]
+[[platform.java21.dependency]]
 groupId = "io.ballerina.stdlib"
 artifactId = "tcp-native"
 version = "1.13.7"
 path = "../native/build/libs/tcp-native-1.13.7-SNAPSHOT.jar"
 
-[[platform.java25.dependency]]
+[[platform.java21.dependency]]
 path = "../test-utils/build/libs/tcp-test-utils-1.13.7-SNAPSHOT.jar"
 scope = "testOnly"
 
-[[platform.java25.dependency]]
+[[platform.java21.dependency]]
 groupId = "io.netty"
 artifactId = "netty-handler"
 version = "4.1.135.Final"
 path = "./lib/netty-handler-4.1.135.Final.jar"
 
-[[platform.java25.dependency]]
+[[platform.java21.dependency]]
 groupId = "io.netty"
 artifactId = "netty-buffer"
 version = "4.1.135.Final"
 path = "./lib/netty-buffer-4.1.135.Final.jar"
 
-[[platform.java25.dependency]]
+[[platform.java21.dependency]]
 groupId = "io.netty"
 artifactId = "netty-transport"
 version = "4.1.135.Final"
 path = "./lib/netty-transport-4.1.135.Final.jar"
 
-[[platform.java25.dependency]]
+[[platform.java21.dependency]]
 groupId = "io.netty"
 artifactId = "netty-common"
 version = "4.1.135.Final"
 path = "./lib/netty-common-4.1.135.Final.jar"
 
-[[platform.java25.dependency]]
+[[platform.java21.dependency]]
 groupId = "io.netty"
 artifactId = "netty-resolver"
 version = "4.1.135.Final"
 path = "./lib/netty-resolver-4.1.135.Final.jar"
 
-[[platform.java25.dependency]]
+[[platform.java21.dependency]]
 groupId = "io.netty"
 artifactId = "netty-codec"
 version = "4.1.135.Final"
 path = "./lib/netty-codec-4.1.135.Final.jar"
 
-[[platform.java25.dependency]]
+[[platform.java21.dependency]]
 groupId = "io.netty"
 artifactId = "netty-transport-native-unix-common"
 version = "4.1.135.Final"
 path = "./lib/netty-transport-native-unix-common-4.1.135.Final.jar"
 
-[[platform.java25.dependency]]
+[[platform.java21.dependency]]
 groupId = "io.netty"
 artifactId = "netty-codec-socks"
 version = "4.1.135.Final"
 path = "./lib/netty-codec-socks-4.1.135.Final.jar"
 
-[[platform.java25.dependency]]
+[[platform.java21.dependency]]
 groupId = "org.jboss.marshalling"
 artifactId = "jboss-marshalling"
 version = "2.0.5.Final"
 path = "./lib/jboss-marshalling-2.0.5.Final.jar"
 
-[[platform.java25.dependency]]
+[[platform.java21.dependency]]
 groupId = "at.yawk.lz4"
 artifactId = "lz4-java"
 version = "1.10.2"
 path = "./lib/lz4-java-1.10.2.jar"
 
-[[platform.java25.dependency]]
+[[platform.java21.dependency]]
 groupId = "com.google.protobufl"
 artifactId = "protobuf-java"
 version = "3.25.5"
