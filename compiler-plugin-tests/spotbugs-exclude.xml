@@ -20,4 +20,8 @@
         <Class name="io.ballerina.stdlib.tcp.compiler.CodeSnippetGenerationCodeActionTest" />
         <Bug pattern="UPM_UNCALLED_PRIVATE_METHOD" />
     </Match>
+    <!-- Pre-existing issues surfaced by SpotBugs 4.9.x (bundled in plugin >= 6.2.0) -->
+    <Match>
+        <BugCode name="THROWS"/>
+    </Match>
 </FindBugsFilter>

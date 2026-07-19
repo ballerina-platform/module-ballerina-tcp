@@ -29,6 +29,10 @@ allprojects {
     apply plugin: 'jacoco'
     apply plugin: 'maven-publish'
 
+    jacoco {
+        toolVersion = "${jacocoVersion}"
+    }
+
     repositories {
         mavenLocal()
         maven {
@@ -59,6 +63,7 @@ allprojects {
 }
 
 subprojects {
+
     configurations {
         ballerinaStdLibs
         jbalTools
@@ -96,6 +101,6 @@ release {
     }
 }
 
-task build {
+tasks.named('build') {
     dependsOn('tcp-ballerina:build')
 }
