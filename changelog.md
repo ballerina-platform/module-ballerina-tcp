@@ -7,7 +7,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Fixed
 
-- [Update Netty version to 4.1.133-Final](https://github.com/ballerina-platform/ballerina-library/issues/8924)
+- [Update Netty version to 4.1.136-Final](https://github.com/ballerina-platform/ballerina-library/issues/8924)
 
 ## [1.13.6] - 2026-05-11
 
