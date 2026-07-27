@@ -3,6 +3,10 @@ This file contains all the notable changes done to the Ballerina TCP package thr
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.13.8] - 2026-07-27
+
+- [Update lz4-java to 1.11.1 to fix CVE-2026-59949](https://github.com/ballerina-platform/ballerina-library/issues/8933)
+
 ## [1.13.7] - 2026-07-24
 
 ### Fixed
