@@ -1,5 +1,4 @@
-Ballerina TCP Library
-===================
+# Ballerina TCP Library
 
   [![Build](https://github.com/ballerina-platform/module-ballerina-tcp/actions/workflows/build-timestamped-master.yml/badge.svg)](https://github.com/ballerina-platform/module-ballerina-tcp/actions/workflows/build-timestamped-master.yml)
   [![codecov](https://codecov.io/gh/ballerina-platform/module-ballerina-tcp/branch/master/graph/badge.svg)](https://codecov.io/gh/ballerina-platform/module-ballerina-tcp) 
@@ -8,7 +7,9 @@ Ballerina TCP Library
   [![GitHub Last Commit](https://img.shields.io/github/last-commit/ballerina-platform/module-ballerina-tcp.svg)](https://github.com/ballerina-platform/module-ballerina-tcp/commits/master)
   [![Github issues](https://img.shields.io/github/issues/ballerina-platform/ballerina-standard-library/module/tcp.svg?label=Open%20Issues)](https://github.com/ballerina-platform/ballerina-standard-library/labels/module%2Ftcp) 
 
-This library provides a client-server implementation for sending/receiving messages to/from another application process (local or remote) for connection-oriented protocols. 
+## Overview
+
+This module provides a client-server implementation for sending and receiving messages between application processes over the connection-oriented TCP protocol, including support for TLS.
 
 #### Client
 
@@ -167,7 +168,7 @@ Execute the commands below to build from source.
         
 ## Contributing to Ballerina
 
-As an open source project, Ballerina welcomes contributions from the community. 
+As an open-source project, Ballerina welcomes contributions from the community. 
 
 For more information, go to the [contribution guidelines](https://github.com/ballerina-platform/ballerina-lang/blob/master/CONTRIBUTING.md).
 
