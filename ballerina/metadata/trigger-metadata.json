@@ -1,0 +1,115 @@
+{
+  "version": "v1.0",
+
+  "listeners": [
+    {
+      "id": "$listener",
+      "doc": "TCP listener bound to one port. Dispatches each new connection to the attached service's onConnect handler.",
+      "type": { "name": "Listener" },
+      "services": ["$service"],
+      "multipleServicesAllowed": false
+    }
+  ],
+
+  "serviceTypes": [
+    {
+      "id": "$service",
+      "doc": "Handles a new TCP connection. Its onConnect handler decides whether to accept the connection and, if so, returns the connection service that will process its bytes.",
+      "type": { "name": "Service" },
+      "concrete": false,
+      "multipleListenersAllowed": true,
+      "handlers": {
+        "backedByConcreteType": false,
+        "options": [
+          {
+            "id": "$service.onConnect",
+            "name": "onConnect",
+            "kind": "remote",
+            "doc": "Invoked once a new client connects. Returns the connection service instance that will handle this connection's bytes, or an error to reject the connection.",
+            "presence": "optional",
+            "params": [
+              {
+                "id": "$service.onConnect.caller",
+                "name": "caller",
+                "doc": "Handle for the newly connected client, exposing its remote/local host and port. Store it if the returned connection service needs to write back later.",
+                "type": { "name": "Caller" },
+                "presence": "required"
+              }
+            ],
+            "returns": {
+              "id": "$service.onConnect.returns",
+              "type": [{ "name": "ConnectionService" }, { "name": "Error" }, { "name": "()", "builtin": true }]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "$connectionService",
+      "doc": "The per-connection service returned by onConnect. Its handlers are invoked over the lifetime of one TCP connection.",
+      "type": { "name": "ConnectionService" },
+      "concrete": false,
+      "multipleListenersAllowed": false,
+      "handlers": {
+        "backedByConcreteType": false,
+        "options": [
+          {
+            "id": "$connectionService.onBytes",
+            "name": "onBytes",
+            "kind": "remote",
+            "doc": "Invoked once for each chunk of bytes received from the client. Return bytes to write back to the same client, or () to send nothing.",
+            "presence": "required",
+            "params": [
+              {
+                "id": "$connectionService.onBytes.data",
+                "name": "data",
+                "doc": "The bytes received from the client.",
+                "type": { "shape": "readonly", "elementType": { "shape": "array", "elementType": { "name": "byte", "builtin": true } } },
+                "presence": "required"
+              }
+            ],
+            "returns": {
+              "id": "$connectionService.onBytes.returns",
+              "type": [
+                { "shape": "array", "elementType": { "name": "byte", "builtin": true } },
+                { "name": "Error" },
+                { "name": "()", "builtin": true }
+              ]
+            }
+          },
+          {
+            "id": "$connectionService.onError",
+            "name": "onError",
+            "kind": "remote",
+            "doc": "Invoked when the connection fails, such as a read or write error on the underlying socket.",
+            "presence": "optional",
+            "params": [
+              {
+                "id": "$connectionService.onError.err",
+                "name": "err",
+                "doc": "The failure that occurred on this connection.",
+                "type": { "name": "Error" },
+                "presence": "required"
+              }
+            ],
+            "returns": {
+              "id": "$connectionService.onError.returns",
+              "type": [{ "name": "Error" }, { "name": "()", "builtin": true }]
+            }
+          },
+          {
+            "id": "$connectionService.onClose",
+            "name": "onClose",
+            "kind": "remote",
+            "doc": "Invoked when the connection is closed, by either side.",
+            "presence": "optional",
+            "returns": {
+              "id": "$connectionService.onClose.returns",
+              "type": [{ "name": "Error" }, { "name": "()", "builtin": true }]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
