@@ -8,6 +8,7 @@ repository = "https://github.com/ballerina-platform/module-ballerina-tcp"
 icon = "icon.png"
 license = ["Apache-2.0"]
 distribution = "2201.12.0"
+include = ["metadata"]
 
 [platform.java21]
 graalvmCompatible = true
