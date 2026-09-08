@@ -1,6 +1,12 @@
 ## Overview
 
-This module provides APIs for sending/receiving messages to/from another application process (local or remote) over the connection-oriented TCP protocol.
+This module provides a client-server implementation for sending and receiving messages between application processes over the connection-oriented TCP protocol, including support for TLS.
+
+## Key Features
+
+- TCP client and listener for sending and receiving byte data
+- Event-driven service methods: `onConnect`, `onBytes`, `onError`, `onClose`
+- TLS support for secure client and server communication
 
 #### Client
 
