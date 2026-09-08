@@ -25,7 +25,7 @@
             "id": "$service.onConnect",
             "name": "onConnect",
             "kind": "remote",
-            "doc": "Invoked once a new client connects. Returns the connection service instance that will handle this connection's bytes, or an error to reject the connection.",
+            "doc": "Invoked once a new client connects. Returns the connection service instance that will handle this connection's bytes, or an error to reject the connection. Not compiler-enforced, but this is the service's only handler: omitting it compiles to a silent no-op that never returns a connection service.",
             "presence": "optional",
             "params": [
               {
@@ -58,7 +58,7 @@
             "name": "onBytes",
             "kind": "remote",
             "doc": "Invoked once for each chunk of bytes received from the client. Return bytes to write back to the same client, or () to send nothing.",
-            "presence": "required",
+            "presence": "optional",
             "params": [
               {
                 "id": "$connectionService.onBytes.data",
@@ -66,6 +66,13 @@
                 "doc": "The bytes received from the client.",
                 "type": { "shape": "readonly", "elementType": { "shape": "array", "elementType": { "name": "byte", "builtin": true } } },
                 "presence": "required"
+              },
+              {
+                "id": "$connectionService.onBytes.caller",
+                "name": "caller",
+                "doc": "Handle for the connected client, exposing its remote/local host and port. Include it when the handler needs to write back to the same client from within onBytes.",
+                "type": { "name": "Caller" },
+                "presence": "optional"
               }
             ],
             "returns": {
