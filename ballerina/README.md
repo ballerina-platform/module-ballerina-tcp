@@ -2,7 +2,7 @@
 
 This module provides a client-server implementation for sending and receiving messages between application processes over the connection-oriented TCP protocol, including support for TLS.
 
-## Key Features
+### Key Features
 
 - TCP client and listener for sending and receiving byte data
 - Event-driven service methods: `onConnect`, `onBytes`, `onError`, `onClose`
