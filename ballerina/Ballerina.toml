@@ -1,13 +1,14 @@
 [package]
 org = "ballerina"
 name = "tcp"
-version = "1.13.7"
+version = "1.13.10"
 authors = ["Ballerina"]
-keywords = ["network", "socket", "service", "client"]
+keywords = ["network", "socket", "service", "client", "Type/Connector", "Type/Trigger", "Area/Built-in", "Area/Communication", "Name/TCP"]
 repository = "https://github.com/ballerina-platform/module-ballerina-tcp"
 icon = "icon.png"
 license = ["Apache-2.0"]
 distribution = "2201.12.0"
+include = ["metadata"]
 
 [platform.java21]
 graalvmCompatible = true
@@ -15,60 +16,60 @@ graalvmCompatible = true
 [[platform.java21.dependency]]
 groupId = "io.ballerina.stdlib"
 artifactId = "tcp-native"
-version = "1.13.7"
-path = "../native/build/libs/tcp-native-1.13.7-SNAPSHOT.jar"
+version = "1.13.10"
+path = "../native/build/libs/tcp-native-1.13.10.jar"
 
 [[platform.java21.dependency]]
-path = "../test-utils/build/libs/tcp-test-utils-1.13.7-SNAPSHOT.jar"
+path = "../test-utils/build/libs/tcp-test-utils-1.13.10.jar"
 scope = "testOnly"
 
 [[platform.java21.dependency]]
 groupId = "io.netty"
 artifactId = "netty-handler"
-version = "4.1.135.Final"
-path = "./lib/netty-handler-4.1.135.Final.jar"
+version = "4.1.137.Final"
+path = "./lib/netty-handler-4.1.137.Final.jar"
 
 [[platform.java21.dependency]]
 groupId = "io.netty"
 artifactId = "netty-buffer"
-version = "4.1.135.Final"
-path = "./lib/netty-buffer-4.1.135.Final.jar"
+version = "4.1.137.Final"
+path = "./lib/netty-buffer-4.1.137.Final.jar"
 
 [[platform.java21.dependency]]
 groupId = "io.netty"
 artifactId = "netty-transport"
-version = "4.1.135.Final"
-path = "./lib/netty-transport-4.1.135.Final.jar"
+version = "4.1.137.Final"
+path = "./lib/netty-transport-4.1.137.Final.jar"
 
 [[platform.java21.dependency]]
 groupId = "io.netty"
 artifactId = "netty-common"
-version = "4.1.135.Final"
-path = "./lib/netty-common-4.1.135.Final.jar"
+version = "4.1.137.Final"
+path = "./lib/netty-common-4.1.137.Final.jar"
 
 [[platform.java21.dependency]]
 groupId = "io.netty"
 artifactId = "netty-resolver"
-version = "4.1.135.Final"
-path = "./lib/netty-resolver-4.1.135.Final.jar"
+version = "4.1.137.Final"
+path = "./lib/netty-resolver-4.1.137.Final.jar"
 
 [[platform.java21.dependency]]
 groupId = "io.netty"
 artifactId = "netty-codec"
-version = "4.1.135.Final"
-path = "./lib/netty-codec-4.1.135.Final.jar"
+version = "4.1.137.Final"
+path = "./lib/netty-codec-4.1.137.Final.jar"
 
 [[platform.java21.dependency]]
 groupId = "io.netty"
 artifactId = "netty-transport-native-unix-common"
-version = "4.1.135.Final"
-path = "./lib/netty-transport-native-unix-common-4.1.135.Final.jar"
+version = "4.1.137.Final"
+path = "./lib/netty-transport-native-unix-common-4.1.137.Final.jar"
 
 [[platform.java21.dependency]]
 groupId = "io.netty"
 artifactId = "netty-codec-socks"
-version = "4.1.135.Final"
-path = "./lib/netty-codec-socks-4.1.135.Final.jar"
+version = "4.1.137.Final"
+path = "./lib/netty-codec-socks-4.1.137.Final.jar"
 
 [[platform.java21.dependency]]
 groupId = "org.jboss.marshalling"
@@ -79,8 +80,8 @@ path = "./lib/jboss-marshalling-2.0.5.Final.jar"
 [[platform.java21.dependency]]
 groupId = "at.yawk.lz4"
 artifactId = "lz4-java"
-version = "1.10.2"
-path = "./lib/lz4-java-1.10.2.jar"
+version = "1.11.1"
+path = "./lib/lz4-java-1.11.1.jar"
 
 [[platform.java21.dependency]]
 groupId = "com.google.protobufl"
