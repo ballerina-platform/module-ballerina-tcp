@@ -99,6 +99,14 @@ release {
     }
 }
 
-tasks.named('build') {
-    dependsOn('tcp-ballerina:build')
+if (tasks.names.contains('build')) {
+    tasks.named('build') {
+        dependsOn('tcp-ballerina:build')
+
+    }
+} else {
+    tasks.register('build') {
+        dependsOn('tcp-ballerina:build')
+
+    }
 }
