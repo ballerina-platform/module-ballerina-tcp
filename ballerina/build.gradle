@@ -71,7 +71,7 @@ dependencies {
     externalJars(group: 'io.netty', name: 'netty-resolver', version: "${nettyVersion}") {
         transitive = false
     }
-    externalJars(group: 'io.netty', name: 'netty-codec', version: "${nettyVersion}") {
+    externalJars(group: 'io.netty', name: 'netty-codec-base', version: "${nettyVersion}") {
         transitive = false
     }
     externalJars(group: 'io.netty', name: 'netty-transport-native-unix-common', version: "${nettyVersion}") {
