@@ -78,7 +78,10 @@ public class SSLHandlerFactory {
     }
 
     private SslContextBuilder clientContextBuilderWithKs(SslProvider sslProvider) {
-        return SslContextBuilder.forClient().sslProvider(sslProvider).keyManager(kmf).trustManager(tmf);
+        SslContextBuilder clientSslContextBuilder = SslContextBuilder.forClient().sslProvider(sslProvider)
+                .keyManager(kmf).trustManager(tmf);
+        setEndpointIdentification(clientSslContextBuilder);
+        return clientSslContextBuilder;
     }
 
     private SslContextBuilder serverContextBuilderWithCerts(SslProvider sslProvider) {
@@ -93,9 +96,17 @@ public class SSLHandlerFactory {
 
     private SslContextBuilder clientContextBuilderWithCerts(SslProvider sslProvider) {
         String keyPassword = sslConfig.getClientKeyPassword();
-        return SslContextBuilder.forClient().sslProvider(sslProvider)
+        SslContextBuilder clientSslContextBuilder = SslContextBuilder.forClient().sslProvider(sslProvider)
                 .keyManager(sslConfig.getClientCertificates(), sslConfig.getClientKeyFile(), keyPassword)
                 .trustManager(sslConfig.getClientTrustCertificates());
+        setEndpointIdentification(clientSslContextBuilder);
+        return clientSslContextBuilder;
+    }
+
+    // Netty 4.2 defaults this to HTTPS. The module has no host name verification setting and its clients are
+    // not given a peer host, so inheriting that default would break every TLS connection. Keep 4.1 behaviour.
+    private void setEndpointIdentification(SslContextBuilder clientSslContextBuilder) {
+        clientSslContextBuilder.endpointIdentificationAlgorithm(null);
     }
 
     private void setCiphers(SslContextBuilder sslContextBuilder, List<String> ciphers) {
