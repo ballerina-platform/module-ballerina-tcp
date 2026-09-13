@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ## [Unreleased]
 
 ### Changed
+- [Migrate to Netty 4.2.18.Final ahead of the Netty 4.1 end of life](https://github.com/ballerina-platform/ballerina-library/issues/9152)
+- Replace the `netty-codec` dependency with `netty-codec-base`, following the Netty 4.2 module split
+- Configure endpoint identification explicitly on client SSL contexts, so Netty 4.2's new host name verification default does not change behaviour
 - [[#9132] Updated Keywords and Reformat README for Connector Store Discoverability](https://github.com/ballerina-platform/ballerina-library/issues/9132)
 
 ### Fixed
