@@ -99,7 +99,7 @@ dependencies = [
 [[package]]
 org = "ballerina"
 name = "tcp"
-version = "1.13.11"
+version = "1.14.0"
 dependencies = [
 	{org = "ballerina", name = "crypto"},
 	{org = "ballerina", name = "io"},
