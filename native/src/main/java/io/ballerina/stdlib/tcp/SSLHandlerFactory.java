@@ -43,6 +43,8 @@ import javax.net.ssl.TrustManagerFactory;
  */
 public class SSLHandlerFactory {
 
+    private static final String ENDPOINT_IDENTIFICATION_ALGORITHM = "HTTPS";
+
     private SSLConfig sslConfig;
     private boolean needClientAuth;
     private boolean wantClientAuth;
@@ -78,7 +80,10 @@ public class SSLHandlerFactory {
     }
 
     private SslContextBuilder clientContextBuilderWithKs(SslProvider sslProvider) {
-        return SslContextBuilder.forClient().sslProvider(sslProvider).keyManager(kmf).trustManager(tmf);
+        SslContextBuilder clientSslContextBuilder = SslContextBuilder.forClient().sslProvider(sslProvider)
+                .keyManager(kmf).trustManager(tmf);
+        setEndpointIdentification(clientSslContextBuilder);
+        return clientSslContextBuilder;
     }
 
     private SslContextBuilder serverContextBuilderWithCerts(SslProvider sslProvider) {
@@ -93,9 +98,18 @@ public class SSLHandlerFactory {
 
     private SslContextBuilder clientContextBuilderWithCerts(SslProvider sslProvider) {
         String keyPassword = sslConfig.getClientKeyPassword();
-        return SslContextBuilder.forClient().sslProvider(sslProvider)
+        SslContextBuilder clientSslContextBuilder = SslContextBuilder.forClient().sslProvider(sslProvider)
                 .keyManager(sslConfig.getClientCertificates(), sslConfig.getClientKeyFile(), keyPassword)
                 .trustManager(sslConfig.getClientTrustCertificates());
+        setEndpointIdentification(clientSslContextBuilder);
+        return clientSslContextBuilder;
+    }
+
+    // The client passes the configured remote host to the SslHandler, so the peer certificate identity is
+    // verified unless the user explicitly opts out via `verifyHostName`.
+    private void setEndpointIdentification(SslContextBuilder clientSslContextBuilder) {
+        clientSslContextBuilder.endpointIdentificationAlgorithm(
+                sslConfig.isVerifyHostName() ? ENDPOINT_IDENTIFICATION_ALGORITHM : null);
     }
 
     private void setCiphers(SslContextBuilder sslContextBuilder, List<String> ciphers) {

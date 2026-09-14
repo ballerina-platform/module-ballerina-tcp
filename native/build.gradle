@@ -32,7 +32,7 @@ dependencies {
     implementation group: 'io.netty', name: 'netty-transport', version: "${nettyVersion}"
     implementation group: 'io.netty', name: 'netty-common', version: "${nettyVersion}"
     implementation group: 'io.netty', name: 'netty-resolver', version: "${nettyVersion}"
-    implementation group: 'io.netty', name: 'netty-codec', version: "${nettyVersion}"
+    implementation group: 'io.netty', name: 'netty-codec-base', version: "${nettyVersion}"
     implementation group: 'org.ballerinalang', name: 'ballerina-lang', version: "${ballerinaLangVersion}"
     implementation group: 'org.ballerinalang', name: 'ballerina-runtime', version: "${ballerinaLangVersion}"
     implementation group: 'org.ballerinalang', name: 'ballerina-tools-api', version: "${ballerinaLangVersion}"

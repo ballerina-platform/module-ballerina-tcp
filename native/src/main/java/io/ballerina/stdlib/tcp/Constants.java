@@ -71,6 +71,7 @@ public class Constants {
     public static final BString SECURE_SOCKET = StringUtils.fromString("secureSocket");
     public static final BString SECURESOCKET_CONFIG_ENABLE_SSL = StringUtils.fromString("enable");
     public static final BString SECURESOCKET_CONFIG_CERT = StringUtils.fromString("cert");
+    public static final BString SECURESOCKET_CONFIG_VERIFY_HOST_NAME = StringUtils.fromString("verifyHostName");
     public static final BString SECURESOCKET_CONFIG_TRUSTSTORE_FILE_PATH = StringUtils.fromString("path");
     public static final BString SECURESOCKET_CONFIG_TRUSTSTORE_PASSWORD = StringUtils.fromString("password");
     public static final BString SECURESOCKET_CONFIG_KEY = StringUtils.fromString("key");

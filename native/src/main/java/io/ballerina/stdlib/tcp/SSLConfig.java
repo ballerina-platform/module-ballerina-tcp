@@ -60,6 +60,7 @@ public class SSLConfig {
     private String clientKeyPassword;
     private int sessionTimeOut;
     private long handshakeTimeOut;
+    private boolean verifyHostName = true;
     private boolean disableSsl = false;
     private boolean useJavaDefaults = false;
 
@@ -225,5 +226,13 @@ public class SSLConfig {
 
     public void setHandshakeTimeOut(long handshakeTimeOut) {
         this.handshakeTimeOut = handshakeTimeOut;
+    }
+
+    public boolean isVerifyHostName() {
+        return verifyHostName;
+    }
+
+    public void setVerifyHostName(boolean verifyHostName) {
+        this.verifyHostName = verifyHostName;
     }
 }
