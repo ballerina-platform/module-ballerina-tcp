@@ -99,8 +99,4 @@
         <Class name="io.ballerina.stdlib.tcp.TcpFactory"/>
         <Bug pattern="SING_SINGLETON_GETTER_NOT_SYNCHRONIZED"/>
     </Match>
-    <Match>
-        <Class name="io.ballerina.stdlib.tcp.TcpClientHandler"/>
-        <Bug pattern="AT_STALE_THREAD_WRITE_OF_PRIMITIVE"/>
-    </Match>
 </FindBugsFilter>

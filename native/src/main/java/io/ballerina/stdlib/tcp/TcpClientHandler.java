@@ -35,12 +35,12 @@ public class TcpClientHandler extends SimpleChannelInboundHandler<ByteBuf> {
 
     private CompletableFuture<Object> callback;
     private AtomicBoolean writeFutureCompleted = new AtomicBoolean(false);
-    private boolean isCloseTriggered = false;
+    private AtomicBoolean isCloseTriggered = new AtomicBoolean(false);
     private LinkedList<WriteFlowController> writeFlowControllers = new LinkedList<>();
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        if (!isCloseTriggered && callback != null) {
+        if (!isCloseTriggered.get() && callback != null) {
             callback.complete(Utils.createTcpError("Connection closed by the server."));
         }
         ctx.channel().close();
@@ -103,7 +103,7 @@ public class TcpClientHandler extends SimpleChannelInboundHandler<ByteBuf> {
     }
 
     public void setIsCloseTriggered() {
-        isCloseTriggered = true;
+        isCloseTriggered.set(true);
     }
 
     public void addWriteFlowControl(WriteFlowController writeFlowController) {
