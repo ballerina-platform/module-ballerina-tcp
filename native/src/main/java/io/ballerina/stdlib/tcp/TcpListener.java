@@ -33,6 +33,7 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslHandler;
 
+import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
@@ -97,7 +98,7 @@ public class TcpListener {
                 });
     }
 
-    private SslContext getSslContext(BMap<BString, Object> secureSocket) throws Exception {
+    private SslContext getSslContext(BMap<BString, Object> secureSocket) throws IOException {
         SSLConfig sslConfig = Utils.setSslConfig(secureSocket, new SSLConfig(), true);
 
         SSLHandlerFactory sslHandlerFactory = new SSLHandlerFactory(sslConfig);

@@ -33,6 +33,7 @@ import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslHandler;
 import io.netty.handler.timeout.IdleStateHandler;
 
+import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
@@ -89,7 +90,8 @@ public class TcpClient {
     }
 
     private void setSSLHandler(SocketChannel channel, BMap<BString, Object> secureSocket,
-                               TcpClientHandler tcpClientHandler, CompletableFuture<Object> callback) throws Exception {
+                               TcpClientHandler tcpClientHandler, CompletableFuture<Object> callback)
+            throws IOException {
         SSLConfig sslConfig = Utils.setSslConfig(secureSocket, new SSLConfig(), false);
 
         SSLHandlerFactory sslHandlerFactory = new SSLHandlerFactory(sslConfig);
