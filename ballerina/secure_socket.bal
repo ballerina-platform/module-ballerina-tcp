@@ -20,6 +20,9 @@ import ballerina/crypto;
 #
 # + enable - Enable SSL validation
 # + cert - Configurations associated with `crypto:TrustStore` or single certificate file that the client trusts
+# + verifyHostName - Enable/disable the host name verification against the server certificate. Disabling this makes
+# the connection vulnerable to man-in-the-middle attacks and should only be done with self-signed or legacy
+# certificates that do not carry a matching name
 # + protocol - SSL/TLS protocol related options
 # + ciphers - List of ciphers to be used
 # E.g., `TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256`, `TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA`
@@ -28,6 +31,7 @@ import ballerina/crypto;
 public type ClientSecureSocket record {|
     boolean enable = true;
     crypto:TrustStore|string cert?;
+    boolean verifyHostName = true;
     record {|
         Protocol name;
         string[] versions = [];

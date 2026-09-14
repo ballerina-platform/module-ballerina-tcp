@@ -43,6 +43,8 @@ import javax.net.ssl.TrustManagerFactory;
  */
 public class SSLHandlerFactory {
 
+    private static final String ENDPOINT_IDENTIFICATION_ALGORITHM = "HTTPS";
+
     private SSLConfig sslConfig;
     private boolean needClientAuth;
     private boolean wantClientAuth;
@@ -103,10 +105,11 @@ public class SSLHandlerFactory {
         return clientSslContextBuilder;
     }
 
-    // Netty 4.2 defaults this to HTTPS. The module has no host name verification setting and its clients are
-    // not given a peer host, so inheriting that default would break every TLS connection. Keep 4.1 behaviour.
+    // The client passes the configured remote host to the SslHandler, so the peer certificate identity is
+    // verified unless the user explicitly opts out via `verifyHostName`.
     private void setEndpointIdentification(SslContextBuilder clientSslContextBuilder) {
-        clientSslContextBuilder.endpointIdentificationAlgorithm(null);
+        clientSslContextBuilder.endpointIdentificationAlgorithm(
+                sslConfig.isVerifyHostName() ? ENDPOINT_IDENTIFICATION_ALGORITHM : null);
     }
 
     private void setCiphers(SslContextBuilder sslContextBuilder, List<String> ciphers) {
