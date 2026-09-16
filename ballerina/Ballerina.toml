@@ -10,7 +10,7 @@ license = ["Apache-2.0"]
 distribution = "2201.14.0"
 include = ["metadata"]
 
-[platform.java21]
+[platform.java25]
 graalvmCompatible = true
 
 [[platform.java25.dependency]]
