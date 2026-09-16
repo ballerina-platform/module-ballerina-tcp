@@ -58,7 +58,7 @@ public class TcpClient {
                         TcpClientHandler tcpClientHandler = new TcpClientHandler();
                         if (secureSocket != null
                                 && secureSocket.getBooleanValue(Constants.SECURESOCKET_CONFIG_ENABLE_SSL)) {
-                            setSSLHandler(ch, secureSocket, tcpClientHandler, callback);
+                            setSSLHandler(ch, remoteAddress, secureSocket, tcpClientHandler, callback);
                         } else {
                             ch.pipeline().addLast(Constants.CLIENT_HANDLER, tcpClientHandler);
                         }
@@ -89,14 +89,16 @@ public class TcpClient {
                 });
     }
 
-    private void setSSLHandler(SocketChannel channel, BMap<BString, Object> secureSocket,
-                               TcpClientHandler tcpClientHandler, CompletableFuture<Object> callback)
-            throws IOException {
+    private void setSSLHandler(SocketChannel channel, InetSocketAddress remoteAddress,
+                               BMap<BString, Object> secureSocket, TcpClientHandler tcpClientHandler,
+                               CompletableFuture<Object> callback) throws IOException {
         SSLConfig sslConfig = Utils.setSslConfig(secureSocket, new SSLConfig(), false);
 
         SSLHandlerFactory sslHandlerFactory = new SSLHandlerFactory(sslConfig);
         SslContext sslContext = sslHandlerFactory.createContextForClient();
-        SslHandler sslHandler = sslContext.newHandler(channel.alloc());
+        // The configured host is passed as the peer host so that SNI and certificate identity checks use it.
+        SslHandler sslHandler = sslContext.newHandler(channel.alloc(), remoteAddress.getHostString(),
+                remoteAddress.getPort());
         sslHandler.setHandshakeTimeout(sslConfig.getHandshakeTimeOut(), TimeUnit.SECONDS);
         channel.pipeline().addFirst(Constants.SSL_HANDLER, sslHandler);
         channel.pipeline().addLast(Constants.SSL_HANDSHAKE_HANDLER,

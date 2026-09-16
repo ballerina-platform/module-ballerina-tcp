@@ -123,6 +123,41 @@ function testSecureClientWithTruststore() returns error? {
     check socketClient->close();
 }
 
+@test:Config {dependsOn: [testSecureClientWithTruststore]}
+function testHostNameVerificationFailure() returns error? {
+    // The keystore certificate is issued for `localhost`, so connecting via the IP must fail the identity check.
+    Error|Client socketClient = new ("127.0.0.1", PORT7, secureSocket = {
+        cert: {
+            path: truststore,
+            password: "ballerina"
+        }
+    });
+
+    if socketClient is Client {
+        check socketClient->close();
+        test:assertFail(msg = "Host name verification should have failed for a non-matching host");
+    }
+}
+
+@test:Config {dependsOn: [testHostNameVerificationFailure]}
+function testHostNameVerificationDisabled() returns error? {
+    Client socketClient = check new ("127.0.0.1", PORT7, secureSocket = {
+        cert: {
+            path: truststore,
+            password: "ballerina"
+        },
+        verifyHostName: false
+    });
+
+    string msg = "Hello Ballerina Echo from secure client";
+    check socketClient->writeBytes(msg.toBytes());
+
+    readonly & byte[] receivedData = check socketClient->readBytes();
+    test:assertEquals('string:fromBytes(receivedData), msg, "Found unexpected output");
+
+    check socketClient->close();
+}
+
 @test:Config {dependsOn: [testSecureClientEcho]}
 function testSecureSocketConfigEnableFalse() returns error? {
     Client socketClient = check new ("localhost", PORT1, secureSocket = {

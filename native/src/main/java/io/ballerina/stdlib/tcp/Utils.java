@@ -63,6 +63,8 @@ public class Utils {
         } else {
             Object cert = secureSocket.get(Constants.SECURESOCKET_CONFIG_CERT);
             evaluateCertField(cert, sslConfig);
+            sslConfig.setVerifyHostName(
+                    secureSocket.getBooleanValue(Constants.SECURESOCKET_CONFIG_VERIFY_HOST_NAME));
         }
 
         BMap<BString, Object> protocol = getBMapValueIfPresent(secureSocket, Constants.SECURESOCKET_CONFIG_PROTOCOL);
