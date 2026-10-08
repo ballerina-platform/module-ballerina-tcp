@@ -5,12 +5,12 @@
 
 [ballerina]
 dependencies-toml-version = "2"
-distribution-version = "2201.10.3"
+distribution-version = "2201.14.0-20260917-124200-7f273e6a"
 
 [[package]]
 org = "ballerina"
 name = "crypto"
-version = "2.7.2"
+version = "2.13.0"
 dependencies = [
 	{org = "ballerina", name = "jballerina.java"},
 	{org = "ballerina", name = "time"}
@@ -19,7 +19,7 @@ dependencies = [
 [[package]]
 org = "ballerina"
 name = "io"
-version = "1.6.3"
+version = "1.8.2"
 dependencies = [
 	{org = "ballerina", name = "jballerina.java"},
 	{org = "ballerina", name = "lang.value"}
@@ -28,6 +28,30 @@ dependencies = [
 [[package]]
 org = "ballerina"
 name = "jballerina.java"
+version = "0.0.0"
+
+[[package]]
+org = "ballerina"
+name = "lang.__internal"
+version = "0.0.0"
+dependencies = [
+	{org = "ballerina", name = "jballerina.java"},
+	{org = "ballerina", name = "lang.object"}
+]
+
+[[package]]
+org = "ballerina"
+name = "lang.int"
+version = "0.0.0"
+dependencies = [
+	{org = "ballerina", name = "jballerina.java"},
+	{org = "ballerina", name = "lang.__internal"},
+	{org = "ballerina", name = "lang.object"}
+]
+
+[[package]]
+org = "ballerina"
+name = "lang.object"
 version = "0.0.0"
 
 [[package]]
@@ -61,7 +85,7 @@ dependencies = [
 [[package]]
 org = "ballerina"
 name = "log"
-version = "2.10.0"
+version = "2.17.1"
 dependencies = [
 	{org = "ballerina", name = "io"},
 	{org = "ballerina", name = "jballerina.java"},
@@ -75,15 +99,40 @@ modules = [
 [[package]]
 org = "ballerina"
 name = "observe"
-version = "1.3.0"
+version = "1.8.0"
 dependencies = [
 	{org = "ballerina", name = "jballerina.java"}
 ]
 
 [[package]]
 org = "ballerina"
+name = "otel"
+version = "0.9.0"
+dependencies = [
+	{org = "ballerina", name = "io"},
+	{org = "ballerina", name = "jballerina.java"},
+	{org = "ballerina", name = "log"},
+	{org = "ballerina", name = "observe"},
+	{org = "ballerina", name = "task"}
+]
+modules = [
+	{org = "ballerina", packageName = "otel", moduleName = "otel"}
+]
+
+[[package]]
+org = "ballerina"
+name = "task"
+version = "2.11.3"
+dependencies = [
+	{org = "ballerina", name = "jballerina.java"},
+	{org = "ballerina", name = "time"},
+	{org = "ballerina", name = "uuid"}
+]
+
+[[package]]
+org = "ballerina"
 name = "tcp"
-version = "1.11.2"
+version = "1.14.0"
 dependencies = [
 	{org = "ballerina", name = "crypto"},
 	{org = "ballerina", name = "jballerina.java"}
@@ -95,9 +144,20 @@ modules = [
 [[package]]
 org = "ballerina"
 name = "time"
-version = "2.5.0"
+version = "2.8.2"
 dependencies = [
 	{org = "ballerina", name = "jballerina.java"}
+]
+
+[[package]]
+org = "ballerina"
+name = "uuid"
+version = "1.10.1"
+dependencies = [
+	{org = "ballerina", name = "crypto"},
+	{org = "ballerina", name = "jballerina.java"},
+	{org = "ballerina", name = "lang.int"},
+	{org = "ballerina", name = "time"}
 ]
 
 [[package]]
@@ -119,6 +179,7 @@ version = "0.1.0"
 dependencies = [
 	{org = "ballerina", name = "lang.string"},
 	{org = "ballerina", name = "log"},
+	{org = "ballerina", name = "otel"},
 	{org = "ballerina", name = "tcp"},
 	{org = "ballerinai", name = "observe"}
 ]
