@@ -5,14 +5,26 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [1.14.0] - 2026-10-08
+
 ### Changed
 - [Migrate to Netty 4.2.18.Final ahead of the Netty 4.1 end of life](https://github.com/ballerina-platform/ballerina-library/issues/9152)
 - Replace the `netty-codec` dependency with `netty-codec-base`, following the Netty 4.2 module split
 - Enable host name verification on TCP clients by default, with a new `verifyHostName` field in `tcp:ClientSecureSocket` to opt out
-- [[#9132] Updated Keywords and Reformat README for Connector Store Discoverability](https://github.com/ballerina-platform/ballerina-library/issues/9132)
+- Update the Java platform to 25
+- Upgrade Gradle to 9.5.1 and the Ballerina Gradle plugin to 4.0.0
 
 ### Fixed
+- Update `lz4-java` to 1.11.4
 
+## [1.13.10] - 2026-09-08
+
+### Changed
+- [[#9132] Updated Keywords and Reformat README for Connector Store Discoverability](https://github.com/ballerina-platform/ballerina-library/issues/9132)
+
+## [1.13.9] - 2026-09-03
+
+### Fixed
 - [Update Netty version to 4.1.137.Final](https://github.com/ballerina-platform/ballerina-library/issues/9093)
 
 ## [1.13.8] - 2026-07-27
