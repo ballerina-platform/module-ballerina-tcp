@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Fixed
 
+- [Update lz4-java to 1.11.4 to fix CVE-2026-106451](https://github.com/ballerina-platform/ballerina-library/issues/9316)
 - [Update Netty version to 4.1.137.Final](https://github.com/ballerina-platform/ballerina-library/issues/9093)
 
 ## [1.13.8] - 2026-07-27
