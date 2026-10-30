@@ -56,7 +56,7 @@ public class Caller {
             tcpService.setIsCallerClosed(true);
             try {
                 TcpListener.close(channel, callback);
-                Dispatcher.invokeOnClose(tcpService);
+                Dispatcher.invokeOnClose(tcpService, channel);
             } catch (Exception e) {
                 callback.complete(Utils.createTcpError(e.getMessage()));
             }

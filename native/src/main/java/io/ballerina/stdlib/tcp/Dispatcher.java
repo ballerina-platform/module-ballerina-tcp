@@ -33,6 +33,8 @@ import io.ballerina.runtime.api.values.BError;
 import io.ballerina.runtime.api.values.BObject;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
+import io.netty.util.Attribute;
+import io.netty.util.AttributeKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,11 +48,15 @@ public class Dispatcher {
 
     private static final Logger log = LoggerFactory.getLogger(Dispatcher.class);
 
+    // One queue per connection: keeps onBytes/onClose calls of a connection in the order the data was read.
+    private static final AttributeKey<SerialDispatchQueue> DISPATCH_QUEUE =
+            AttributeKey.valueOf("ballerina.tcp.serialDispatchQueue");
+
     private static void invokeOnBytes(TcpService tcpService, ByteBuf buffer, Channel channel, Type[] parameterTypes) {
         try {
             Object[] params = getOnBytesSignature(buffer, channel, tcpService, parameterTypes);
             BObject connService = tcpService.getConnectionService();
-            invokeAsyncCall(connService, Constants.ON_BYTES, tcpService, channel, false, params);
+            invokeOrderedCall(connService, Constants.ON_BYTES, tcpService, channel, channel, params);
         } catch (BError e) {
             Dispatcher.invokeOnError(tcpService, e.getMessage());
         }
@@ -141,17 +147,51 @@ public class Dispatcher {
 
     private static void invokeAsyncCall(BObject balService, String methodName, TcpService tcpService, Channel channel,
                                         boolean isOnConnectInvoked, Object[] params) {
-        Thread.startVirtualThread(() -> {
-            try {
-                Object result = tcpService.getRuntime().callMethod(balService, methodName,
-                        new StrandMetadata(isIsolated(balService, methodName), null), params);
-                handleResult(result, channel, tcpService, isOnConnectInvoked);
-            } catch (BError error) {
-                handleError(error);
-            } catch (Throwable throwable) {
-                handleError(ErrorCreator.createError(throwable));
+        Thread.startVirtualThread(
+                () -> callService(balService, methodName, tcpService, channel, isOnConnectInvoked, params));
+    }
+
+    /**
+     * Invokes a method of the connection service so that the calls of one connection run one at a time, in the
+     * order they were submitted (the order the data was read from the socket).
+     *
+     * @param orderingChannel the connection whose calls must stay ordered
+     * @param resultChannel   the channel used to send a returned byte[], may be null
+     */
+    private static void invokeOrderedCall(BObject balService, String methodName, TcpService tcpService,
+                                          Channel orderingChannel, Channel resultChannel, Object[] params) {
+        if (orderingChannel == null) {
+            invokeAsyncCall(balService, methodName, tcpService, resultChannel, false, params);
+            return;
+        }
+        getDispatchQueue(orderingChannel).submit(
+                () -> callService(balService, methodName, tcpService, resultChannel, false, params));
+    }
+
+    private static SerialDispatchQueue getDispatchQueue(Channel channel) {
+        Attribute<SerialDispatchQueue> attribute = channel.attr(DISPATCH_QUEUE);
+        SerialDispatchQueue queue = attribute.get();
+        if (queue == null) {
+            queue = new SerialDispatchQueue();
+            SerialDispatchQueue existing = attribute.setIfAbsent(queue);
+            if (existing != null) {
+                queue = existing;
             }
-        });
+        }
+        return queue;
+    }
+
+    private static void callService(BObject balService, String methodName, TcpService tcpService, Channel channel,
+                                    boolean isOnConnectInvoked, Object[] params) {
+        try {
+            Object result = tcpService.getRuntime().callMethod(balService, methodName,
+                    new StrandMetadata(isIsolated(balService, methodName), null), params);
+            handleResult(result, channel, tcpService, isOnConnectInvoked);
+        } catch (BError error) {
+            handleError(error);
+        } catch (Throwable throwable) {
+            handleError(ErrorCreator.createError(throwable));
+        }
     }
 
     private static void handleResult(Object result, Channel channel, TcpService tcpService ,
@@ -178,7 +218,7 @@ public class Dispatcher {
         return new Object[]{caller};
     }
 
-    public static void invokeOnClose(TcpService tcpService) {
+    public static void invokeOnClose(TcpService tcpService, Channel channel) {
         if (tcpService.getConnectionService() == null) {
             return;
         }
@@ -190,7 +230,7 @@ public class Dispatcher {
             if (methodType != null) {
                 Object[] params = {};
                 BObject balService = tcpService.getConnectionService();
-                invokeAsyncCall(balService, Constants.ON_CLOSE, tcpService, null, false, params);
+                invokeOrderedCall(balService, Constants.ON_CLOSE, tcpService, channel, null, params);
             }
         } catch (BError e) {
             Dispatcher.invokeOnError(tcpService, e.getMessage());
