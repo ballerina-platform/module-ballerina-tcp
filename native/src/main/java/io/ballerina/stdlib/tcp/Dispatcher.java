@@ -40,6 +40,7 @@ import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
 import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * Dispatch async methods.
@@ -56,7 +57,7 @@ public class Dispatcher {
         try {
             Object[] params = getOnBytesSignature(buffer, channel, tcpService, parameterTypes);
             BObject connService = tcpService.getConnectionService();
-            invokeOrderedCall(connService, Constants.ON_BYTES, tcpService, channel, channel, params);
+            invokeOrderedCall(connService, Constants.ON_BYTES, tcpService, channel, true, params);
         } catch (BError e) {
             Dispatcher.invokeOnError(tcpService, e.getMessage());
         }
@@ -154,17 +155,20 @@ public class Dispatcher {
     /**
      * Invokes a method of the connection service so that the calls of one connection run one at a time, in the
      * order they were submitted (the order the data was read from the socket).
+     * <p>
+     * The channel must not be null. Every caller has the connection's channel: the {@code onBytes} read, the
+     * {@code channelInactive} event and the caller's {@code close()}. A null here would be a programming error, so
+     * it fails instead of falling back to an unordered call.
      *
-     * @param orderingChannel the connection whose calls must stay ordered
-     * @param resultChannel   the channel used to send a returned byte[], may be null
+     * @param channel           the connection whose calls must stay ordered
+     * @param sendReturnedBytes whether a {@code byte[]} returned by the method is written back to the channel
+     *                          ({@code onBytes}) or ignored ({@code onClose})
      */
     private static void invokeOrderedCall(BObject balService, String methodName, TcpService tcpService,
-                                          Channel orderingChannel, Channel resultChannel, Object[] params) {
-        if (orderingChannel == null) {
-            invokeAsyncCall(balService, methodName, tcpService, resultChannel, false, params);
-            return;
-        }
-        getDispatchQueue(orderingChannel).submit(
+                                          Channel channel, boolean sendReturnedBytes, Object[] params) {
+        Objects.requireNonNull(channel, "channel is required to keep the calls of a connection ordered");
+        Channel resultChannel = sendReturnedBytes ? channel : null;
+        getDispatchQueue(channel).submit(
                 () -> callService(balService, methodName, tcpService, resultChannel, false, params));
     }
 
@@ -230,7 +234,7 @@ public class Dispatcher {
             if (methodType != null) {
                 Object[] params = {};
                 BObject balService = tcpService.getConnectionService();
-                invokeOrderedCall(balService, Constants.ON_CLOSE, tcpService, channel, null, params);
+                invokeOrderedCall(balService, Constants.ON_CLOSE, tcpService, channel, false, params);
             }
         } catch (BError e) {
             Dispatcher.invokeOnError(tcpService, e.getMessage());

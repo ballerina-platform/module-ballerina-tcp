@@ -18,6 +18,9 @@
 
 package io.ballerina.stdlib.tcp;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayDeque;
 import java.util.Queue;
 
@@ -31,6 +34,8 @@ import java.util.Queue;
  * follow the read order.
  */
 final class SerialDispatchQueue {
+
+    private static final Logger log = LoggerFactory.getLogger(SerialDispatchQueue.class);
 
     private final Queue<Runnable> tasks = new ArrayDeque<>();
     private boolean draining = false;
@@ -64,9 +69,10 @@ final class SerialDispatchQueue {
             try {
                 next.run();
             } catch (Throwable t) {
-                // Keep draining: one failed task must not block the rest of the connection.
-                Thread current = Thread.currentThread();
-                current.getUncaughtExceptionHandler().uncaughtException(current, t);
+                // The tasks submitted by the Dispatcher already handle their own errors, so this is unexpected.
+                // Log it through the module logger and keep draining: one failed task must not block the rest of
+                // the connection.
+                log.error("Error while dispatching TCP callback", t);
             }
         }
     }
