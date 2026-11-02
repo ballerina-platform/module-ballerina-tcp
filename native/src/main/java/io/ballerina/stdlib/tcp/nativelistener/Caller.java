@@ -22,7 +22,6 @@ import io.ballerina.runtime.api.Environment;
 import io.ballerina.runtime.api.values.BArray;
 import io.ballerina.runtime.api.values.BObject;
 import io.ballerina.stdlib.tcp.Constants;
-import io.ballerina.stdlib.tcp.Dispatcher;
 import io.ballerina.stdlib.tcp.TcpListener;
 import io.ballerina.stdlib.tcp.TcpService;
 import io.ballerina.stdlib.tcp.Utils;
@@ -56,7 +55,6 @@ public class Caller {
             tcpService.setIsCallerClosed(true);
             try {
                 TcpListener.close(channel, callback);
-                Dispatcher.invokeOnClose(tcpService);
             } catch (Exception e) {
                 callback.complete(Utils.createTcpError(e.getMessage()));
             }

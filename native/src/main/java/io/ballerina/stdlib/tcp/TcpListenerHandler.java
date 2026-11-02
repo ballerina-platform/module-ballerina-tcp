@@ -39,7 +39,7 @@ public class TcpListenerHandler extends SimpleChannelInboundHandler<ByteBuf> {
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         ctx.channel().close();
-        Dispatcher.invokeOnClose(tcpService);
+        Dispatcher.invokeOnClose(tcpService, ctx.channel());
     }
 
     @Override
