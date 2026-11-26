@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Fixed
 
 - [Update lz4-java to 1.11.4 to fix CVE-2026-106451](https://github.com/ballerina-platform/ballerina-library/issues/9316)
+- [Update the `crypto` dependency to 2.9.4 to pick up the Bouncy Castle 1.85 fixes](https://github.com/ballerina-platform/ballerina-library/issues/9645)
 
 ## [1.13.10] - 2026-09-08
 
